@@ -86,9 +86,8 @@ class GeminiService:
             print(f"\nVideo uploaded. Name: {video_file.name}")
 
             # 3. Generate Content
-            # Using Gemini 3.0 Flash as requested!
-            # Code execution is disabled to allow direct video input.
-            model_name = "gemini-3-flash-preview"
+            # Using stable Gemini 1.5 Flash
+            model_name = "gemini-1.5-flash"
             
             prompt = f"""
             You are an elite gym coach with computer vision expertise. 

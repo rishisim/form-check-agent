@@ -1,17 +1,27 @@
+import logging
+import sys
+import os
 import cv2
 import numpy as np
 import base64
 import asyncio
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from pose_tracker import PoseTracker
 from exercises.squat import SquatAnalyzer
 from gemini_service import GeminiService
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(os.path.join(os.path.dirname(__file__), "server_log.txt"), mode='a')
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Form Check Agent API")
 
@@ -45,12 +55,19 @@ async def websocket_video_endpoint(websocket: WebSocket):
     Returns pose analysis and AI feedback.
     """
     await websocket.accept()
-    print("WebSocket connection established")
+    logger.info("WebSocket connection established")
     
     try:
         while True:
             # Receive base64 encoded frame from client
-            data = await websocket.receive_json()
+            try:
+                data = await websocket.receive_json()
+            except Exception as e:
+                if "disconnect" in str(e).lower():
+                    logger.info("WebSocket disconnect message received in loop")
+                    break
+                logger.error(f"Error receiving/parsing JSON: {e}")
+                continue
             
             if data.get("type") == "frame":
                 # Decode base64 image
@@ -58,10 +75,14 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 if not frame_base64:
                     continue
                 
-                # Decode base64 to numpy array
-                img_bytes = base64.b64decode(frame_base64)
-                nparr = np.frombuffer(img_bytes, np.uint8)
-                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                try:
+                    # Decode base64 to numpy array
+                    img_bytes = base64.b64decode(frame_base64)
+                    nparr = np.frombuffer(img_bytes, np.uint8)
+                    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                except Exception as e:
+                    logger.error(f"Error decoding image: {e}")
+                    continue
                 
                 if frame is None:
                     await websocket.send_json({"error": "Failed to decode frame"})
@@ -90,24 +111,22 @@ async def websocket_video_endpoint(websocket: WebSocket):
                     "buffered_frames": len(gemini_service.frame_buffer)
                 })
             
-            elif data.get("type") == "request_ai_feedback":
-                # Trigger Gemini analysis
-                exercise = data.get("exercise", "squat")
-                print(f"AI feedback requested for {exercise}")
-                
-                # Run in background to not block
-                response = gemini_service.analyze_current_buffer(exercise)
-                
+            elif data.get("type") == "reset_reps":
+                logger.info("Resetting rep counter")
+                squat_analyzer.reset()
                 await websocket.send_json({
-                    "type": "ai_feedback",
-                    "response": response
+                    "type": "reset_confirmation",
+                    "status": "success"
                 })
                 
     except WebSocketDisconnect:
-        print("WebSocket disconnected")
+        logger.info("WebSocket disconnected")
     except Exception as e:
-        print(f"WebSocket error: {e}")
-        await websocket.close()
+        logger.error(f"WebSocket error: {e}", exc_info=True)
+        try:
+            await websocket.close()
+        except:
+            pass
 
 if __name__ == "__main__":
     import uvicorn

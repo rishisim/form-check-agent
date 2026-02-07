@@ -9,18 +9,27 @@ interface FeedbackToastProps {
 export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
     if (!message) return null;
 
-    const getColor = (level: string) => {
+    const getBgColor = (level: string) => {
         switch (level) {
-            case 'success': return '#4CAF50';
-            case 'warning': return '#FFC107';
-            case 'error': return '#F44336';
-            default: return '#FFFFFF';
+            case 'success': return '#DDEBF7'; // Light Blue
+            case 'warning': return '#FFF2CC'; // Light Yellow
+            case 'error': return '#FCE4D6';   // Light Peach
+            default: return '#FDFDFD';
+        }
+    };
+
+    const getTextColor = (level: string) => {
+        switch (level) {
+            case 'success': return '#41719C'; // Darker Blue
+            case 'warning': return '#BF8F00'; // Darker Yellow
+            case 'error': return '#C65911';   // Darker Peach/Red
+            default: return '#444444';
         }
     };
 
     return (
-        <View style={[styles.container, { borderLeftColor: getColor(level) }]}>
-            <Text style={[styles.text, { color: level === 'warning' ? '#FFD740' : '#FFFFFF' }]}>
+        <View style={[styles.container, { backgroundColor: getBgColor(level) }]}>
+            <Text style={[styles.text, { color: getTextColor(level) }]}>
                 {message}
             </Text>
         </View>
@@ -30,23 +39,21 @@ export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 120,
+        bottom: 80,
         alignSelf: 'center',
-        backgroundColor: 'rgba(20, 20, 20, 0.9)',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 12,
-        borderLeftWidth: 4,
-        maxWidth: '80%',
+        paddingVertical: 14,
+        paddingHorizontal: 28,
+        borderRadius: 20,
+        maxWidth: '85%',
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
-        elevation: 8,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 4,
     },
     text: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '800',
         textAlign: 'center',
     }
 });

@@ -1,0 +1,711 @@
+/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1770503285.436618       1 gl_context.cc:344] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M5
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+INFO:     Started server process [20085]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     10.194.83.145:52836 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:28:07,657 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:29:44,532 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:29:44,532 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:35396 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:29:47,659 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:36:00,465 [ERROR] Error receiving/parsing JSON: (1001, '')
+2026-02-07 16:36:00,465 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:39838 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:36:03,235 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:37:14,053 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:37:14,053 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:58042 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:37:14,060 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.83.145:52978 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:37:17,117 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:37:21,281 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:37:21,281 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:52980 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:37:21,295 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:38:56,335 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:38:56,335 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:52764 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:38:56,346 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.83.145:47782 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:38:59,398 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:39:17,320 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:39:17,320 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:50802 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:39:17,328 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54142 - "WebSocket /ws/video?exercise=pushup" [accepted]
+2026-02-07 16:49:28,207 [INFO] WebSocket connection established
+INFO:     connection open
+[ WARN:0@1342.923] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.923] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.926] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.926] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.928] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.928] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.930] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.930] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.932] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.932] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.934] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.934] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.936] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.936] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.938] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.938] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.940] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.942] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.942] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.944] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.944] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.946] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.946] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.947] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.947] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.949] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.949] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.951] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.951] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.953] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.955] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.955] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.957] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.957] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.959] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.959] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.960] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.960] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1342.962] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+AI feedback requested for pushup
+Starting analysis for pushup...
+Video saved to /var/folders/3t/g2jlc2dj1lj2n6bbs_0d2jj40000gn/T/tmpsbnq7b20.mp4
+Uploading to Gemini...
+2026-02-07 16:50:28,191 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files "HTTP/1.1 200 OK"
+2026-02-07 16:50:29,193 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files?upload_id=AJRbA5Woqrk01MV_bJfBYYEdaOwOtUaqIHNvZgOM1grbSOfjGNbtvz3czFxyqlw2oVLraKcde4C9X5wc5DUGFzi6O_C8Gmr4DMatbxgcDA3pCYc&upload_protocol=resumable "HTTP/1.1 200 OK"
+.2026-02-07 16:50:30,275 [INFO] HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/files/v7k643g3ibxv "HTTP/1.1 200 OK"
+.2026-02-07 16:50:31,360 [INFO] HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/files/v7k643g3ibxv "HTTP/1.1 200 OK"
+
+Video uploaded. Name: files/v7k643g3ibxv
+Requesting analysis from gemini-1.5-flash...
+2026-02-07 16:50:31,361 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 16:50:31,474 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent "HTTP/1.1 404 Not Found"
+Traceback (most recent call last):
+  File "/Users/rishisim/Documents/form-check-agent/backend/gemini_service.py", line 110, in analyze_current_buffer
+    response = self.client.models.generate_content(
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/models.py", line 5020, in generate_content
+    response = self._generate_content(
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/models.py", line 3832, in _generate_content
+    response = self._api_client.request(
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/_api_client.py", line 1331, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/_api_client.py", line 1167, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 378, in iter
+    result = action(retry_state)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 390, in __get_result
+    raise self._exception
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/_api_client.py", line 1144, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/errors.py", line 108, in raise_for_response
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+Error during Gemini analysis: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+2026-02-07 16:50:35,698 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:50:35,698 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54145 - "WebSocket /ws/video?exercise=pushup" [accepted]
+2026-02-07 16:50:35,703 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:50:53,760 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:50:53,760 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54146 - "WebSocket /ws/video?exercise=pushup" [accepted]
+2026-02-07 16:50:54,685 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:50:56,226 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:50:56,226 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54147 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:50:56,981 [INFO] WebSocket connection established
+INFO:     connection open
+[ WARN:0@1441.001] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.001] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.002] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.002] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.002] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.002] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.002] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.003] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.003] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.003] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.003] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.003] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.003] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.004] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.004] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.004] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.004] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.005] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.005] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.005] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+[ WARN:0@1441.005] global cap_ffmpeg.cpp:218 write FFmpeg: Failed to write frame
+AI feedback requested for squat
+Starting analysis for squat...
+Video saved to /var/folders/3t/g2jlc2dj1lj2n6bbs_0d2jj40000gn/T/tmpzlat0tv6.mp4
+Uploading to Gemini...
+2026-02-07 16:52:06,050 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files "HTTP/1.1 200 OK"
+2026-02-07 16:52:06,665 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files?upload_id=AJRbA5UgsLSOYFDL3fNjhix6eZTXdf_rsvnaa-UyXyiOY3ufTrJPSiVrhqRx4hsD0eJQWNkmiyHblcRbfCLr04_dYl-I2glDlhv3w6oIILqzPQ&upload_protocol=resumable "HTTP/1.1 200 OK"
+.2026-02-07 16:52:07,728 [INFO] HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/files/au4w36avyvo1 "HTTP/1.1 200 OK"
+.2026-02-07 16:52:08,866 [INFO] HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/files/au4w36avyvo1 "HTTP/1.1 200 OK"
+
+Video uploaded. Name: files/au4w36avyvo1
+Requesting analysis from gemini-1.5-flash...
+2026-02-07 16:52:08,867 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 16:52:08,899 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent "HTTP/1.1 404 Not Found"
+Traceback (most recent call last):
+  File "/Users/rishisim/Documents/form-check-agent/backend/gemini_service.py", line 110, in analyze_current_buffer
+    response = self.client.models.generate_content(
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/models.py", line 5020, in generate_content
+    response = self._generate_content(
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/models.py", line 3832, in _generate_content
+    response = self._api_client.request(
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/_api_client.py", line 1331, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/_api_client.py", line 1167, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 378, in iter
+    result = action(retry_state)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 438, in result
+    return self.__get_result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py", line 390, in __get_result
+    raise self._exception
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/tenacity/__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/_api_client.py", line 1144, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/Users/rishisim/Documents/form-check-agent/venv/lib/python3.9/site-packages/google/genai/errors.py", line 108, in raise_for_response
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+INFO:     10.194.86.178:54149 - "WebSocket /ws/video" [accepted]
+Error during Gemini analysis: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+2026-02-07 16:52:14,450 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:14,451 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:14,451 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54150 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:16,018 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:16,025 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:16,025 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:17,078 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:17,078 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54151 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:17,081 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:17,860 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:17,860 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54152 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:17,862 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:19,432 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:19,432 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54153 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:19,432 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:19,803 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:19,804 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54154 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:19,808 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:20,256 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:20,256 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54155 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:20,257 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:21,681 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:21,681 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54156 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:21,681 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:21,844 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:21,844 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54157 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:21,849 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54158 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:21,998 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:22,007 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:22,007 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:22,199 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:22,199 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54159 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:22,202 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:22,354 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:22,355 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54160 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:22,356 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:22,533 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:22,533 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54161 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:22,533 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54162 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:22,674 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:22,682 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:22,682 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:22,845 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:22,845 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54163 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:22,853 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:23,009 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:23,010 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54164 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:23,015 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:23,174 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:23,174 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54165 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:23,176 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:23,366 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:23,366 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54166 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:23,370 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:23,519 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:23,519 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54167 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:23,519 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:23,649 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:23,649 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54168 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:23,653 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54169 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:23,886 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:23,886 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:23,886 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:24,520 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:24,520 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54170 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:24,524 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:24,714 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:24,714 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54171 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:24,716 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54172 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:24,935 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:24,936 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:24,936 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:25,044 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:25,044 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54173 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:25,050 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:25,219 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:25,220 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54174 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:25,224 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:25,456 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:25,456 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54175 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:25,461 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:25,616 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:25,616 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54176 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:25,616 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:25,775 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:25,775 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54177 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:25,779 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:25,996 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:25,996 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54178 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:25,996 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:26,147 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:26,147 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54179 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:26,148 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:26,302 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:26,302 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54180 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:26,306 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:26,511 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:26,511 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54181 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:26,520 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:26,655 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:26,655 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54182 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:26,659 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:26,846 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:26,846 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54183 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:26,852 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:27,030 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:27,030 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54184 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:27,032 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54185 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:27,196 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:27,197 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:27,197 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:27,359 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:27,359 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54186 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:27,359 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:27,554 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:27,554 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54187 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:27,555 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:27,716 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:27,716 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54188 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:27,719 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:27,890 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:27,891 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54189 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:27,895 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:28,089 [INFO] WebSocket disconnected
+INFO:     connection closed
+INFO:     10.194.86.178:54190 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:28,090 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:28,249 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:28,249 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54191 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:28,251 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54192 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:28,431 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:28,438 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:28,438 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:28,617 [INFO] WebSocket disconnected
+INFO:     connection closed
+INFO:     10.194.86.178:54193 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:28,617 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:28,756 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:28,757 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54194 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:28,760 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:28,959 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:28,959 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54195 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:28,968 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:29,144 [INFO] WebSocket disconnected
+INFO:     connection closed
+INFO:     10.194.86.178:54196 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:29,145 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:29,311 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:29,311 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54197 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:29,313 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:29,485 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:29,485 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54198 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:29,492 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:29,683 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:29,683 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54199 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:29,712 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:29,870 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:29,870 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54200 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:29,875 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:30,058 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:30,058 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54201 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:30,063 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:30,236 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:30,236 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54202 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:30,238 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:30,583 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:30,583 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54203 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:30,585 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:30,759 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:30,759 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54204 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:30,767 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54205 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:30,939 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:30,949 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:30,949 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:31,085 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:31,085 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54206 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:31,089 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:31,295 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:31,295 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54207 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:31,305 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:31,466 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:31,466 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54208 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:31,470 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:31,641 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:31,641 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54209 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:31,643 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:31,823 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:31,823 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54210 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:31,828 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:31,995 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:31,996 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54211 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:31,996 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:32,171 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:32,171 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54212 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:32,172 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:32,358 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:32,358 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54213 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:32,365 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:32,553 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:32,554 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54214 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:32,554 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:32,804 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:32,804 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54215 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:32,808 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:32,965 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:32,965 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54216 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:32,970 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:33,147 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:33,147 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54217 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:33,151 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:33,349 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:33,349 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54218 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:33,350 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:33,528 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:33,529 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54219 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:33,529 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:33,693 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:33,693 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54220 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:33,698 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:33,886 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:33,886 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54221 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:33,886 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:34,050 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:34,051 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54222 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:34,051 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:34,211 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:34,211 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54223 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:34,217 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:34,388 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:34,388 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54224 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:34,392 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:34,558 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:34,558 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54225 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:34,564 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:34,725 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:34,725 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54226 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:34,726 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.86.178:54227 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:34,905 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:34,912 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:34,912 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:52:35,425 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:35,425 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:39780 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:52:38,556 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:52:55,650 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:52:55,650 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54229 - "WebSocket /ws/video?exercise=pushup" [accepted]
+2026-02-07 16:52:55,760 [INFO] WebSocket connection established
+INFO:     connection open
+NFO] WebSocket connection established

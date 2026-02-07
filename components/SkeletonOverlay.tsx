@@ -37,18 +37,20 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory }: SkeletonOverl
     return (
         <View style={StyleSheet.absoluteFill}>
             <Svg height={height} width={width} style={StyleSheet.absoluteFill}>
-                {/* Hip Trajectory */}
+                {/* Hip Trajectory - Soft Lavender */}
                 {hipTrajectory.length > 1 && (
                     <Polyline
                         points={trajectoryPoints}
                         fill="none"
-                        stroke="#FFC107"
-                        strokeWidth="3"
-                        strokeOpacity="0.6"
+                        stroke="#D6D6FF"
+                        strokeWidth="4"
+                        strokeOpacity="0.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     />
                 )}
 
-                {/* Skeleton Connections */}
+                {/* Skeleton Connections - Soft Grey */}
                 {CONNECTIONS.map(([start, end], index) => {
                     const startPt = getPoint(start);
                     const endPt = getPoint(end);
@@ -61,13 +63,14 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory }: SkeletonOverl
                             y1={startPt.y}
                             x2={endPt.x}
                             y2={endPt.y}
-                            stroke="rgba(255, 255, 255, 0.4)"
-                            strokeWidth="2"
+                            stroke="#E0E0E0"
+                            strokeWidth="2.5"
+                            strokeOpacity="0.7"
                         />
                     );
                 })}
 
-                {/* Key Joints */}
+                {/* Key Joints - Clean White */}
                 {[11, 12, 23, 24, 25, 26, 27, 28].map((idx) => {
                     const pt = getPoint(idx);
                     if (!pt) return null;
@@ -76,9 +79,10 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory }: SkeletonOverl
                             key={idx}
                             cx={pt.x}
                             cy={pt.y}
-                            r="4"
+                            r="5"
                             fill="#FFFFFF"
-                            opacity={0.8}
+                            stroke="#E0E0E0"
+                            strokeWidth="1"
                         />
                     );
                 })}

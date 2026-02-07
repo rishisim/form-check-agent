@@ -20,20 +20,23 @@ export default function FormCheckScreen() {
     const router = useRouter();
     const [permission, requestPermission] = useCameraPermissions();
     const [isConnected, setIsConnected] = useState(false);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'error' | 'disconnected'>('disconnected');
     const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
 
     // UI State
-    const [isProMode, setIsProMode] = useState(false); // Toggle for Skeleton/Details
+    // Removed isProMode, isAnalyzing, aiFeedback
 
     // Analysis State
-    const [repCount, setRepCount] = useState(0);
+    const [repCount, setRepCount] = useState(0); // keep for backward compatibility or total
+    const [validReps, setValidReps] = useState(0);
+    const [invalidReps, setInvalidReps] = useState(0);
     const [feedback, setFeedback] = useState('Position yourself in frame');
     const [feedbackLevel, setFeedbackLevel] = useState<'success' | 'warning' | 'error'>('success');
-    const [aiFeedback, setAiFeedback] = useState('');
 
     // Pro Mode Data
     const [kneeAngle, setKneeAngle] = useState<number | null>(null);
+    const [hipAngle, setHipAngle] = useState<number | null>(null);
+    const [sideDetected, setSideDetected] = useState<'left' | 'right' | null>(null);
     const [landmarks, setLandmarks] = useState<number[][]>([]);
     const [hipTrajectory, setHipTrajectory] = useState<number[][]>([]);
 
@@ -47,16 +50,23 @@ export default function FormCheckScreen() {
     const isStreamingRef = useRef(false);
     const isCapturingRef = useRef(false);
     const cameraReadyRef = useRef(false);
+    const isResetPendingRef = useRef(false);
 
     // Connect to backend WebSocket
     const connectWebSocket = useCallback(() => {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
+
         console.log('Connecting to', SERVER_URL);
+        setConnectionStatus('connecting');
+
         const ws = new WebSocket(SERVER_URL);
 
         ws.onopen = () => {
             console.log('WebSocket connected');
             setIsConnected(true);
-            setFeedback('Connected! Start your exercise.');
+            setConnectionStatus('connected');
+            setFeedback('Ready! Start your squat.');
+            setFeedbackLevel('success');
         };
 
         ws.onmessage = (event) => {
@@ -64,31 +74,39 @@ export default function FormCheckScreen() {
                 const data = JSON.parse(event.data);
                 const now = Date.now();
 
-                // Throttle UI updates to ~15fps (every 66ms)
+                // Handle Reset Confirmation
+                if (data.type === 'reset_confirmation') {
+                    console.log('Reset confirmed by server');
+                    isResetPendingRef.current = false;
+                    return;
+                }
+
+                // Ignore analysis messages while waiting for reset confirmation
+                if (isResetPendingRef.current && data.type === 'analysis') {
+                    return;
+                }
+
+                // Throttle UI updates to ~10fps for even more stability (every 100ms)
                 if (data.type === 'analysis' && data.feedback) {
-                    if (now - lastUpdateRef.current > 66) {
+                    if (now - lastUpdateRef.current > 100) {
                         const analysis = data.feedback.analysis;
                         if (analysis) {
-                            setRepCount(analysis.rep_count || 0);
+                            setValidReps(analysis.valid_reps || 0);
+                            setInvalidReps(analysis.invalid_reps || 0);
                             setKneeAngle(analysis.knee_angle);
+                            setHipAngle(analysis.hip_angle);
+                            setSideDetected(analysis.side_detected);
                             setFeedback(analysis.feedback);
                             setFeedbackLevel(analysis.feedback_level || 'success');
 
-                            // Visuals
                             setTargetDepthY(analysis.target_depth_y || 0);
                             setCurrentDepthY(analysis.current_depth_y || 0);
 
-                            if (isProMode) {
-                                // Only update heavy arrays in Pro Mode to save React cycles
-                                setLandmarks(data.feedback.landmarks || []);
-                                setHipTrajectory(analysis.hip_trajectory || []);
-                            }
+                            setLandmarks(data.feedback.landmarks || []);
+                            setHipTrajectory(analysis.hip_trajectory || []);
                         }
                         lastUpdateRef.current = now;
                     }
-                } else if (data.type === 'ai_feedback') {
-                    setAiFeedback(data.response);
-                    setIsAnalyzing(false);
                 }
             } catch (e) {
                 console.error('Failed to parse message:', e);
@@ -97,15 +115,16 @@ export default function FormCheckScreen() {
 
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
-            setFeedback('Connection error. Check server.');
-            setFeedbackLevel('error');
+            setConnectionStatus('error');
         };
 
         ws.onclose = () => {
             console.log('WebSocket closed');
             setIsConnected(false);
-            setFeedback('Disconnected. Tap to reconnect.');
-            setFeedbackLevel('warning');
+            setConnectionStatus('disconnected');
+            // Silent retry in 3 seconds
+            setTimeout(connectWebSocket, 3000);
+
             if (frameIntervalRef.current) {
                 clearTimeout(frameIntervalRef.current);
                 frameIntervalRef.current = null;
@@ -114,7 +133,7 @@ export default function FormCheckScreen() {
         };
 
         wsRef.current = ws;
-    }, [isProMode]); // Re-connect if mode changes? No, just closure dependency.
+    }, []);
 
     // Throttle state updates
     const lastUpdateRef = useRef(0);
@@ -129,6 +148,18 @@ export default function FormCheckScreen() {
         if (wsRef.current) {
             wsRef.current.close();
         }
+    }, []);
+
+    // Reset Reps
+    const resetReps = useCallback(() => {
+        isResetPendingRef.current = true;
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({ type: 'reset_reps' }));
+        }
+        setValidReps(0);
+        setInvalidReps(0);
+        setFeedback('Counter reset. Start again!');
+        setFeedbackLevel('success');
     }, []);
 
     const onCameraReady = useCallback(async () => {
@@ -155,7 +186,8 @@ export default function FormCheckScreen() {
         }
         isStreamingRef.current = true;
 
-        const intervalMs = Platform.OS === 'android' ? 400 : 250;
+        // Slow down to 2 frames per second (500ms) for maximum stability over WiFi
+        const intervalMs = 500;
 
         const captureLoop = async () => {
             if (!isStreamingRef.current) {
@@ -171,7 +203,7 @@ export default function FormCheckScreen() {
                     isCapturingRef.current = true;
                     const photo = await cameraRef.current.takePictureAsync({
                         base64: true,
-                        quality: Platform.OS === 'android' ? 0.15 : 0.25,
+                        quality: 0.1, // Drastically reduce quality to lower bandwidth
                         skipProcessing: true,
                     });
 
@@ -191,20 +223,6 @@ export default function FormCheckScreen() {
         };
 
         captureLoop();
-    }, []);
-
-    // Request AI analysis
-    const requestAIFeedback = useCallback(() => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-            setIsAnalyzing(true);
-            setAiFeedback('Analyzing your form...');
-            wsRef.current.send(JSON.stringify({
-                type: 'request_ai_feedback',
-                exercise: 'squat'
-            }));
-        } else {
-            Alert.alert('Not Connected', 'Please wait for connection to the server.');
-        }
     }, []);
 
     // Lifecycle
@@ -237,6 +255,7 @@ export default function FormCheckScreen() {
 
     return (
         <View style={styles.container}>
+            {/* ... (camera and previous overlay layers) */}
             <CameraView
                 ref={cameraRef}
                 style={styles.camera}
@@ -247,84 +266,74 @@ export default function FormCheckScreen() {
             />
 
             <View pointerEvents="box-none" style={styles.overlay}>
-                {/* 1. Underlying Visual Layers */}
                 <DepthLine
                     targetDepthY={targetDepthY}
                     currentDepthY={currentDepthY}
                     isValid={!!targetDepthY}
                 />
 
-                {isProMode && (
-                    <SkeletonOverlay
-                        landmarks={landmarks}
-                        hipTrajectory={hipTrajectory}
-                    />
-                )}
+                <SkeletonOverlay
+                    landmarks={landmarks}
+                    hipTrajectory={hipTrajectory}
+                />
 
-                {/* 2. UI Overlay Layer */}
                 <SafeAreaView style={styles.safeOverlay}>
-                    {/* Top Bar */}
-                    <View style={styles.topBar}>
-                        <TouchableOpacity onPress={() => router.back()} style={styles.backButtonBlur}>
-                            <Text style={styles.backButton}>←</Text>
-                        </TouchableOpacity>
-
-                        {/* Connection Status Dot */}
-                        <View style={[styles.statusDot, { backgroundColor: isConnected ? '#4CAF50' : '#F44336' }]} />
-                    </View>
-
-                    {/* Right Side: Rep Counter */}
-                    <RepCounter count={repCount} />
-
-                    {/* Center: Feedback Toast */}
-                    <FeedbackToast message={feedback} level={feedbackLevel} />
-
-                    {/* AI & Mode Controls - Bottom */}
-                    <View style={styles.bottomControls}>
-                        {/* Toggle Mode */}
+                    {/* Consolidated Seamless HUD Bar */}
+                    <View style={styles.hudBar}>
+                        {/* 1. Status & Side */}
                         <TouchableOpacity
-                            style={styles.modeToggle}
-                            onPress={() => setIsProMode(!isProMode)}
+                            style={[styles.hudItem, { backgroundColor: isConnected ? '#E2F0D9' : '#FCE4D6' }]}
+                            onPress={connectWebSocket}
                         >
-                            <Text style={styles.modeText}>{isProMode ? 'PRO' : 'FOCUS'}</Text>
-                        </TouchableOpacity>
-
-                        {/* AI Coach Button */}
-                        <TouchableOpacity
-                            style={[styles.aiButton, isAnalyzing && styles.aiButtonDisabled]}
-                            onPress={requestAIFeedback}
-                            disabled={isAnalyzing}
-                        >
-                            <Text style={styles.aiButtonText}>
-                                {isAnalyzing ? 'Analyzing...' : '🧠 AI'}
+                            <View style={[styles.statusDot, { backgroundColor: isConnected ? '#88B04B' : '#C65911' }]} />
+                            <Text style={styles.hudLabel}>SIDE</Text>
+                            <Text style={[styles.hudValue, { fontSize: 16 }]}>
+                                {sideDetected === 'left' ? '←' : sideDetected === 'right' ? '→' : '?'}
                             </Text>
                         </TouchableOpacity>
+
+                        <View style={styles.hudDivider} />
+
+                        {/* 2. Metrics Group */}
+                        <View style={styles.metricsGroup}>
+                            <View style={styles.metricItem}>
+                                <Text style={styles.hudLabel}>KNEE</Text>
+                                <Text style={[styles.hudValue, { color: '#41719C' }]}>
+                                    {kneeAngle !== null ? `${kneeAngle}°` : '--'}
+                                </Text>
+                            </View>
+
+                            <View style={styles.metricItem}>
+                                <Text style={styles.hudLabel}>BACK</Text>
+                                <Text style={[styles.hudValue, { color: '#7030A0' }]}>
+                                    {hipAngle !== null ? `${hipAngle}°` : '--'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.hudDivider} />
+
+                        {/* 3. Resettable Reps */}
+                        <TouchableOpacity
+                            onPress={resetReps}
+                            activeOpacity={0.7}
+                            style={styles.repControl}
+                        >
+                            <RepCounter
+                                validCount={validReps}
+                                invalidCount={invalidReps}
+                                transparent
+                            />
+                        </TouchableOpacity>
                     </View>
 
-                    {/* AI Feedback Popup */}
-                    {aiFeedback ? (
-                        <View style={styles.aiPopup}>
-                            <Text style={styles.aiPopupTitle}>AI Coach</Text>
-                            <Text style={styles.aiPopupText}>{aiFeedback}</Text>
-                            <TouchableOpacity onPress={() => setAiFeedback('')} style={styles.closeAi}>
-                                <Text style={styles.closeAiText}>Close</Text>
-                            </TouchableOpacity>
-                        </View>
-                    ) : null}
-
-                    {/* Pro Mode Stats */}
-                    {isProMode && kneeAngle !== null && (
-                        <View style={styles.debugStats}>
-                            <Text style={styles.debugText}>Knee: {kneeAngle}°</Text>
-                        </View>
-                    )}
-
+                    {/* Feedback Toast */}
+                    <FeedbackToast message={feedback} level={feedbackLevel} />
                 </SafeAreaView>
             </View>
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -347,109 +356,67 @@ const styles = StyleSheet.create({
     },
     topBar: {
         flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    hudBar: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 6,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 24,
+        marginHorizontal: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        elevation: 6,
     },
-    backButtonBlur: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        justifyContent: 'center',
+    hudDivider: {
+        width: 1,
+        height: 30,
+        backgroundColor: '#EAEAEA',
+        marginHorizontal: 4,
+    },
+    metricsGroup: {
+        flexDirection: 'row',
+        flex: 1,
+        justifyContent: 'space-evenly',
         alignItems: 'center',
     },
-    backButton: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: 'bold',
+    metricItem: {
+        alignItems: 'center',
+        minWidth: 45,
+    },
+    repControl: {
+        paddingRight: 4,
+    },
+    hudItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 16,
     },
     statusDot: {
         width: 8,
         height: 8,
         borderRadius: 4,
-        position: 'absolute',
-        top: 15,
-        right: 15,
+        marginRight: 6,
     },
-    bottomControls: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
+    hudLabel: {
+        fontSize: 8,
+        fontWeight: '900',
+        color: '#888888',
+        marginRight: 4,
+        letterSpacing: 0.5,
     },
-    modeToggle: {
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
-    },
-    modeText: {
-        color: '#FFF',
-        fontWeight: 'bold',
-        fontSize: 12,
-        letterSpacing: 1,
-    },
-    aiButton: {
-        backgroundColor: '#6200EE',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 30,
-        shadowColor: "#6200EE",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    aiButtonDisabled: {
-        backgroundColor: '#555',
-        shadowOpacity: 0,
-    },
-    aiButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    aiPopup: {
-        position: 'absolute',
-        bottom: 100,
-        left: 20,
-        right: 20,
-        backgroundColor: '#1E1E1E',
-        padding: 20,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#333',
-        elevation: 10,
-    },
-    aiPopupTitle: {
-        color: '#BB86FC',
-        fontWeight: 'bold',
-        marginBottom: 8,
-    },
-    aiPopupText: {
-        color: '#E0E0E0',
-        fontSize: 16,
-        lineHeight: 24,
-    },
-    closeAi: {
-        marginTop: 15,
-        alignSelf: 'flex-end',
-    },
-    closeAiText: {
-        color: '#BB86FC',
-        fontWeight: 'bold',
-    },
-    debugStats: {
-        position: 'absolute',
-        top: 100,
-        left: 20,
-    },
-    debugText: {
-        color: 'rgba(255,255,255,0.6)',
-        fontSize: 12,
-        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    hudValue: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: '#444444',
     },
     text: { color: '#fff' },
     button: { padding: 10, backgroundColor: 'blue', marginTop: 10, borderRadius: 5 },

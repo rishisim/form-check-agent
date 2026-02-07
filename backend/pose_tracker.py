@@ -30,7 +30,7 @@ class PoseTracker:
             for id, lm in enumerate(self.results.pose_landmarks.landmark):
                 h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
-                lm_list.append([id, cx, cy])
+                lm_list.append([id, cx, cy, lm.visibility])
                 if draw:
                     cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
         return lm_list
