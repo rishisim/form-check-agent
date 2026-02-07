@@ -1,5 +1,13 @@
 # Product Requirements Document (PRD)
 
+<div align="center">
+
+| 🏠 **[Home / README](README.md)** | 📄 **[Product Specs (PRD)](PRD.md)** |
+| :---: | :---: |
+
+</div>
+<br />
+
 **Project Name:** Form Check Agent  
 **Version:** 1.0  
 **Status:** In Development  

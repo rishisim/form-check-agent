@@ -1,5 +1,13 @@
 # Form Check Agent
 
+<div align="center">
+
+| 🏠 **[Home / README](README.md)** | 📄 **[Product Specs (PRD)](PRD.md)** |
+| :---: | :---: |
+
+</div>
+<br />
+
 Form Check Agent is a real-time AI coaching application that helps users improve their exercise form using their phone's camera. By leveraging computer vision and generative AI, it provides instant biomechanical feedback to ensure safe and effective workouts.
 
 ## 🚀 Features
