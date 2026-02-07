@@ -43,6 +43,7 @@ export default function FormCheckScreen() {
     // Depth Data
     const [targetDepthY, setTargetDepthY] = useState(0);
     const [currentDepthY, setCurrentDepthY] = useState(0);
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
     const cameraRef = useRef<CameraView>(null);
     const wsRef = useRef<WebSocket | null>(null);
@@ -51,6 +52,10 @@ export default function FormCheckScreen() {
     const isCapturingRef = useRef(false);
     const cameraReadyRef = useRef(false);
     const isResetPendingRef = useRef(false);
+    const currentSessionIdRef = useRef<string | null>(null);
+    const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const lastFrameSeqRef = useRef(0);
+    const intentionalDisconnectRef = useRef(false);
 
     // Connect to backend WebSocket
     const connectWebSocket = useCallback(() => {
@@ -67,6 +72,8 @@ export default function FormCheckScreen() {
             setConnectionStatus('connected');
             setFeedback('Ready! Start your squat.');
             setFeedbackLevel('success');
+            setCurrentSessionId(null); // Reset session ID for new connection
+            currentSessionIdRef.current = null;
         };
 
         ws.onmessage = (event) => {
@@ -76,8 +83,22 @@ export default function FormCheckScreen() {
 
                 // Handle Reset Confirmation
                 if (data.type === 'reset_confirmation') {
-                    console.log('Reset confirmed by server');
+                    console.log('Reset confirmed by server, new session:', data.new_session_id);
                     isResetPendingRef.current = false;
+                    currentSessionIdRef.current = data.new_session_id;
+                    setCurrentSessionId(data.new_session_id);
+                    // Clear reset timeout
+                    if (resetTimeoutRef.current) {
+                        clearTimeout(resetTimeoutRef.current);
+                        resetTimeoutRef.current = null;
+                    }
+                    // Force-zero all state (belt and suspenders)
+                    setValidReps(0);
+                    setInvalidReps(0);
+                    // Reset frame sequence baseline
+                    lastFrameSeqRef.current = data.frame_seq ?? 0;
+                    // Reset throttle so next analysis update renders immediately
+                    lastUpdateRef.current = 0;
                     return;
                 }
 
@@ -86,13 +107,38 @@ export default function FormCheckScreen() {
                     return;
                 }
 
-                // Throttle UI updates to ~10fps for even more stability (every 100ms)
+                // Throttle UI updates to ~12fps (every 80ms)
                 if (data.type === 'analysis' && data.feedback) {
-                    if (now - lastUpdateRef.current > 100) {
-                        const analysis = data.feedback.analysis;
+                    // Safety check for session ID sync (use ref to avoid stale closure)
+                    const activeSessionId = currentSessionIdRef.current;
+                    if (activeSessionId && data.feedback.session_id && data.feedback.session_id !== activeSessionId) {
+                        // This is a stale message from a previous session — discard it
+                        return;
+                    }
+
+                    // Drop frames with sequence number at or below our reset baseline
+                    const incomingSeq = data.feedback.frame_seq ?? 0;
+                    if (incomingSeq > 0 && incomingSeq <= lastFrameSeqRef.current) {
+                        return;
+                    }
+
+                    // First time we get a session ID, save it
+                    if (!activeSessionId && data.feedback.session_id) {
+                        currentSessionIdRef.current = data.feedback.session_id;
+                        setCurrentSessionId(data.feedback.session_id);
+                    }
+                    // Always update landmarks immediately (unthrottled) for smooth skeleton
+                    setLandmarks(data.feedback.landmarks || []);
+                    const analysis = data.feedback.analysis;
+                    if (analysis) {
+                        setHipTrajectory(analysis.hip_trajectory || []);
+                    }
+
+                    // Throttle heavier UI updates (text, angles, reps) to ~15fps
+                    if (now - lastUpdateRef.current > 66) {
                         if (analysis) {
-                            setValidReps(analysis.valid_reps || 0);
-                            setInvalidReps(analysis.invalid_reps || 0);
+                            setValidReps(analysis.valid_reps ?? 0);
+                            setInvalidReps(analysis.invalid_reps ?? 0);
                             setKneeAngle(analysis.knee_angle);
                             setHipAngle(analysis.hip_angle);
                             setSideDetected(analysis.side_detected);
@@ -101,9 +147,6 @@ export default function FormCheckScreen() {
 
                             setTargetDepthY(analysis.target_depth_y || 0);
                             setCurrentDepthY(analysis.current_depth_y || 0);
-
-                            setLandmarks(data.feedback.landmarks || []);
-                            setHipTrajectory(analysis.hip_trajectory || []);
                         }
                         lastUpdateRef.current = now;
                     }
@@ -122,14 +165,22 @@ export default function FormCheckScreen() {
             console.log('WebSocket closed');
             setIsConnected(false);
             setConnectionStatus('disconnected');
-            // Silent retry in 3 seconds
-            setTimeout(connectWebSocket, 3000);
+            // Only auto-reconnect if this wasn't an intentional disconnect
+            if (!intentionalDisconnectRef.current) {
+                setTimeout(connectWebSocket, 3000);
+            }
 
             if (frameIntervalRef.current) {
                 clearTimeout(frameIntervalRef.current);
                 frameIntervalRef.current = null;
             }
+            if (resetTimeoutRef.current) {
+                clearTimeout(resetTimeoutRef.current);
+                resetTimeoutRef.current = null;
+            }
             isStreamingRef.current = false;
+            isResetPendingRef.current = false; // Prevent stuck state if disconnect happens during reset
+            currentSessionIdRef.current = null;
         };
 
         wsRef.current = ws;
@@ -140,6 +191,7 @@ export default function FormCheckScreen() {
 
     // Disconnect WebSocket
     const disconnectWebSocket = useCallback(() => {
+        intentionalDisconnectRef.current = true;
         if (frameIntervalRef.current) {
             clearTimeout(frameIntervalRef.current);
             frameIntervalRef.current = null;
@@ -153,13 +205,42 @@ export default function FormCheckScreen() {
     // Reset Reps
     const resetReps = useCallback(() => {
         isResetPendingRef.current = true;
+
+        // Clear any previous reset timeout to prevent race conditions from rapid taps
+        if (resetTimeoutRef.current) {
+            clearTimeout(resetTimeoutRef.current);
+            resetTimeoutRef.current = null;
+        }
+
+        // Safety timeout: If server doesn't reply in 3s, unlock and invalidate old session
+        resetTimeoutRef.current = setTimeout(() => {
+            if (isResetPendingRef.current) {
+                console.log('Reset timed out, force unlocking');
+                isResetPendingRef.current = false;
+                // Use a unique client-side ID so stale server messages won't match
+                currentSessionIdRef.current = `client_reset_${Date.now()}`;
+                setCurrentSessionId(null);
+            }
+        }, 3000);
+
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: 'reset_reps' }));
+        } else {
+            // If not connected, just unlock immediately
+            isResetPendingRef.current = false;
+            if (resetTimeoutRef.current) {
+                clearTimeout(resetTimeoutRef.current);
+                resetTimeoutRef.current = null;
+            }
         }
+
+        // Immediately reset client-side counts and throttle timer
         setValidReps(0);
         setInvalidReps(0);
         setFeedback('Counter reset. Start again!');
         setFeedbackLevel('success');
+        lastUpdateRef.current = 0;
+        lastFrameSeqRef.current = Number.MAX_SAFE_INTEGER; // Block ALL old frames until server confirms
     }, []);
 
     const onCameraReady = useCallback(async () => {
@@ -186,8 +267,8 @@ export default function FormCheckScreen() {
         }
         isStreamingRef.current = true;
 
-        // Slow down to 2 frames per second (500ms) for maximum stability over WiFi
-        const intervalMs = 500;
+        // ~7 frames per second for smoother tracking
+        const intervalMs = 150;
 
         const captureLoop = async () => {
             if (!isStreamingRef.current) {
@@ -203,8 +284,9 @@ export default function FormCheckScreen() {
                     isCapturingRef.current = true;
                     const photo = await cameraRef.current.takePictureAsync({
                         base64: true,
-                        quality: 0.1, // Drastically reduce quality to lower bandwidth
+                        quality: 0.1, // Minimal quality — sufficient for pose detection, faster transfer
                         skipProcessing: true,
+                        shutterSound: false,
                     });
 
                     if (photo?.base64) {
@@ -275,6 +357,7 @@ export default function FormCheckScreen() {
                 <SkeletonOverlay
                     landmarks={landmarks}
                     hipTrajectory={hipTrajectory}
+                    mirrored={true}
                 />
 
                 <SafeAreaView style={styles.safeOverlay}>

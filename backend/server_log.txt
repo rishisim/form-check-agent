@@ -708,4 +708,141 @@ INFO:     connection closed
 INFO:     10.194.86.178:54229 - "WebSocket /ws/video?exercise=pushup" [accepted]
 2026-02-07 16:52:55,760 [INFO] WebSocket connection established
 INFO:     connection open
-NFO] WebSocket connection established
+INFO:     10.194.83.145:56672 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:53:35,309 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:53:36,754 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:53:36,754 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:54396 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:53:39,721 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:55:42,373 [ERROR] Error receiving/parsing JSON: (1001, '')
+2026-02-07 16:55:42,375 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:55:42,375 [ERROR] Error receiving/parsing JSON: (1001, '')
+2026-02-07 16:55:42,375 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:55:42,376 [ERROR] Error receiving/parsing JSON: (1001, '')
+2026-02-07 16:55:42,376 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 16:55:42,376 [ERROR] Error receiving/parsing JSON: (1001, '')
+2026-02-07 16:55:42,376 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:35672 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:55:45,741 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:55:52,166 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:55:52,166 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54233 - "WebSocket /ws/video?exercise=pushup" [accepted]
+2026-02-07 16:55:52,172 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:55:57,862 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:55:57,862 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.86.178:54234 - "WebSocket /ws/video?exercise=pushup" [accepted]
+2026-02-07 16:55:57,867 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:56:03,661 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 16:56:03,661 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:57148 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:57:27,483 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:57:27,484 [INFO] WebSocket disconnected
+INFO:     connection closed
+2026-02-07 16:57:29,328 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:57:29,328 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:57154 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:57:29,342 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:58:04,435 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:58:04,435 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:40108 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:58:04,448 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:58:06,344 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:58:06,344 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:40116 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:58:06,357 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 16:58:35,377 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 16:58:35,377 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:50934 - "WebSocket /ws/video" [accepted]
+2026-02-07 16:58:38,622 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 17:02:12,004 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:02:12,005 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.91.9:56700 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:05:37,021 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.83.145:56108 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:05:58,353 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 17:06:19,299 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:06:19,299 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 17:06:19,918 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:06:19,918 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:54936 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:06:20,475 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.83.145:54946 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:06:22,450 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 17:06:23,584 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:06:23,585 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+2026-02-07 17:06:23,597 [ERROR] Error receiving/parsing JSON: (1001, '')
+2026-02-07 17:06:23,597 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.83.145:48360 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:07:11,730 [INFO] WebSocket connection established
+INFO:     connection open
+INFO:     10.194.91.9:56701 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:07:25,036 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 17:07:41,617 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:07:41,617 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+INFO:     10.194.91.9:56702 - "WebSocket /ws/video" [accepted]
+2026-02-07 17:07:43,360 [INFO] WebSocket connection established
+INFO:     connection open
+2026-02-07 17:08:01,019 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:08:01,020 [INFO] WebSocket disconnect message received in loop
+INFO:     connection closed
+O] WebSocket disconnect message received in loop
+2026-02-07 17:09:41,235 [INFO] WebSocket connection established
+2026-02-07 17:10:04,458 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:10:04,458 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:11:52,413 [INFO] WebSocket connection established
+2026-02-07 17:11:54,941 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:11:54,941 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:12:07,162 [INFO] WebSocket connection established
+2026-02-07 17:12:14,936 [INFO] Resetting rep counter
+2026-02-07 17:13:36,148 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:13:36,148 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:13:36,159 [INFO] WebSocket connection established
+2026-02-07 17:13:39,192 [INFO] WebSocket connection established
+2026-02-07 17:13:45,994 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:13:45,995 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:15:40,824 [INFO] WebSocket connection established
+2026-02-07 17:16:24,372 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:16:24,372 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:18:04,640 [INFO] WebSocket connection established
+2026-02-07 17:21:04,564 [INFO] WebSocket connection established
+2026-02-07 17:21:06,763 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:21:06,763 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:23:13,815 [INFO] WebSocket connection established
+2026-02-07 17:23:33,084 [ERROR] Error receiving/parsing JSON: (1000, '')
+2026-02-07 17:23:33,084 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:23:35,263 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:23:35,264 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:26:06,326 [INFO] WebSocket connection established

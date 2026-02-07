@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import base64
 import asyncio
+import uuid
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -34,9 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize services
-tracker = PoseTracker()
-squat_analyzer = SquatAnalyzer()
+# Initialize services (Gemini is stateless/buffered, safe to share)
 gemini_service = GeminiService()
 
 @app.get("/")
@@ -56,6 +55,12 @@ async def websocket_video_endpoint(websocket: WebSocket):
     """
     await websocket.accept()
     logger.info("WebSocket connection established")
+    
+    # Initialize tracker AND analyzer per session (no shared state)
+    session_tracker = PoseTracker()
+    session_analyzer = SquatAnalyzer()
+    current_session_id = str(uuid.uuid4())
+    frame_seq = 0
     
     try:
         while True:
@@ -91,18 +96,33 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 # Add frame to Gemini buffer
                 gemini_service.add_frame(frame)
                 
-                # Process with MediaPipe
-                processed_frame = tracker.find_pose(frame, draw=False)
-                lm_list = tracker.get_position(processed_frame, draw=False)
+                # Process with per-session MediaPipe tracker
+                processed_frame = session_tracker.find_pose(frame, draw=False)
+                lm_list = session_tracker.get_position(processed_frame, draw=False)
+                
+                # Increment frame sequence
+                frame_seq += 1
                 
                 # Analyze squat form
                 feedback = None
                 if len(lm_list) != 0:
                     # Get angles and feedback from squat analyzer
-                    analysis = squat_analyzer.get_analysis(lm_list)
+                    analysis = session_analyzer.get_analysis(lm_list)
+                    
+                    # Normalize data for frontend rendering
+                    h, w, _ = frame.shape
+                    normalized_landmarks = [[id, x/w, y/h, v] for id, x, y, v in lm_list]
+                    
+                    if analysis:
+                        analysis["target_depth_y"] = analysis["target_depth_y"] / h
+                        analysis["current_depth_y"] = analysis["current_depth_y"] / h
+                        analysis["hip_trajectory"] = [[x/w, y/h] for x, y in analysis["hip_trajectory"]]
+
                     feedback = {
-                        "landmarks": lm_list,
-                        "analysis": analysis
+                        "landmarks": normalized_landmarks,
+                        "analysis": analysis,
+                        "session_id": current_session_id,
+                        "frame_seq": frame_seq
                     }
                 
                 await websocket.send_json({
@@ -113,10 +133,15 @@ async def websocket_video_endpoint(websocket: WebSocket):
             
             elif data.get("type") == "reset_reps":
                 logger.info("Resetting rep counter")
-                squat_analyzer.reset()
+                session_analyzer.reset()
+                # Generate a guaranteed-unique session ID
+                current_session_id = str(uuid.uuid4())
+                frame_seq = 0
                 await websocket.send_json({
                     "type": "reset_confirmation",
-                    "status": "success"
+                    "status": "success",
+                    "new_session_id": current_session_id,
+                    "frame_seq": 0
                 })
                 
     except WebSocketDisconnect:

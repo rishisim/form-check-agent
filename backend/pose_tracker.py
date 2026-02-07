@@ -3,12 +3,12 @@ import mediapipe as mp
 import numpy as np
 
 class PoseTracker:
-    def __init__(self, static_image_mode=False, model_complexity=1, smooth_landmarks=True, detection_confidence=0.5, tracking_confidence=0.5):
+    def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, detection_confidence=0.5, tracking_confidence=0.5):
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(
             static_image_mode=static_image_mode,
-            model_complexity=model_complexity,
+            model_complexity=model_complexity,       # 0 = lite (fastest), 1 = full, 2 = heavy
             smooth_landmarks=smooth_landmarks,
             min_detection_confidence=detection_confidence,
             min_tracking_confidence=tracking_confidence
@@ -24,13 +24,14 @@ class PoseTracker:
         
         return img
 
-    def get_position(self, img, draw=True):
+    def get_position(self, img, draw=False):
         lm_list = []
         if self.results.pose_landmarks:
+            h, w, c = img.shape
             for id, lm in enumerate(self.results.pose_landmarks.landmark):
-                h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 lm_list.append([id, cx, cy, lm.visibility])
+                
                 if draw:
                     cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
         return lm_list
