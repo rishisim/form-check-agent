@@ -846,3 +846,29 @@ O] WebSocket disconnect message received in loop
 2026-02-07 17:23:35,263 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
 2026-02-07 17:23:35,264 [INFO] WebSocket disconnect message received in loop
 2026-02-07 17:26:06,326 [INFO] WebSocket connection established
+2026-02-07 17:27:09,335 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:27:09,338 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:36:33,919 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:36:33,922 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:38:11,412 [INFO] WebSocket connection established
+2026-02-07 17:38:27,286 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:38:27,286 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:39:42,451 [INFO] WebSocket connection established
+2026-02-07 17:41:03,732 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:41:03,733 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:42:16,669 [INFO] WebSocket connection established
+2026-02-07 17:43:27,767 [ERROR] Error receiving/parsing JSON: (<CloseCode.ABNORMAL_CLOSURE: 1006>, '')
+2026-02-07 17:43:27,770 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:43:32,989 [INFO] WebSocket connection established
+2026-02-07 17:48:24,520 [INFO] WebSocket connection established
+2026-02-07 17:51:55,125 [ERROR] Error receiving/parsing JSON: (1012, None)
+2026-02-07 17:51:55,125 [INFO] WebSocket disconnect message received in loop
+2026-02-07 17:52:32,111 [INFO] [38e3dc40] WebSocket connection established (1 active)
+2026-02-07 17:53:29,228 [INFO] [38e3dc40] Client disconnected normally
+2026-02-07 17:53:29,228 [INFO] [38e3dc40] Connection cleaned up (0 active)
+2026-02-07 17:53:34,951 [INFO] [09efcaf7] WebSocket connection established (1 active)
+2026-02-07 17:54:28,693 [INFO] [09efcaf7] Client disconnected normally
+2026-02-07 17:54:28,694 [INFO] [09efcaf7] Connection cleaned up (0 active)
+2026-02-07 17:54:42,545 [INFO] [8201c001] WebSocket connection established (1 active)
+2026-02-07 17:54:46,644 [INFO] [8201c001] Client disconnected normally
+2026-02-07 17:54:46,645 [INFO] [8201c001] Connection cleaned up (0 active)

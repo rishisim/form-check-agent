@@ -57,9 +57,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 2,
     },
     countText: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '800',
-        lineHeight: 28,
+        lineHeight: 32,
     },
     validText: {
         color: '#88B04B',
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         color: '#E67E22',
     },
     label: {
-        fontSize: 8,
+        fontSize: 10,
         fontWeight: '800',
         color: '#999999',
         letterSpacing: 1,

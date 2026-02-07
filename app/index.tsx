@@ -1,9 +1,10 @@
 import { Link } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.logo}>🏋️</Text>
                 <Text style={styles.title}>Form Check Agent</Text>
@@ -11,55 +12,58 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.exerciseList}>
-                <Link href="/form-check" style={styles.exerciseCard}>
-                    <View>
+                <Link href="/workout-config" style={styles.exerciseCard}>
+                    <View style={styles.cardInner}>
                         <Text style={styles.exerciseEmoji}>🦵</Text>
                         <Text style={styles.exerciseName}>Squats</Text>
                         <Text style={styles.exerciseDesc}>Track depth & form</Text>
                     </View>
                 </Link>
 
-                {/* Future exercises - disabled for now */}
+                {/* Future exercises – disabled */}
                 <View style={[styles.exerciseCard, styles.disabled]}>
-                    <Text style={styles.exerciseEmoji}>💪</Text>
-                    <Text style={styles.exerciseName}>Push-ups</Text>
-                    <Text style={styles.exerciseDesc}>Coming soon</Text>
+                    <View style={styles.cardInner}>
+                        <Text style={styles.exerciseEmoji}>💪</Text>
+                        <Text style={styles.exerciseName}>Push-ups</Text>
+                        <Text style={styles.exerciseDesc}>Coming soon</Text>
+                    </View>
                 </View>
             </View>
 
-            <Text style={styles.instructions}>
-                Make sure to run the backend server first:{'\n'}
-                <Text style={styles.code}>source venv/bin/activate && python backend/server.py</Text>
+            <Text style={styles.footer}>
+                Run the backend first:{'\n'}
+                <Text style={styles.code}>python backend/server.py</Text>
             </Text>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#121212',
+        backgroundColor: '#F7F7F8',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
+        padding: 24,
     },
     header: {
         alignItems: 'center',
-        marginBottom: 40,
+        marginBottom: 48,
     },
     logo: {
-        fontSize: 64,
-        marginBottom: 10,
+        fontSize: 72,
+        marginBottom: 12,
     },
     title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginBottom: 8,
+        fontSize: 30,
+        fontWeight: '800',
+        color: '#333',
+        marginBottom: 6,
     },
     subtitle: {
         fontSize: 16,
-        color: '#888',
+        color: '#999',
+        fontWeight: '500',
     },
     exerciseList: {
         flexDirection: 'row',
@@ -67,41 +71,47 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     exerciseCard: {
-        backgroundColor: '#1E1E1E',
-        padding: 24,
-        borderRadius: 16,
+        backgroundColor: '#fff',
+        padding: 28,
+        borderRadius: 24,
         alignItems: 'center',
-        minWidth: 140,
-        borderWidth: 1,
-        borderColor: '#333',
+        minWidth: 150,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    cardInner: {
+        alignItems: 'center',
     },
     disabled: {
-        opacity: 0.5,
+        opacity: 0.4,
     },
     exerciseEmoji: {
-        fontSize: 40,
-        marginBottom: 8,
+        fontSize: 44,
+        marginBottom: 10,
     },
     exerciseName: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
+        color: '#333',
+        fontSize: 19,
+        fontWeight: '700',
         marginBottom: 4,
     },
     exerciseDesc: {
-        color: '#888',
-        fontSize: 12,
+        color: '#999',
+        fontSize: 13,
+        fontWeight: '500',
     },
-    instructions: {
-        color: '#666',
+    footer: {
+        color: '#bbb',
         fontSize: 12,
         textAlign: 'center',
         position: 'absolute',
-        bottom: 40,
+        bottom: 48,
     },
     code: {
-        color: '#4FC3F7',
+        color: '#88B04B',
         fontFamily: 'monospace',
     },
 });
-
