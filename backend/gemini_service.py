@@ -1,10 +1,12 @@
 import os
 import cv2
-import google.generativeai as genai
 import time
 import tempfile
+import base64
 from collections import deque
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
 load_dotenv()
 
@@ -16,13 +18,9 @@ class GeminiService:
         
         if not api_key:
             print("Warning: GEMINI_API_KEY not found in environment variables.")
-        
-        genai.configure(api_key=api_key)
-        
-        # Use Gemini 1.5 Flash as requested (optimized for speed/video)
-        # Note: Model name might be 'gemini-1.5-flash-latest' or similar. 
-        # Using 'gemini-1.5-flash' as a safe bet for now.
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+            self.client = None
+        else:
+            self.client = genai.Client(api_key=api_key)
         
         self.buffer_size = buffer_seconds * fps
         self.frame_buffer = deque(maxlen=self.buffer_size)
@@ -38,10 +36,13 @@ class GeminiService:
         Saves the buffered frames to a temporary video file and sends it to Gemini.
         Returns the text response.
         """
+        if not self.client:
+            return "Error: Gemini API key not configured."
+        
         if self.is_analyzing:
             return "Analysis already in progress..."
         
-        if len(self.frame_buffer) < 30: # Minimum 1 second
+        if len(self.frame_buffer) < 30:  # Minimum 1 second
             return "Not enough data for analysis."
 
         self.is_analyzing = True
@@ -53,7 +54,8 @@ class GeminiService:
                 temp_video_path = temp_video.name
             
             height, width, layers = self.frame_buffer[0].shape
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            # usage of avc1 (H.264) is generally more compatible
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')
             out = cv2.VideoWriter(temp_video_path, fourcc, self.fps, (width, height))
 
             for frame in self.frame_buffer:
@@ -64,40 +66,74 @@ class GeminiService:
 
             # 2. Upload using File API
             print("Uploading to Gemini...")
-            video_file = genai.upload_file(temp_video_path)
+            with open(temp_video_path, 'rb') as f:
+                video_bytes = f.read()
             
-            # Wait for processing? Usually fast for small clips.
+            video_file = self.client.files.upload(
+                file=temp_video_path,
+                config=types.UploadFileConfig(mime_type="video/mp4")
+            )
+            
+            # Wait for processing
             while video_file.state.name == "PROCESSING":
                 print('.', end='', flush=True)
                 time.sleep(1)
-                video_file = genai.get_file(video_file.name)
+                video_file = self.client.files.get(name=video_file.name)
 
             if video_file.state.name == "FAILED":
                 raise ValueError(f"Video processing failed: {video_file.state.name}")
             
-            print(f"\nVideo uploaded. URI: {video_file.uri}")
+            print(f"\nVideo uploaded. Name: {video_file.name}")
 
             # 3. Generate Content
-            prompt = f"""
-            You are an elite gym coach. The user is performing a {exercise_name}.
-            Analyze the video clip. Focus on form, stability, and safety.
+            # Using Gemini 3.0 Flash as requested!
+            # Code execution is disabled to allow direct video input.
+            model_name = "gemini-3-flash-preview"
             
-            Give a concise, actionable 5-word cue to fix their form instantly. 
-            If form is perfect, say "Perfect form!".
+            prompt = f"""
+            You are an elite gym coach with computer vision expertise. 
+            The user is performing a {exercise_name}.
+            
+            Analyze the video clip carefully:
+            1. Observe the user's body positioning and movement
+            2. Identify any form issues (depth, alignment, stability)
+            3. Focus on safety and effectiveness
+            
+            Give a concise, actionable coaching cue (max 10 words) to fix their form instantly.
+            If form is perfect, say "Perfect form! Great work!".
+            
+            Be specific and encouraging.
             """
             
-            print("Requesting analysis from Gemini...")
-            response = self.model.generate_content([video_file, prompt])
+            print(f"Requesting analysis from {model_name}...")
+            
+            # Using generate_content directly with file API
+            response = self.client.models.generate_content(
+                model=model_name,
+                contents=[
+                    types.Content(
+                        parts=[
+                            types.Part.from_uri(file_uri=video_file.uri, mime_type="video/mp4"),
+                            types.Part.from_text(text=prompt)
+                        ]
+                    )
+                ]
+            )
             
             # Cleanup
             os.remove(temp_video_path)
             # Consider deleting the file from Gemini storage too if needed
-            # genai.delete_file(video_file.name)
+            # self.client.files.delete(name=video_file.name)
             
             self.is_analyzing = False
-            return response.text
+            if response.text:
+                return response.text
+            else:
+                return "No feedback generated."
 
         except Exception as e:
             self.is_analyzing = False
+            import traceback
+            traceback.print_exc()
             print(f"Error during Gemini analysis: {e}")
-            return f"Error: {e}"
+            return f"Error: {str(e)}"
