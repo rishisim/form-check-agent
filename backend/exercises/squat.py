@@ -6,11 +6,15 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from geometry import calculate_angle
 
+from collections import deque
+
 class SquatAnalyzer:
     def __init__(self):
         self.stage = "up" # Start in "up" position
         self.counter = 0
         self.feedback = "Start Squatting"
+        # Track last 30 frames of hip positions for trajectory
+        self.hip_history = deque(maxlen=30) 
 
     def get_analysis(self, lm_list):
         """
@@ -24,9 +28,12 @@ class SquatAnalyzer:
         # Using Right Side landmarks for now
         # 12: R Shoulder, 24: R Hip, 26: R Knee, 28: R Ankle
         r_shoulder = lm_list[12][1:]
-        r_hip = lm_list[24][1:]
+        r_hip = lm_list[24][1:] 
         r_knee = lm_list[26][1:]
         r_ankle = lm_list[28][1:]
+        
+        # Add current hip position to history
+        self.hip_history.append(r_hip)
         
         # 1. Knee Angle (Flexion)
         knee_angle = calculate_angle(r_hip, r_knee, r_ankle)
@@ -75,8 +82,14 @@ class SquatAnalyzer:
 
         # Combine feedback
         final_feedback = self.feedback
+        feedback_level = 'success' # default
+        
         if feedback_list:
             final_feedback = feedback_list[0] # Prioritize first error
+            feedback_level = 'warning'
+        
+        if not is_good_form:
+            feedback_level = 'error'
             
         return {
             "knee_angle": int(knee_angle),
@@ -84,8 +97,12 @@ class SquatAnalyzer:
             "stage": self.stage,
             "rep_count": self.counter,
             "feedback": final_feedback,
+            "feedback_level": feedback_level,
             "is_good_form": is_good_form,
-            "depth_status": "Good" if hip_y >= knee_y else "High"
+            "depth_status": "Good" if hip_y >= knee_y else "High",
+            "target_depth_y": knee_y,
+            "current_depth_y": hip_y,
+            "hip_trajectory": list(self.hip_history)
         }
 
     def analyze(self, img, lm_list):

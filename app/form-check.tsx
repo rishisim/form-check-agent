@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, Platform } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { SkeletonOverlay } from '../components/SkeletonOverlay';
+import { DepthLine } from '../components/DepthLine';
+import { RepCounter } from '../components/RepCounter';
+import { FeedbackToast } from '../components/FeedbackToast';
 
 // Configuration - Your computer's local IP for physical device testing
 // Make sure your phone is on the same WiFi network as your computer
@@ -11,20 +16,37 @@ const SERVER_URL = 'ws://10.194.82.50:8000/ws/video';
 // Android emulator: 'ws://10.0.2.2:8000/ws/video'
 // iOS simulator: 'ws://localhost:8000/ws/video'
 
-
 export default function FormCheckScreen() {
     const router = useRouter();
     const [permission, requestPermission] = useCameraPermissions();
     const [isConnected, setIsConnected] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
+
+    // UI State
+    const [isProMode, setIsProMode] = useState(false); // Toggle for Skeleton/Details
+
+    // Analysis State
     const [repCount, setRepCount] = useState(0);
     const [feedback, setFeedback] = useState('Position yourself in frame');
+    const [feedbackLevel, setFeedbackLevel] = useState<'success' | 'warning' | 'error'>('success');
     const [aiFeedback, setAiFeedback] = useState('');
+
+    // Pro Mode Data
     const [kneeAngle, setKneeAngle] = useState<number | null>(null);
+    const [landmarks, setLandmarks] = useState<number[][]>([]);
+    const [hipTrajectory, setHipTrajectory] = useState<number[][]>([]);
+
+    // Depth Data
+    const [targetDepthY, setTargetDepthY] = useState(0);
+    const [currentDepthY, setCurrentDepthY] = useState(0);
 
     const cameraRef = useRef<CameraView>(null);
     const wsRef = useRef<WebSocket | null>(null);
     const frameIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const isStreamingRef = useRef(false);
+    const isCapturingRef = useRef(false);
+    const cameraReadyRef = useRef(false);
 
     // Connect to backend WebSocket
     const connectWebSocket = useCallback(() => {
@@ -49,8 +71,17 @@ export default function FormCheckScreen() {
                         if (analysis) {
                             setRepCount(analysis.rep_count || 0);
                             setKneeAngle(analysis.knee_angle);
-                            if (analysis.feedback) {
-                                setFeedback(analysis.feedback);
+                            setFeedback(analysis.feedback);
+                            setFeedbackLevel(analysis.feedback_level || 'success');
+
+                            // Visuals
+                            setTargetDepthY(analysis.target_depth_y || 0);
+                            setCurrentDepthY(analysis.current_depth_y || 0);
+
+                            if (isProMode) {
+                                // Only update heavy arrays in Pro Mode to save React cycles
+                                setLandmarks(data.feedback.landmarks || []);
+                                setHipTrajectory(analysis.hip_trajectory || []);
                             }
                         }
                         lastUpdateRef.current = now;
@@ -67,45 +98,80 @@ export default function FormCheckScreen() {
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
             setFeedback('Connection error. Check server.');
+            setFeedbackLevel('error');
         };
 
         ws.onclose = () => {
             console.log('WebSocket closed');
             setIsConnected(false);
             setFeedback('Disconnected. Tap to reconnect.');
+            setFeedbackLevel('warning');
+            if (frameIntervalRef.current) {
+                clearTimeout(frameIntervalRef.current);
+                frameIntervalRef.current = null;
+            }
+            isStreamingRef.current = false;
         };
 
         wsRef.current = ws;
-    }, []);
+    }, [isProMode]); // Re-connect if mode changes? No, just closure dependency.
 
     // Throttle state updates
     const lastUpdateRef = useRef(0);
 
-
-
     // Disconnect WebSocket
     const disconnectWebSocket = useCallback(() => {
         if (frameIntervalRef.current) {
-            clearInterval(frameIntervalRef.current);
+            clearTimeout(frameIntervalRef.current);
+            frameIntervalRef.current = null;
         }
+        isStreamingRef.current = false;
         if (wsRef.current) {
             wsRef.current.close();
         }
     }, []);
 
+    const onCameraReady = useCallback(async () => {
+        cameraReadyRef.current = true;
+        try {
+            const sizes = await cameraRef.current?.getAvailablePictureSizesAsync();
+            if (sizes && sizes.length) {
+                const smallest = [...sizes].sort((a, b) => {
+                    const [aw, ah] = a.split('x').map(Number);
+                    const [bw, bh] = b.split('x').map(Number);
+                    return aw * ah - bw * bh;
+                })[0];
+                setPictureSize(smallest);
+            }
+        } catch (e) {
+            // ignore sizing errors, fallback to default
+        }
+    }, []);
+
     // Start streaming frames
     const startStreaming = useCallback(async () => {
-        if (!cameraRef.current || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        if (isStreamingRef.current) {
             return;
         }
+        isStreamingRef.current = true;
 
-        // Capture and send frames at ~10fps for bandwidth efficiency
-        frameIntervalRef.current = setInterval(async () => {
+        const intervalMs = Platform.OS === 'android' ? 400 : 250;
+
+        const captureLoop = async () => {
+            if (!isStreamingRef.current) {
+                return;
+            }
+
             try {
-                if (cameraRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+                if (
+                    cameraRef.current &&
+                    wsRef.current?.readyState === WebSocket.OPEN &&
+                    !isCapturingRef.current
+                ) {
+                    isCapturingRef.current = true;
                     const photo = await cameraRef.current.takePictureAsync({
                         base64: true,
-                        quality: 0.4, // Good balance
+                        quality: Platform.OS === 'android' ? 0.15 : 0.25,
                         skipProcessing: true,
                     });
 
@@ -118,8 +184,13 @@ export default function FormCheckScreen() {
                 }
             } catch (e) {
                 // Silently fail on frame capture errors
+            } finally {
+                isCapturingRef.current = false;
+                frameIntervalRef.current = setTimeout(captureLoop, intervalMs);
             }
-        }, 200); // 5fps for better performance
+        };
+
+        captureLoop();
     }, []);
 
     // Request AI analysis
@@ -170,51 +241,86 @@ export default function FormCheckScreen() {
                 ref={cameraRef}
                 style={styles.camera}
                 facing="front"
-            >
-                {/* Overlay UI */}
-                <View style={styles.overlay}>
-                    {/* Top bar */}
+                animateShutter={false}
+                pictureSize={pictureSize}
+                onCameraReady={onCameraReady}
+            />
+
+            <View pointerEvents="box-none" style={styles.overlay}>
+                {/* 1. Underlying Visual Layers */}
+                <DepthLine
+                    targetDepthY={targetDepthY}
+                    currentDepthY={currentDepthY}
+                    isValid={!!targetDepthY}
+                />
+
+                {isProMode && (
+                    <SkeletonOverlay
+                        landmarks={landmarks}
+                        hipTrajectory={hipTrajectory}
+                    />
+                )}
+
+                {/* 2. UI Overlay Layer */}
+                <SafeAreaView style={styles.safeOverlay}>
+                    {/* Top Bar */}
                     <View style={styles.topBar}>
-                        <TouchableOpacity onPress={() => router.back()}>
-                            <Text style={styles.backButton}>← Back</Text>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.backButtonBlur}>
+                            <Text style={styles.backButton}>←</Text>
                         </TouchableOpacity>
+
+                        {/* Connection Status Dot */}
                         <View style={[styles.statusDot, { backgroundColor: isConnected ? '#4CAF50' : '#F44336' }]} />
                     </View>
 
-                    {/* Stats */}
-                    <View style={styles.statsContainer}>
-                        <View style={styles.statBox}>
-                            <Text style={styles.statValue}>{repCount}</Text>
-                            <Text style={styles.statLabel}>REPS</Text>
+                    {/* Right Side: Rep Counter */}
+                    <RepCounter count={repCount} />
+
+                    {/* Center: Feedback Toast */}
+                    <FeedbackToast message={feedback} level={feedbackLevel} />
+
+                    {/* AI & Mode Controls - Bottom */}
+                    <View style={styles.bottomControls}>
+                        {/* Toggle Mode */}
+                        <TouchableOpacity
+                            style={styles.modeToggle}
+                            onPress={() => setIsProMode(!isProMode)}
+                        >
+                            <Text style={styles.modeText}>{isProMode ? 'PRO' : 'FOCUS'}</Text>
+                        </TouchableOpacity>
+
+                        {/* AI Coach Button */}
+                        <TouchableOpacity
+                            style={[styles.aiButton, isAnalyzing && styles.aiButtonDisabled]}
+                            onPress={requestAIFeedback}
+                            disabled={isAnalyzing}
+                        >
+                            <Text style={styles.aiButtonText}>
+                                {isAnalyzing ? 'Analyzing...' : '🧠 AI'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* AI Feedback Popup */}
+                    {aiFeedback ? (
+                        <View style={styles.aiPopup}>
+                            <Text style={styles.aiPopupTitle}>AI Coach</Text>
+                            <Text style={styles.aiPopupText}>{aiFeedback}</Text>
+                            <TouchableOpacity onPress={() => setAiFeedback('')} style={styles.closeAi}>
+                                <Text style={styles.closeAiText}>Close</Text>
+                            </TouchableOpacity>
                         </View>
-                        {kneeAngle !== null && (
-                            <View style={styles.statBox}>
-                                <Text style={styles.statValue}>{Math.round(kneeAngle)}°</Text>
-                                <Text style={styles.statLabel}>KNEE ANGLE</Text>
-                            </View>
-                        )}
-                    </View>
+                    ) : null}
 
-                    {/* Feedback */}
-                    <View style={styles.feedbackContainer}>
-                        <Text style={styles.feedbackText}>{feedback}</Text>
-                        {aiFeedback ? (
-                            <Text style={styles.aiFeedbackText}>🤖 {aiFeedback}</Text>
-                        ) : null}
-                    </View>
+                    {/* Pro Mode Stats */}
+                    {isProMode && kneeAngle !== null && (
+                        <View style={styles.debugStats}>
+                            <Text style={styles.debugText}>Knee: {kneeAngle}°</Text>
+                        </View>
+                    )}
 
-                    {/* AI Button */}
-                    <TouchableOpacity
-                        style={[styles.aiButton, isAnalyzing && styles.aiButtonDisabled]}
-                        onPress={requestAIFeedback}
-                        disabled={isAnalyzing}
-                    >
-                        <Text style={styles.aiButtonText}>
-                            {isAnalyzing ? 'Analyzing...' : '🧠 Ask AI Coach'}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </CameraView>
+                </SafeAreaView>
+            </View>
         </View>
     );
 }
@@ -223,103 +329,129 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     camera: {
         flex: 1,
         width: '100%',
+        backgroundColor: '#000',
     },
     overlay: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 2,
+        elevation: 2,
+    },
+    safeOverlay: {
         flex: 1,
-        backgroundColor: 'transparent',
-        padding: 20,
         justifyContent: 'space-between',
+        padding: 20,
     },
     topBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 40,
+    },
+    backButtonBlur: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     backButton: {
         color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
-    },
-    statusDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 20,
-    },
-    statBox: {
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        padding: 15,
-        borderRadius: 12,
-        alignItems: 'center',
-        minWidth: 100,
-    },
-    statValue: {
-        color: '#fff',
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 'bold',
     },
-    statLabel: {
-        color: '#aaa',
-        fontSize: 12,
-        marginTop: 4,
+    statusDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        position: 'absolute',
+        top: 15,
+        right: 15,
     },
-    feedbackContainer: {
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        padding: 15,
-        borderRadius: 12,
+    bottomControls: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 20,
     },
-    feedbackText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
-        textAlign: 'center',
+    modeToggle: {
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
     },
-    aiFeedbackText: {
-        color: '#4FC3F7',
-        fontSize: 16,
-        marginTop: 10,
-        textAlign: 'center',
-    },
-    text: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    button: {
-        marginTop: 20,
-        padding: 15,
-        backgroundColor: '#007AFF',
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
+    modeText: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        fontSize: 12,
+        letterSpacing: 1,
     },
     aiButton: {
         backgroundColor: '#6200EE',
-        padding: 18,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
         borderRadius: 30,
-        alignItems: 'center',
-        marginBottom: 40,
+        shadowColor: "#6200EE",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+        elevation: 5,
     },
     aiButtonDisabled: {
         backgroundColor: '#555',
+        shadowOpacity: 0,
     },
     aiButtonText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
+    aiPopup: {
+        position: 'absolute',
+        bottom: 100,
+        left: 20,
+        right: 20,
+        backgroundColor: '#1E1E1E',
+        padding: 20,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#333',
+        elevation: 10,
+    },
+    aiPopupTitle: {
+        color: '#BB86FC',
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    aiPopupText: {
+        color: '#E0E0E0',
+        fontSize: 16,
+        lineHeight: 24,
+    },
+    closeAi: {
+        marginTop: 15,
+        alignSelf: 'flex-end',
+    },
+    closeAiText: {
+        color: '#BB86FC',
+        fontWeight: 'bold',
+    },
+    debugStats: {
+        position: 'absolute',
+        top: 100,
+        left: 20,
+    },
+    debugText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 12,
+        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    },
+    text: { color: '#fff' },
+    button: { padding: 10, backgroundColor: 'blue', marginTop: 10, borderRadius: 5 },
+    buttonText: { color: '#fff' },
 });
