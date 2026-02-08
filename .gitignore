@@ -42,3 +42,4 @@ yarn-error.*
 
 # backend
 /backend/.env
+__pycache__/

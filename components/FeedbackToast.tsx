@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { colors, spacing, radius } from '../constants/theme';
 
 interface FeedbackToastProps {
     message: string;
@@ -9,20 +10,11 @@ interface FeedbackToastProps {
 export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
     if (!message) return null;
 
-    const getColor = (level: string) => {
-        switch (level) {
-            case 'success': return '#4CAF50';
-            case 'warning': return '#FFC107';
-            case 'error': return '#F44336';
-            default: return '#FFFFFF';
-        }
-    };
+    const accentColor = level === 'success' ? colors.success : level === 'warning' ? colors.warning : colors.error;
 
     return (
-        <View style={[styles.container, { borderLeftColor: getColor(level) }]}>
-            <Text style={[styles.text, { color: level === 'warning' ? '#FFD740' : '#FFFFFF' }]}>
-                {message}
-            </Text>
+        <View style={[styles.container, { borderLeftColor: accentColor }]}>
+            <Text style={styles.text} numberOfLines={2}>{message}</Text>
         </View>
     );
 });
@@ -30,23 +22,19 @@ export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 120,
+        bottom: 110,
         alignSelf: 'center',
-        backgroundColor: 'rgba(20, 20, 20, 0.9)',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 12,
-        borderLeftWidth: 4,
-        maxWidth: '80%',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
-        elevation: 8,
+        backgroundColor: 'rgba(10, 10, 10, 0.85)',
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.lg,
+        borderRadius: radius.sm,
+        borderLeftWidth: 3,
+        maxWidth: '85%',
     },
     text: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 15,
+        fontWeight: '600',
+        color: colors.text,
         textAlign: 'center',
-    }
+    },
 });

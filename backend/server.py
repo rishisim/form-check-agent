@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import base64
 import asyncio
+from urllib.parse import parse_qs
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -11,6 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from pose_tracker import PoseTracker
 from exercises.squat import SquatAnalyzer
+from exercises.pushup import PushupAnalyzer
 from gemini_service import GeminiService
 
 app = FastAPI(title="Form Check Agent API")
@@ -27,7 +29,10 @@ app.add_middleware(
 # Initialize services
 tracker = PoseTracker()
 squat_analyzer = SquatAnalyzer()
+pushup_analyzer = PushupAnalyzer()
 gemini_service = GeminiService()
+
+ANALYZERS = {"squat": squat_analyzer, "pushup": pushup_analyzer}
 
 @app.get("/")
 async def root():
@@ -42,10 +47,16 @@ async def websocket_video_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for real-time video streaming.
     Receives base64 encoded frames from the Expo app.
+    Query param: exercise=squat|pushup (default: squat)
     Returns pose analysis and AI feedback.
     """
+    query_string = websocket.scope.get("query_string", b"").decode()
+    params = parse_qs(query_string)
+    exercise = params.get("exercise", ["squat"])[0].lower()
+    analyzer = ANALYZERS.get(exercise, squat_analyzer)
+
     await websocket.accept()
-    print("WebSocket connection established")
+    print(f"WebSocket connection established (exercise={exercise})")
     
     try:
         while True:
@@ -74,15 +85,13 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 processed_frame = tracker.find_pose(frame, draw=False)
                 lm_list = tracker.get_position(processed_frame, draw=False)
                 
-                # Analyze squat form
-                feedback = None
-                if len(lm_list) != 0:
-                    # Get angles and feedback from squat analyzer
-                    analysis = squat_analyzer.get_analysis(lm_list)
-                    feedback = {
-                        "landmarks": lm_list,
-                        "analysis": analysis
-                    }
+                # Always analyze - get_analysis returns "no body" when empty/incomplete
+                h, w = frame.shape[0], frame.shape[1]
+                analysis = analyzer.get_analysis(lm_list, frame_width=w, frame_height=h)
+                feedback = {
+                    "landmarks": lm_list,
+                    "analysis": analysis
+                }
                 
                 await websocket.send_json({
                     "type": "analysis",

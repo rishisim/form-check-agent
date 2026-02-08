@@ -54,8 +54,8 @@ class GeminiService:
                 temp_video_path = temp_video.name
             
             height, width, layers = self.frame_buffer[0].shape
-            # usage of avc1 (H.264) is generally more compatible
-            fourcc = cv2.VideoWriter_fourcc(*'avc1')
+            # mp4v works reliably on Windows; avc1 can cause "no usable data" with some codecs
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             out = cv2.VideoWriter(temp_video_path, fourcc, self.fps, (width, height))
 
             for frame in self.frame_buffer:
@@ -86,9 +86,8 @@ class GeminiService:
             print(f"\nVideo uploaded. Name: {video_file.name}")
 
             # 3. Generate Content
-            # Using Gemini 3.0 Flash as requested!
-            # Code execution is disabled to allow direct video input.
-            model_name = "gemini-3-flash-preview"
+            # Use gemini-2.5-flash - has reliable video support (gemini-3-flash-preview has "no usable data" issues)
+            model_name = "gemini-2.5-flash"
             
             prompt = f"""
             You are an elite gym coach with computer vision expertise. 
@@ -121,19 +120,25 @@ class GeminiService:
             )
             
             # Cleanup
-            os.remove(temp_video_path)
-            # Consider deleting the file from Gemini storage too if needed
-            # self.client.files.delete(name=video_file.name)
+            if os.path.exists(temp_video_path):
+                os.remove(temp_video_path)
             
             self.is_analyzing = False
-            if response.text:
-                return response.text
-            else:
-                return "No feedback generated."
+            
+            try:
+                text = response.text
+                if text and text.strip():
+                    return text.strip()
+            except (AttributeError, IndexError, KeyError):
+                pass
+            return "Couldn't analyze video. Try again with clearer footage and good lighting."
 
         except Exception as e:
             self.is_analyzing = False
             import traceback
             traceback.print_exc()
+            err_msg = str(e).lower()
+            if "no usable data" in err_msg or "invalid" in err_msg or "blocked" in err_msg:
+                return "Video couldn't be analyzed. Try better lighting and ensure you're fully in frame."
             print(f"Error during Gemini analysis: {e}")
             return f"Error: {str(e)}"

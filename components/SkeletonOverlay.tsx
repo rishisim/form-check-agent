@@ -3,57 +3,47 @@ import Svg, { Line, Circle, Polyline } from 'react-native-svg';
 import { View, Dimensions, StyleSheet } from 'react-native';
 
 interface SkeletonOverlayProps {
-    landmarks: number[][]; // [id, x, y]
-    hipTrajectory: number[][]; // List of [x, y]
+    landmarks: number[][];
+    hipTrajectory: number[][];
 }
 
 const { width, height } = Dimensions.get('window');
 
-// MediaPipe Pose Connections
 const CONNECTIONS = [
-    [11, 12], [11, 13], [13, 15], // Left Arm
-    [12, 14], [14, 16],           // Right Arm
-    [11, 23], [12, 24],           // Torso
-    [23, 24],                     // Hips
-    [23, 25], [25, 27],           // Left Leg
-    [24, 26], [26, 28]            // Right Leg
+    [11, 12], [11, 13], [13, 15],
+    [12, 14], [14, 16],
+    [11, 23], [12, 24], [23, 24],
+    [23, 25], [25, 27], [24, 26], [26, 28],
 ];
 
 export const SkeletonOverlay = memo(({ landmarks, hipTrajectory }: SkeletonOverlayProps) => {
     if (!landmarks || landmarks.length === 0) return null;
 
-    // Helper to get coords (assuming normalized 0-1)
     const getPoint = (idx: number) => {
         const point = landmarks[idx];
         if (!point) return null;
         return { x: point[1] * width, y: point[2] * height };
     };
 
-    // Draw Hip Trajectory
     const trajectoryPoints = hipTrajectory
         .map(pt => `${pt[0] * width},${pt[1] * height}`)
         .join(' ');
 
     return (
-        <View style={StyleSheet.absoluteFill}>
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
             <Svg height={height} width={width} style={StyleSheet.absoluteFill}>
-                {/* Hip Trajectory */}
                 {hipTrajectory.length > 1 && (
                     <Polyline
                         points={trajectoryPoints}
                         fill="none"
-                        stroke="#FFC107"
-                        strokeWidth="3"
-                        strokeOpacity="0.6"
+                        stroke="rgba(99, 102, 241, 0.5)"
+                        strokeWidth="2"
                     />
                 )}
-
-                {/* Skeleton Connections */}
                 {CONNECTIONS.map(([start, end], index) => {
                     const startPt = getPoint(start);
                     const endPt = getPoint(end);
                     if (!startPt || !endPt) return null;
-
                     return (
                         <Line
                             key={index}
@@ -61,13 +51,11 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory }: SkeletonOverl
                             y1={startPt.y}
                             x2={endPt.x}
                             y2={endPt.y}
-                            stroke="rgba(255, 255, 255, 0.4)"
-                            strokeWidth="2"
+                            stroke="rgba(255, 255, 255, 0.35)"
+                            strokeWidth="1.5"
                         />
                     );
                 })}
-
-                {/* Key Joints */}
                 {[11, 12, 23, 24, 25, 26, 27, 28].map((idx) => {
                     const pt = getPoint(idx);
                     if (!pt) return null;
@@ -76,9 +64,8 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory }: SkeletonOverl
                             key={idx}
                             cx={pt.x}
                             cy={pt.y}
-                            r="4"
-                            fill="#FFFFFF"
-                            opacity={0.8}
+                            r="3"
+                            fill="rgba(255, 255, 255, 0.6)"
                         />
                     );
                 })}

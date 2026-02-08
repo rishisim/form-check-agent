@@ -4,11 +4,18 @@ import { StatusBar } from 'expo-status-bar';
 export default function Layout() {
   return (
     <>
-      <Stack>
-        <Stack.Screen name="index" options={{ title: 'Home' }} />
-        <Stack.Screen name="form-check" options={{ title: 'Analyze Form' }} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#0A0A0A' },
+          animation: 'fade',
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="form-check" />
+        <Stack.Screen name="form-check-pushup" />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
     </>
   );
 }

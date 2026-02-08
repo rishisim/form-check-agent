@@ -10,8 +10,8 @@ class PoseTracker:
             static_image_mode=static_image_mode,
             model_complexity=model_complexity,
             smooth_landmarks=smooth_landmarks,
-            min_detection_confidence=detection_confidence,
-            min_tracking_confidence=tracking_confidence
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5
         )
 
     def find_pose(self, img, draw=True):

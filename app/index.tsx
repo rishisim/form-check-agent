@@ -1,35 +1,29 @@
 import { Link } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
+import { colors, spacing, radius } from '../constants/theme';
 
 export default function HomeScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.logo}>🏋️</Text>
-                <Text style={styles.title}>Form Check Agent</Text>
-                <Text style={styles.subtitle}>AI-Powered Workout Coach</Text>
+                <Text style={styles.logo}>Form</Text>
+                <Text style={styles.subtitle}>AI form coach</Text>
             </View>
 
             <View style={styles.exerciseList}>
                 <Link href="/form-check" style={styles.exerciseCard}>
-                    <View>
-                        <Text style={styles.exerciseEmoji}>🦵</Text>
-                        <Text style={styles.exerciseName}>Squats</Text>
-                        <Text style={styles.exerciseDesc}>Track depth & form</Text>
-                    </View>
+                    <Text style={styles.exerciseEmoji}>Squats</Text>
+                    <Text style={styles.exerciseDesc}>Depth & form</Text>
                 </Link>
 
-                {/* Future exercises - disabled for now */}
-                <View style={[styles.exerciseCard, styles.disabled]}>
-                    <Text style={styles.exerciseEmoji}>💪</Text>
-                    <Text style={styles.exerciseName}>Push-ups</Text>
-                    <Text style={styles.exerciseDesc}>Coming soon</Text>
-                </View>
+                <Link href="/form-check-pushup" style={styles.exerciseCard}>
+                    <Text style={styles.exerciseEmoji}>Push-ups</Text>
+                    <Text style={styles.exerciseDesc}>Reps & form</Text>
+                </Link>
             </View>
 
             <Text style={styles.instructions}>
-                Make sure to run the backend server first:{'\n'}
-                <Text style={styles.code}>source venv/bin/activate && python backend/server.py</Text>
+                Run backend: cd form-check-agent, cd backend, python server.py
             </Text>
         </View>
     );
@@ -38,70 +32,54 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#121212',
+        backgroundColor: colors.bg,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
+        padding: spacing.lg,
     },
     header: {
         alignItems: 'center',
-        marginBottom: 40,
+        marginBottom: spacing.xl * 2,
     },
     logo: {
-        fontSize: 64,
-        marginBottom: 10,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginBottom: 8,
+        fontSize: 32,
+        fontWeight: '600',
+        color: colors.text,
+        letterSpacing: -0.5,
     },
     subtitle: {
-        fontSize: 16,
-        color: '#888',
+        fontSize: 15,
+        color: colors.textMuted,
+        marginTop: spacing.xs,
     },
     exerciseList: {
         flexDirection: 'row',
-        gap: 16,
-        marginBottom: 40,
+        gap: spacing.md,
     },
     exerciseCard: {
-        backgroundColor: '#1E1E1E',
-        padding: 24,
-        borderRadius: 16,
-        alignItems: 'center',
+        backgroundColor: colors.surface,
+        padding: spacing.lg,
+        borderRadius: radius.md,
         minWidth: 140,
         borderWidth: 1,
-        borderColor: '#333',
-    },
-    disabled: {
-        opacity: 0.5,
+        borderColor: colors.border,
     },
     exerciseEmoji: {
-        fontSize: 40,
-        marginBottom: 8,
-    },
-    exerciseName: {
-        color: '#fff',
+        color: colors.text,
         fontSize: 18,
         fontWeight: '600',
-        marginBottom: 4,
     },
     exerciseDesc: {
-        color: '#888',
-        fontSize: 12,
+        color: colors.textMuted,
+        fontSize: 13,
+        marginTop: spacing.xs,
     },
     instructions: {
-        color: '#666',
+        color: colors.textMuted,
         fontSize: 12,
         textAlign: 'center',
         position: 'absolute',
-        bottom: 40,
-    },
-    code: {
-        color: '#4FC3F7',
-        fontFamily: 'monospace',
+        bottom: spacing.xl + spacing.lg,
+        paddingHorizontal: spacing.lg,
     },
 });
-
