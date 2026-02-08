@@ -44,8 +44,7 @@ class PushupAnalyzer:
     ELBOW_DEEP = 95        # Definitely at bottom
 
     # Body alignment (shoulder-hip-ankle): straight line ~170-180°
-    BODY_STRAIGHT_MIN = 155   # Below = hip sagging or piking
-    BODY_WARNING_ANGLE = 165  # Getting out of alignment
+    BODY_STRAIGHT_MIN = 155   # Below = hip sagging
 
     # Elbow flare: ideal ~45° from body
     MIN_VISIBILITY = 0.50
@@ -60,10 +59,11 @@ class PushupAnalyzer:
     WARN_FRAMES_LOCKOUT = 6  # "Full lockout"
     FEEDBACK_HOLD_TIME = 2.5
 
+    # Pushup-specific form tips (no squat language)
     WARN_PRIORITY = [
-        "Keep body straight!",
         "Engage your core!",
-        "Lower your chest",
+        "Keep body straight!",
+        "Lower your chest more",
         "Full lockout at top",
     ]
 
@@ -192,7 +192,7 @@ class PushupAnalyzer:
 
         actively_pushing = self.stage in ("descending", "bottom", "ascending")
 
-        # Body alignment: hip sagging or piking
+        # Body alignment: hip sagging or piking (pushup-specific cues)
         if actively_pushing:
             if body_angle < self.BODY_STRAIGHT_MIN:
                 self._body_warn_frames += 1
@@ -200,7 +200,7 @@ class PushupAnalyzer:
                 self._body_warn_frames = max(0, self._body_warn_frames - 2)
 
             if self._body_warn_frames >= self.WARN_FRAMES_BODY:
-                feedback_list.append("Keep body straight!")
+                feedback_list.append("Engage your core!")
                 frame_good_form = False
         else:
             self._body_warn_frames = max(0, self._body_warn_frames - 1)
@@ -234,8 +234,8 @@ class PushupAnalyzer:
                 self._rep_had_good_depth = True
 
             if self._deeper_warn_frames >= self.WARN_FRAMES_DEEPER and not is_deep_enough:
-                if "Lower your chest" not in feedback_list:
-                    feedback_list.append("Lower your chest")
+                if "Lower your chest more" not in feedback_list:
+                    feedback_list.append("Lower your chest more")
 
             if self._deep_frame_count >= self.MIN_DEEP_FRAMES:
                 self.stage = "bottom"
@@ -288,7 +288,7 @@ class PushupAnalyzer:
                     else:
                         self.invalid_reps += 1
                         if not self._rep_had_good_depth:
-                            self.feedback = "Lower your chest next time"
+                            self.feedback = "Lower chest more next rep"
                         elif self._rep_form_issues:
                             self.feedback = self._rep_form_issues[0]
                         else:
@@ -297,11 +297,11 @@ class PushupAnalyzer:
                 self.stage = "up"
                 self._deep_frame_count = 0
 
-        # Feedback stabilization
+        # Feedback stabilization (all pushup-specific tips)
         _warn_counter = {
-            "Keep body straight!": self._body_warn_frames,
             "Engage your core!": self._body_warn_frames,
-            "Lower your chest": self._deeper_warn_frames,
+            "Keep body straight!": self._body_warn_frames,
+            "Lower your chest more": self._deeper_warn_frames,
             "Full lockout at top": self._lockout_warn_frames,
         }
 
@@ -332,7 +332,7 @@ class PushupAnalyzer:
             self._active_warning = None
 
         rep_completion_msgs = {
-            "Good rep!", "Lower your chest next time", "Check form",
+            "Good rep!", "Lower chest more next rep", "Check form",
             "Good depth! Push up!",
         }
         is_priority = desired_feedback in rep_completion_msgs
