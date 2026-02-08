@@ -14,6 +14,7 @@ from starlette.websockets import WebSocketState
 
 from pose_tracker import PoseTracker
 from exercises.squat import SquatAnalyzer
+from exercises.pushup import PushupAnalyzer
 from gemini_service import GeminiService
 from tts_service import TTSService
 
@@ -132,6 +133,8 @@ async def websocket_video_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for real-time video streaming.
 
+    Query params: ?exercise=squat|pushup
+
     Uses a **latest-frame-wins** pattern: incoming frames are dropped into a
     slot; a background worker always processes only the most recent frame.
     This prevents frame queueing and keeps the skeleton as close to real-time
@@ -140,11 +143,12 @@ async def websocket_video_endpoint(websocket: WebSocket):
     await websocket.accept()
     conn_id = str(uuid.uuid4())[:8]
     active_connections.add(conn_id)
-    logger.info(f"[{conn_id}] WebSocket connection established ({len(active_connections)} active)")
+    ex = (websocket.query_params.get("exercise") or "squat").lower().strip()
+    logger.info(f"[{conn_id}] WebSocket connection established ({len(active_connections)} active, exercise={ex})")
 
     # Per-session state
     session_tracker = PoseTracker()
-    session_analyzer = SquatAnalyzer()
+    session_analyzer = PushupAnalyzer() if ex == "pushup" else SquatAnalyzer()
     current_session_id = str(uuid.uuid4())
     frame_seq = 0
 

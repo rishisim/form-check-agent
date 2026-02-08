@@ -3,14 +3,15 @@ import Svg, { Line, Circle, Text as SvgText } from 'react-native-svg';
 import { View, Dimensions, StyleSheet } from 'react-native';
 
 interface DepthLineProps {
-    targetDepthY: number; // Knee Y (normalized 0-1)
-    currentDepthY: number; // Hip Y
-    isValid: boolean;     // Are coordinates valid?
+    targetDepthY: number;   // Target Y (normalized 0-1)
+    currentDepthY: number;  // Current Y
+    isValid: boolean;       // Are coordinates valid?
+    label?: string;         // Label for current indicator, e.g. "HIPS" or "CHEST"
 }
 
 const { width, height } = Dimensions.get('window');
 
-export const DepthLine = memo(({ targetDepthY, currentDepthY, isValid }: DepthLineProps) => {
+export const DepthLine = memo(({ targetDepthY, currentDepthY, isValid, label = 'HIPS' }: DepthLineProps) => {
     if (!isValid) return null;
 
     const targetY = targetDepthY * height;
@@ -60,7 +61,7 @@ export const DepthLine = memo(({ targetDepthY, currentDepthY, isValid }: DepthLi
                     fontSize="10"
                     fontWeight="bold"
                 >
-                    HIPS
+                    {label}
                 </SvgText>
             </Svg>
         </View>
