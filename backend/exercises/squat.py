@@ -1,9 +1,32 @@
 import cv2
 import math
+import random
 import time
 from collections import deque
 
 from .base import AngleSmoother, calculate_angle
+
+# Success messages for valid reps (randomized for variety)
+REP_SUCCESS_MESSAGES = [
+    "Nice rep, keep it up!",
+    "Good rep!",
+]
+
+# Encouraging messages for invalid reps (randomized)
+REP_INVALID_MESSAGES = {
+    "depth": [
+        "Rep didn't count, go a bit deeper next time!",
+        "Almost! Try sinking a little lower on the next one.",
+    ],
+    "form": [
+        "Rep didn't count, let's clean up the form!",
+        "Close! Focus on form for the next rep.",
+    ],
+    "generic": [
+        "Rep didn't count, you got this! Try again.",
+        "That one didn't count, shake it off and nail the next one!",
+    ],
+}
 
 
 class SquatAnalyzer:
@@ -318,15 +341,21 @@ class SquatAnalyzer:
 
                     if rep_is_valid:
                         self.valid_reps += 1
-                        self.feedback = "Nice rep, keep it up!"
+                        self.feedback = random.choice(REP_SUCCESS_MESSAGES)
                     else:
                         self.invalid_reps += 1
                         if not self._rep_had_good_depth:
-                            self.feedback = "Try to sink a little deeper"
+                            self.feedback = random.choice(REP_INVALID_MESSAGES["depth"])
                         elif actual_form_issues:
-                            self.feedback = actual_form_issues[0]
+                            self.feedback = random.choice(REP_INVALID_MESSAGES["form"])
                         else:
-                            self.feedback = "Let's tighten that up"
+                            self.feedback = random.choice(REP_INVALID_MESSAGES["generic"])
+
+                    # Force-update stable feedback so rep result always displays
+                    # (overrides mid-rep cues like "Great depth, drive it up!")
+                    self._stable_feedback = self.feedback
+                    self._stable_feedback_level = 'success' if rep_is_valid else 'warning'
+                    self._stable_feedback_time = now
 
                 self.stage = "up"
                 self._deep_frame_count = 0
@@ -374,8 +403,14 @@ class SquatAnalyzer:
 
         # Stabilization: rep-completion messages update immediately;
         # warnings need N consistent candidate frames OR the hold time to expire.
-        rep_completion_msgs = {"Nice rep, keep it up!", "Try to sink a little deeper", "Let's tighten that up",
-                               "Great depth, drive it up!"}
+        # Include all possible valid and invalid rep messages as priority
+        rep_completion_msgs = (
+            set(REP_SUCCESS_MESSAGES) |
+            set(REP_INVALID_MESSAGES["depth"]) |
+            set(REP_INVALID_MESSAGES["form"]) |
+            set(REP_INVALID_MESSAGES["generic"]) |
+            {"Great depth, drive it up!"}
+        )
         is_priority = desired_feedback in rep_completion_msgs
 
         if desired_feedback == self._candidate_feedback:

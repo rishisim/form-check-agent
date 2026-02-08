@@ -43,3 +43,7 @@ yarn-error.*
 
 # backend
 /backend/.env
+# Python
+venv/
+__pycache__/
+*.pyc

@@ -12,7 +12,7 @@ import { useOrientation } from '../hooks/useOrientation';
 import { useTheme } from '../hooks/useTheme';
 
 // ─── Configuration ───────────────────────────────────────
-const SERVER_BASE = 'ws://10.194.82.72:8000/ws/video';
+const SERVER_BASE = 'ws://10.194.82.50:8000/ws/video';
 
 export default function FormCheckScreen() {
     const router = useRouter();
@@ -99,7 +99,7 @@ export default function FormCheckScreen() {
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const reconnectDelayRef = useRef(1000);
     const lastFeedbackRef = useRef('');
-    const startStreamingRef = useRef<() => void>(() => {});
+    const startStreamingRef = useRef<() => void>(() => { });
 
     // ─── Workout Stats Tracking ─────────
     const workoutStartRef = useRef<number>(0);
@@ -238,22 +238,23 @@ export default function FormCheckScreen() {
                     return;
                 }
 
-                // Drop messages while awaiting reset
-                if (isResetPendingRef.current && data.type === 'analysis') return;
-
+                // During reset, still process landmarks for smooth skeleton, but skip rep updates
                 if (data.type === 'analysis' && data.feedback) {
                     const activeSessionId = currentSessionIdRef.current;
-                    if (activeSessionId && data.feedback.session_id && data.feedback.session_id !== activeSessionId) return;
+                    // During reset: accept messages from any session for skeleton continuity
+                    // After reset confirmed: filter to new session only
+                    if (!isResetPendingRef.current && activeSessionId && data.feedback.session_id && data.feedback.session_id !== activeSessionId) return;
 
                     const incomingSeq = data.feedback.frame_seq ?? 0;
-                    if (incomingSeq > 0 && incomingSeq <= lastFrameSeqRef.current) return;
+                    // Only apply seq filtering when not in reset mode
+                    if (!isResetPendingRef.current && incomingSeq > 0 && incomingSeq <= lastFrameSeqRef.current) return;
 
                     if (!activeSessionId && data.feedback.session_id) {
                         currentSessionIdRef.current = data.feedback.session_id;
                         setCurrentSessionId(data.feedback.session_id);
                     }
 
-                    // Unthrottled: landmarks for smooth skeleton
+                    // ALWAYS update landmarks for smooth skeleton (never blocks)
                     setLandmarks(data.feedback.landmarks || []);
                     const analysis = data.feedback.analysis;
                     if (analysis) {
@@ -279,10 +280,15 @@ export default function FormCheckScreen() {
                     }
 
                     // Throttled (~30 fps) for numeric / angle displays
+                    // Skip rep count updates during reset to avoid showing stale counts
                     if (now - lastUpdateRef.current > 33) {
                         if (analysis) {
-                            setValidReps(analysis.valid_reps ?? 0);
-                            setInvalidReps(analysis.invalid_reps ?? 0);
+                            // Only update rep counts if not awaiting reset confirmation
+                            if (!isResetPendingRef.current) {
+                                setValidReps(analysis.valid_reps ?? 0);
+                                setInvalidReps(analysis.invalid_reps ?? 0);
+                            }
+                            // Always update angles for smooth display
                             setKneeAngle(analysis.knee_angle);
                             setHipAngle(analysis.hip_angle);
                             setSideDetected(analysis.side_detected);
@@ -404,7 +410,9 @@ export default function FormCheckScreen() {
         setFeedback('Next set — let\'s do this!');
         setFeedbackLevel('success');
         lastUpdateRef.current = 0;
-        lastFrameSeqRef.current = Number.MAX_SAFE_INTEGER;
+        // Reset to 0 to accept new frames immediately. The session_id check
+        // handles stale message filtering; MAX_SAFE_INTEGER blocked ALL frames.
+        lastFrameSeqRef.current = 0;
     }, []);
 
     // ─── Rest Break Countdown ─────────────────────
@@ -422,7 +430,8 @@ export default function FormCheckScreen() {
             setFeedback(goMsg);
             setFeedbackLevel('success');
             speakTTS(goMsg);
-            // Explicitly restart streaming for the next set
+            // Force-restart streaming for the next set
+            isStreamingRef.current = false;
             startStreamingRef.current();
             return;
         }
@@ -451,7 +460,8 @@ export default function FormCheckScreen() {
         setFeedback(goMsg);
         setFeedbackLevel('success');
         speakTTS(goMsg);
-        // Explicitly restart streaming for the next set
+        // Force-restart streaming for the next set
+        isStreamingRef.current = false;
         startStreamingRef.current();
     }, [resetReps, speakTTS]);
 
