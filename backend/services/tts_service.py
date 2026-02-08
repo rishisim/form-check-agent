@@ -2,7 +2,7 @@ import os
 import hashlib
 import logging
 import asyncio
-from typing import Optional, Dict
+from typing import Optional
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,7 +21,7 @@ class TTSService:
         self.output_format = "mp3_44100_128"
 
         # In-memory cache: md5(text) -> audio bytes
-        self._cache: Dict[str, bytes] = {}
+        self._cache: dict = {}
 
         # Lazy-init the client
         self._client = None

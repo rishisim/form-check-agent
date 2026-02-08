@@ -10,7 +10,6 @@ Matches the feature depth of SquatAnalyzer with pushup-specific form checks:
   - Priority-based, debounced, stabilised feedback
 """
 
-import cv2
 import math
 import time
 from collections import deque
@@ -397,34 +396,3 @@ class PushupAnalyzer:
             "side_detected": side,
         }
 
-    # ------------------------------------------------------------------
-    # Legacy local-webcam method
-    # ------------------------------------------------------------------
-    def analyze(self, img, lm_list):
-        """Original method for local webcam testing with drawing."""
-        if len(lm_list) != 0:
-            left_v = lm_list[11][3] + lm_list[13][3] + lm_list[15][3]
-            right_v = lm_list[12][3] + lm_list[14][3] + lm_list[16][3]
-
-            if right_v >= left_v:
-                shoulder = lm_list[12][1:3]
-                elbow = lm_list[14][1:3]
-                wrist = lm_list[16][1:3]
-            else:
-                shoulder = lm_list[11][1:3]
-                elbow = lm_list[13][1:3]
-                wrist = lm_list[15][1:3]
-
-            angle_elbow = calculate_angle(shoulder, elbow, wrist)
-
-            cv2.putText(img, str(int(angle_elbow)), (elbow[0] + 10, elbow[1]),
-                        cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
-
-            if angle_elbow > 150:
-                self.stage = "up"
-            if angle_elbow < 90 and self.stage == "up":
-                self.stage = "down"
-                self.counter += 1
-                print("Push-up count:", self.counter)
-
-            return img

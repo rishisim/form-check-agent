@@ -1,14 +1,16 @@
 import os
 import cv2
-import time
+import logging
 import tempfile
-import base64
+import traceback
 from collections import deque
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class GeminiService:
@@ -17,7 +19,7 @@ class GeminiService:
             api_key = os.environ.get("GEMINI_API_KEY")
         
         if not api_key:
-            print("Warning: GEMINI_API_KEY not found in environment variables.")
+            logger.warning("GEMINI_API_KEY not found in environment variables.")
             self.client = None
         else:
             self.client = genai.Client(api_key=api_key)
@@ -46,7 +48,7 @@ class GeminiService:
             return "Not enough data for analysis."
 
         self.is_analyzing = True
-        print(f"Starting analysis for {exercise_name}...")
+        logger.info(f"Starting analysis for {exercise_name}...")
         
         try:
             # 1. Save frames to temp video
@@ -62,13 +64,10 @@ class GeminiService:
                 out.write(frame)
             out.release()
             
-            print(f"Video saved to {temp_video_path}")
+            logger.info(f"Video saved to {temp_video_path}")
 
             # 2. Upload using File API
-            print("Uploading to Gemini...")
-            with open(temp_video_path, 'rb') as f:
-                video_bytes = f.read()
-            
+            logger.info("Uploading to Gemini...")
             video_file = self.client.files.upload(
                 file=temp_video_path,
                 config=types.UploadFileConfig(mime_type="video/mp4")
@@ -76,14 +75,15 @@ class GeminiService:
             
             # Wait for processing
             while video_file.state.name == "PROCESSING":
-                print('.', end='', flush=True)
+                logger.debug("Video still processing...")
+                import time
                 time.sleep(1)
                 video_file = self.client.files.get(name=video_file.name)
 
             if video_file.state.name == "FAILED":
                 raise ValueError(f"Video processing failed: {video_file.state.name}")
             
-            print(f"\nVideo uploaded. Name: {video_file.name}")
+            logger.info(f"Video uploaded. Name: {video_file.name}")
 
             # 3. Generate Content
             # Using stable Gemini 1.5 Flash
@@ -104,7 +104,7 @@ class GeminiService:
             Be specific and encouraging.
             """
             
-            print(f"Requesting analysis from {model_name}...")
+            logger.info(f"Requesting analysis from {model_name}...")
             
             # Using generate_content directly with file API
             response = self.client.models.generate_content(
@@ -121,8 +121,6 @@ class GeminiService:
             
             # Cleanup
             os.remove(temp_video_path)
-            # Consider deleting the file from Gemini storage too if needed
-            # self.client.files.delete(name=video_file.name)
             
             self.is_analyzing = False
             if response.text:
@@ -132,7 +130,6 @@ class GeminiService:
 
         except Exception as e:
             self.is_analyzing = False
-            import traceback
-            traceback.print_exc()
-            print(f"Error during Gemini analysis: {e}")
+            logger.error(f"Error during Gemini analysis: {e}")
+            logger.debug(traceback.format_exc())
             return f"Error: {str(e)}"

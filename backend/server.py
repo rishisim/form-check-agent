@@ -15,8 +15,6 @@ from starlette.websockets import WebSocketState
 
 from pose_tracker import PoseTracker
 from exercises import get_analyzer
-from exercises.squat import SquatAnalyzer
-from exercises.pushup import PushupAnalyzer
 from services.gemini_service import GeminiService
 from services.tts_service import TTSService
 
@@ -323,8 +321,9 @@ async def websocket_video_endpoint(websocket: WebSocket):
     frame_seq = 0
 
     # Latest-frame slot – written by the reader, consumed by the processor
-    latest_frame: dict = {"frame": None, "seq": 0, "orientation": "portrait"}
+    latest_frame: dict = {"frame": None, "seq": 0}
     frame_event = asyncio.Event()
+    reset_seq_event = asyncio.Event()          # signals _process_loop to reset its seq counter
     connection_alive = True
 
     # --- Keepalive: send a ping every 25 s so the connection doesn't idle-timeout ---
@@ -351,6 +350,11 @@ async def websocket_video_endpoint(websocket: WebSocket):
             if not connection_alive:
                 break
 
+            # If a rep-reset happened, sync our local seq counter
+            if reset_seq_event.is_set():
+                reset_seq_event.clear()
+                last_processed_seq = 0
+
             # Grab the latest frame (drop any older ones implicitly)
             slot = latest_frame.copy()
             if slot["frame"] is None or slot["seq"] <= last_processed_seq:
@@ -359,12 +363,6 @@ async def websocket_video_endpoint(websocket: WebSocket):
 
             frame = slot["frame"]
             seq = slot["seq"]
-
-            # Add frame to Gemini buffer (non-critical)
-            try:
-                gemini_service.add_frame(frame)
-            except Exception:
-                pass
 
             # Run downscale + MediaPipe in a SINGLE thread call
             try:
@@ -406,7 +404,6 @@ async def websocket_video_endpoint(websocket: WebSocket):
             if not await _safe_send(websocket, {
                 "type": "analysis",
                 "feedback": feedback,
-                "buffered_frames": len(gemini_service.frame_buffer),
             }):
                 break  # socket gone
 
@@ -442,9 +439,6 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 if not frame_base64:
                     continue
 
-                # Track client-reported orientation (portrait / landscape)
-                client_orientation = data.get("orientation", "portrait")
-
                 try:
                     img_bytes = base64.b64decode(frame_base64)
                     nparr = np.frombuffer(img_bytes, np.uint8)
@@ -460,7 +454,6 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 frame_seq += 1
                 latest_frame["frame"] = frame
                 latest_frame["seq"] = frame_seq
-                latest_frame["orientation"] = client_orientation
                 frame_event.set()  # wake the processor
 
             elif msg_type == "reset_reps":
@@ -470,6 +463,7 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 frame_seq = 0
                 latest_frame["frame"] = None
                 latest_frame["seq"] = 0
+                reset_seq_event.set()  # tell _process_loop to reset its counter
                 if not await _safe_send(websocket, {
                     "type": "reset_confirmation",
                     "status": "success",

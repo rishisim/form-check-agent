@@ -1,9 +1,11 @@
-import cv2
+import logging
 import math
 import time
 from collections import deque
 
-from .base import AngleSmoother, calculate_angle
+from .base import AngleSmoother, FeedbackStabilizer, calculate_angle
+
+logger = logging.getLogger(__name__)
 
 
 class SquatAnalyzer:
@@ -81,16 +83,17 @@ class SquatAnalyzer:
         self._knee_toe_warn_frames: int = 0
         self._deeper_warn_frames: int = 0
 
-        # ---- Feedback stabilization ----
-        self._stable_feedback: str = "Start Squatting"
-        self._stable_feedback_level: str = "success"
-        self._stable_feedback_time: float = 0.0
-        self._candidate_feedback: str = ""
-        self._candidate_count: int = 0
-        self._candidate_threshold: int = 5  # frames of same message to promote
-
-        # Active-warning lock: once a warning is shown, it stays until resolved
-        self._active_warning: str | None = None
+        # ---- Feedback stabilization (shared logic from base) ----
+        self._stabilizer = FeedbackStabilizer(
+            warn_priority=self.WARN_PRIORITY,
+            rep_completion_msgs={
+                "Good rep!", "Deeper! Hips below knees.", "Check form",
+                "Good depth! Drive up!",
+            },
+            candidate_threshold=5,
+            feedback_hold_time=self.FEEDBACK_HOLD_TIME,
+            initial_feedback="Start Squatting",
+        )
 
     def reset(self):
         """Resets the analyzer state for a new set."""
@@ -111,12 +114,7 @@ class SquatAnalyzer:
         self._back_warn_frames = 0
         self._knee_toe_warn_frames = 0
         self._deeper_warn_frames = 0
-        self._stable_feedback = "Start Squatting"
-        self._stable_feedback_level = "success"
-        self._stable_feedback_time = 0.0
-        self._candidate_feedback = ""
-        self._candidate_count = 0
-        self._active_warning = None
+        self._stabilizer.reset("Start Squatting")
 
     # ------------------------------------------------------------------
     # Main analysis (called by server for every frame)
@@ -316,6 +314,13 @@ class SquatAnalyzer:
                         and self._rep_had_good_depth
                     )
 
+                    # Debug logging to diagnose rep validation
+                    logger.info(f"REP #{self.counter} COMPLETE: "
+                               f"raw_issues={self._rep_form_issues}, "
+                               f"filtered_issues={actual_form_issues}, "
+                               f"had_good_depth={self._rep_had_good_depth}, "
+                               f"valid={rep_is_valid}")
+
                     if rep_is_valid:
                         self.valid_reps += 1
                         self.feedback = "Good rep!"
@@ -331,71 +336,21 @@ class SquatAnalyzer:
                 self.stage = "up"
                 self._deep_frame_count = 0
 
-        # ---- Build final feedback with warning-lock logic -----------------
-        # Map warnings to their debounce counters so we can check "resolved"
-        _warn_counter = {
+        # ---- Build final feedback with stabilizer ---------------------
+        warn_counters = {
             "Keep chest up!": self._back_warn_frames,
             "Chest up a bit more": self._back_warn_frames,
             "Sit back more": self._knee_toe_warn_frames,
             "Squat deeper": self._deeper_warn_frames,
         }
 
-        # If the currently-locked warning is still in the feedback list, keep it.
-        # If it has been resolved (counter dropped to 0), release the lock.
-        if self._active_warning is not None:
-            counter_val = _warn_counter.get(self._active_warning, 0)
-            if counter_val == 0:
-                self._active_warning = None  # resolved → release
-
-        # Pick which warning to show using priority order
-        chosen_warning: str | None = None
-        if feedback_list:
-            if self._active_warning and self._active_warning in feedback_list:
-                # Locked warning is still active → keep it
-                chosen_warning = self._active_warning
-            else:
-                # Pick the highest-priority warning from the list
-                for w in self.WARN_PRIORITY:
-                    if w in feedback_list:
-                        chosen_warning = w
-                        break
-                if chosen_warning is None:
-                    chosen_warning = feedback_list[0]
-                self._active_warning = chosen_warning
-
-        # Determine desired feedback and level
-        if chosen_warning:
-            desired_feedback = chosen_warning
-            desired_level = 'error' if not frame_good_form else 'warning'
-        else:
-            desired_feedback = self.feedback
-            desired_level = 'success'
-            self._active_warning = None  # no warnings → clear lock
-
-        # Stabilization: rep-completion messages update immediately;
-        # warnings need N consistent candidate frames OR the hold time to expire.
-        rep_completion_msgs = {"Good rep!", "Deeper! Hips below knees.", "Check form",
-                               "Good depth! Drive up!"}
-        is_priority = desired_feedback in rep_completion_msgs
-
-        if desired_feedback == self._candidate_feedback:
-            self._candidate_count += 1
-        else:
-            self._candidate_feedback = desired_feedback
-            self._candidate_count = 1
-
-        time_since_stable = now - self._stable_feedback_time
-        should_update = (
-            is_priority
-            or self._candidate_count >= self._candidate_threshold
-            or (time_since_stable >= self.FEEDBACK_HOLD_TIME
-                and self._candidate_count >= 2)
+        stable_feedback, stable_level = self._stabilizer.update(
+            feedback_list=feedback_list,
+            warn_counters=warn_counters,
+            frame_good_form=frame_good_form,
+            default_feedback=self.feedback,
+            now=now,
         )
-
-        if should_update and desired_feedback != self._stable_feedback:
-            self._stable_feedback = desired_feedback
-            self._stable_feedback_level = desired_level
-            self._stable_feedback_time = now
 
         return {
             "knee_angle": int(knee_angle),
@@ -404,8 +359,8 @@ class SquatAnalyzer:
             "rep_count": self.counter,
             "valid_reps": self.valid_reps,
             "invalid_reps": self.invalid_reps,
-            "feedback": self._stable_feedback,
-            "feedback_level": self._stable_feedback_level,
+            "feedback": stable_feedback,
+            "feedback_level": stable_level,
             "is_good_form": frame_good_form,
             "depth_status": "Good" if is_deep_enough else "High",
             "target_depth_y": knee_y,
@@ -414,30 +369,3 @@ class SquatAnalyzer:
             "side_detected": side_used,
         }
 
-    # ------------------------------------------------------------------
-    # Legacy local-webcam method
-    # ------------------------------------------------------------------
-    def analyze(self, img, lm_list):
-        """Original method for local webcam testing with drawing."""
-        if len(lm_list) != 0:
-            left_v = lm_list[23][3] + lm_list[25][3] + lm_list[27][3]
-            right_v = lm_list[24][3] + lm_list[26][3] + lm_list[28][3]
-
-            if right_v >= left_v:
-                hip, knee, ankle = lm_list[24][1:3], lm_list[26][1:3], lm_list[28][1:3]
-            else:
-                hip, knee, ankle = lm_list[23][1:3], lm_list[25][1:3], lm_list[27][1:3]
-
-            angle_knee = calculate_angle(hip, knee, ankle)
-
-            cv2.putText(img, str(int(angle_knee)), (knee[0] + 10, knee[1]),
-                        cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
-
-            if angle_knee > 150:
-                self.stage = "up"
-            if angle_knee < 90 and self.stage == "up":
-                self.stage = "down"
-                self.counter += 1
-                print("Squat count:", self.counter)
-
-            return img

@@ -1587,3 +1587,70 @@ O] WebSocket disconnect message received in loop
 2026-02-08 02:05:58,124 [INFO] TTS cache hit for: 'Go! Start your squats!'
 2026-02-08 02:06:12,265 [INFO] [1dd7ff79] Client disconnected normally
 2026-02-08 02:06:12,265 [INFO] [1dd7ff79] Connection cleaned up (0 active)
+2026-02-08 02:26:16,790 [INFO] [70552e7f] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 02:26:22,330 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:26:22,356 [INFO] TTS generated (24285 bytes) for: 'Go! Start your squats!'
+2026-02-08 02:26:28,216 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:26:28,232 [INFO] TTS generated (23449 bytes) for: 'Good depth! Drive up!'
+2026-02-08 02:26:31,821 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:26:31,834 [INFO] TTS generated (18016 bytes) for: 'Keep chest up!'
+2026-02-08 02:26:45,552 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:26:52,339 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:26:52,341 [INFO] TTS generated (16762 bytes) for: 'Good rep!'
+2026-02-08 02:26:57,567 [INFO] [70552e7f] Resetting rep counter
+2026-02-08 02:26:57,983 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:26:57,999 [INFO] TTS generated (24285 bytes) for: "Set 2  let's go!"
+2026-02-08 02:27:22,743 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:27:32,664 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 02:27:39,010 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:27:42,023 [INFO] [70552e7f] Client disconnected normally
+2026-02-08 02:27:42,024 [INFO] [70552e7f] Connection cleaned up (0 active)
+2026-02-08 02:31:01,968 [INFO] [6c72a188] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 02:31:07,092 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 02:31:15,196 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:31:19,979 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:31:19,982 [INFO] TTS generated (18016 bytes) for: 'Squat deeper'
+2026-02-08 02:31:25,153 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 02:31:29,101 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:31:35,030 [INFO] [6c72a188] Resetting rep counter
+2026-02-08 02:31:35,045 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 02:31:41,993 [INFO] [6ed74789] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 02:31:49,857 [INFO] [6ed74789] Client disconnected normally
+2026-02-08 02:31:49,857 [INFO] [6ed74789] Connection cleaned up (1 active)
+2026-02-08 02:31:56,337 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:31:58,467 [INFO] [6c72a188] Client disconnected normally
+2026-02-08 02:31:58,467 [INFO] [6c72a188] Connection cleaned up (0 active)
+2026-02-08 02:34:16,395 [INFO] [b0d16798] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 02:34:21,620 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 02:34:25,358 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:34:33,154 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 02:34:36,922 [INFO] [b0d16798] Resetting rep counter
+2026-02-08 02:34:36,930 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 02:34:58,014 [INFO] TTS cache hit for: 'Squat deeper'
+2026-02-08 02:35:03,148 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 02:35:07,595 [INFO] [b0d16798] Client disconnected normally
+2026-02-08 02:35:07,595 [INFO] [b0d16798] Connection cleaned up (0 active)
+2026-02-08 02:38:59,739 [INFO] [728835e0] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 02:39:05,267 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:39:05,288 [INFO] TTS generated (24285 bytes) for: 'Go! Start your squats!'
+2026-02-08 02:39:09,511 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:39:09,523 [INFO] TTS generated (24285 bytes) for: 'Good depth! Drive up!'
+2026-02-08 02:39:11,239 [INFO] REP #1 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:39:14,755 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:39:14,758 [INFO] TTS generated (18016 bytes) for: 'Squat deeper'
+2026-02-08 02:39:18,358 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:39:18,371 [INFO] TTS generated (18016 bytes) for: 'Keep chest up!'
+2026-02-08 02:39:21,310 [INFO] REP #2 COMPLETE: raw_issues=['Keep chest up!'], filtered_issues=['Keep chest up!'], had_good_depth=True, valid=False
+2026-02-08 02:39:24,277 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:39:28,154 [INFO] REP #3 COMPLETE: raw_issues=['Keep chest up!'], filtered_issues=['Keep chest up!'], had_good_depth=True, valid=False
+2026-02-08 02:39:28,893 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 02:39:33,403 [INFO] REP #4 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:39:33,895 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:39:33,898 [INFO] TTS generated (14254 bytes) for: 'Good rep!'
+2026-02-08 02:39:36,594 [INFO] [728835e0] Resetting rep counter
+2026-02-08 02:39:36,902 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:39:36,908 [INFO] TTS generated (20524 bytes) for: "Set 2  let's go!"
+2026-02-08 02:39:41,118 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:39:43,886 [INFO] REP #1 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:39:46,668 [INFO] REP #2 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:39:46,765 [INFO] TTS cache hit for: 'Good rep!'

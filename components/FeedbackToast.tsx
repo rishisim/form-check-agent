@@ -10,7 +10,7 @@ interface FeedbackToastProps {
 export const FeedbackToast = memo(({ message, level, isLandscape = false }: FeedbackToastProps) => {
     if (!message) return null;
 
-    const getBgColor = (level: string) => {
+    const getBgColor = () => {
         switch (level) {
             case 'success': return '#D4EDDA'; // Soft Green
             case 'warning': return '#FFF3CD'; // Warm Amber
@@ -19,7 +19,7 @@ export const FeedbackToast = memo(({ message, level, isLandscape = false }: Feed
         }
     };
 
-    const getTextColor = (level: string) => {
+    const getTextColor = () => {
         switch (level) {
             case 'success': return '#155724'; // Dark Green
             case 'warning': return '#856404'; // Dark Amber
@@ -31,12 +31,12 @@ export const FeedbackToast = memo(({ message, level, isLandscape = false }: Feed
     return (
         <View style={[
             styles.container,
-            { backgroundColor: getBgColor(level) },
+            { backgroundColor: getBgColor() },
             isLandscape && styles.containerLandscape,
         ]}>
             <Text style={[
                 styles.text,
-                { color: getTextColor(level) },
+                { color: getTextColor() },
                 isLandscape && styles.textLandscape,
             ]}>
                 {message}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -48,7 +48,6 @@ export default function FormCheckScreen() {
     // ─── Camera / Connection ─────────────────────
     const [permission, requestPermission] = useCameraPermissions();
     const [isConnected, setIsConnected] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'error' | 'disconnected'>('disconnected');
     const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
 
     // ─── Workout Tracking ────────────────────────
@@ -81,7 +80,6 @@ export default function FormCheckScreen() {
     // ─── Depth Data ──────────────────────────────
     const [targetDepthY, setTargetDepthY] = useState(0);
     const [currentDepthY, setCurrentDepthY] = useState(0);
-    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
     // ─── Refs ────────────────────────────────────
     const cameraRef = useRef<CameraView>(null);
@@ -193,17 +191,12 @@ export default function FormCheckScreen() {
             if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) return;
         }
 
-        setConnectionStatus('connecting');
-        console.log('Connecting to', SERVER_URL);
         const ws = new WebSocket(SERVER_URL);
 
         ws.onopen = () => {
             setIsConnected(true);
-            setConnectionStatus('connected');
-            setCurrentSessionId(null);
             currentSessionIdRef.current = null;
             reconnectDelayRef.current = 1000; // reset backoff on success
-            console.log('WebSocket connected');
         };
 
         ws.onmessage = (event) => {
@@ -223,7 +216,6 @@ export default function FormCheckScreen() {
                 if (data.type === 'reset_confirmation') {
                     isResetPendingRef.current = false;
                     currentSessionIdRef.current = data.new_session_id;
-                    setCurrentSessionId(data.new_session_id);
                     if (resetTimeoutRef.current) {
                         clearTimeout(resetTimeoutRef.current);
                         resetTimeoutRef.current = null;
@@ -235,24 +227,36 @@ export default function FormCheckScreen() {
                     return;
                 }
 
-                // Drop messages while awaiting reset
-                if (isResetPendingRef.current && data.type === 'analysis') return;
-
                 if (data.type === 'analysis' && data.feedback) {
+                    const feedback = data.feedback;
+                    const incomingSeq = feedback.frame_seq ?? 0;
+                    const sessionId = feedback.session_id;
                     const activeSessionId = currentSessionIdRef.current;
-                    if (activeSessionId && data.feedback.session_id && data.feedback.session_id !== activeSessionId) return;
 
-                    const incomingSeq = data.feedback.frame_seq ?? 0;
-                    if (incomingSeq > 0 && incomingSeq <= lastFrameSeqRef.current) return;
-
-                    if (!activeSessionId && data.feedback.session_id) {
-                        currentSessionIdRef.current = data.feedback.session_id;
-                        setCurrentSessionId(data.feedback.session_id);
+                    if (isResetPendingRef.current && sessionId && activeSessionId && sessionId !== activeSessionId) {
+                        // Treat first new session_id as implicit reset confirmation
+                        currentSessionIdRef.current = sessionId;
+                        isResetPendingRef.current = false;
+                        if (resetTimeoutRef.current) {
+                            clearTimeout(resetTimeoutRef.current);
+                            resetTimeoutRef.current = null;
+                        }
+                        lastFrameSeqRef.current = 0;
+                    } else if (!activeSessionId && sessionId) {
+                        currentSessionIdRef.current = sessionId;
                     }
 
-                    // Unthrottled: landmarks for smooth skeleton
-                    setLandmarks(data.feedback.landmarks || []);
-                    const analysis = data.feedback.analysis;
+                    const sessionMismatch = !!(currentSessionIdRef.current && sessionId && sessionId !== currentSessionIdRef.current);
+
+                    // Unthrottled: landmarks for smooth skeleton (even during reset)
+                    if (!sessionMismatch || isResetPendingRef.current) {
+                        setLandmarks(feedback.landmarks || []);
+                    }
+
+                    if (isResetPendingRef.current || sessionMismatch) return;
+                    if (incomingSeq > 0 && incomingSeq <= lastFrameSeqRef.current) return;
+
+                    const analysis = feedback.analysis;
                     if (analysis) {
                         setHipTrajectory(analysis.hip_trajectory || []);
 
@@ -306,8 +310,8 @@ export default function FormCheckScreen() {
                         lastUpdateRef.current = now;
                     }
                 }
-            } catch (e) {
-                console.error('Failed to parse message:', e);
+            } catch {
+                // Malformed message — skip
             }
         };
 
@@ -316,15 +320,12 @@ export default function FormCheckScreen() {
             if (e && typeof e === 'object' && 'preventDefault' in e) {
                 (e as any).preventDefault?.();
             }
-            console.log('WebSocket connection failed — is the backend running?');
-            setConnectionStatus('error');
+            // Connection failed — will auto-reconnect
         };
 
         ws.onclose = () => {
             wsRef.current = null;
             setIsConnected(false);
-            setConnectionStatus('disconnected');
-            console.log('WebSocket closed');
 
             if (!intentionalDisconnectRef.current) {
                 // Exponential backoff: 1s → 2s → 4s → max 10s
@@ -380,7 +381,6 @@ export default function FormCheckScreen() {
             if (isResetPendingRef.current) {
                 isResetPendingRef.current = false;
                 currentSessionIdRef.current = `client_reset_${Date.now()}`;
-                setCurrentSessionId(null);
             }
         }, 3000);
 
@@ -399,7 +399,7 @@ export default function FormCheckScreen() {
         setFeedback('Next set — get ready!');
         setFeedbackLevel('success');
         lastUpdateRef.current = 0;
-        lastFrameSeqRef.current = Number.MAX_SAFE_INTEGER;
+        lastFrameSeqRef.current = 0;
     }, []);
 
     // ─── Rest Break Countdown ─────────────────────
@@ -558,7 +558,7 @@ export default function FormCheckScreen() {
     }, [router, totalSets, repsPerSet]);
 
     // ─── Dynamic Theme Styles ────────────────────
-    const themedStyles = useMemo(() => ({
+    const themedStyles = React.useMemo(() => ({
         // Permission screen colors
         permissionContainer: { backgroundColor: theme.background },
         permBackArrow: { color: theme.textSecondary },

@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 
 class PoseTracker:
     def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, detection_confidence=0.45, tracking_confidence=0.4):
@@ -27,7 +26,7 @@ class PoseTracker:
     def get_position(self, img, draw=False):
         lm_list = []
         if self.results.pose_landmarks:
-            h, w, c = img.shape
+            h, w, _ = img.shape
             for id, lm in enumerate(self.results.pose_landmarks.landmark):
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 lm_list.append([id, cx, cy, lm.visibility])
