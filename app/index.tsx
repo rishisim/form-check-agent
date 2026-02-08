@@ -146,108 +146,109 @@ export default function HomeScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Header – always visible */}
-            <View style={styles.header}>
-                <Text style={styles.logo}>🏋️</Text>
-                <Text style={styles.title}>Form Check Agent</Text>
-                <Text style={styles.subtitle}>AI-Powered Workout Coach</Text>
-            </View>
+        <View style={styles.container}>
+            <SafeAreaView style={styles.safeArea}>
+                {/* Header – always visible */}
+                <View style={styles.header}>
+                    <Text style={styles.title}>FormFlow</Text>
+                    <Text style={styles.subtitle}>AI-Powered Workout Coach</Text>
+                </View>
 
-            {/* Page indicator dots + labels */}
-            <View style={styles.tabBar}>
-                {PAGE_TITLES.map((title, i) => (
-                    <Pressable key={title} onPress={() => goToPage(i)} style={styles.tab}>
-                        <Text style={[styles.tabText, activePageIndex === i && styles.tabTextActive]}>
-                            {title}
-                        </Text>
-                        {activePageIndex === i && <View style={styles.tabIndicator} />}
-                    </Pressable>
-                ))}
-            </View>
+                {/* Page indicator dots + labels */}
+                <View style={styles.tabBar}>
+                    {PAGE_TITLES.map((title, i) => (
+                        <Pressable key={title} onPress={() => goToPage(i)} style={styles.tab}>
+                            <Text style={[styles.tabText, activePageIndex === i && styles.tabTextActive]}>
+                                {title}
+                            </Text>
+                            {activePageIndex === i && <View style={styles.tabIndicator} />}
+                        </Pressable>
+                    ))}
+                </View>
 
-            {/* Horizontal paging scroll */}
-            <ScrollView
-                ref={horizontalRef}
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                onMomentumScrollEnd={onHorizontalScroll}
-                style={styles.pager}
-            >
-                {/* ─── Page 1: Body Weight Exercises ─── */}
+                {/* Horizontal paging scroll */}
                 <ScrollView
-                    style={{ width: SCREEN_WIDTH }}
-                    contentContainerStyle={styles.pageContent}
-                    showsVerticalScrollIndicator={false}
+                    ref={horizontalRef}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    onMomentumScrollEnd={onHorizontalScroll}
+                    style={styles.pager}
                 >
-                    <View style={styles.grid}>
-                        <AnimatedExerciseCard
-                            emoji="🦵"
-                            name="Squats"
-                            desc="Track depth & form"
-                            href="/workout-config"
-                        />
+                    {/* ─── Page 1: Body Weight Exercises ─── */}
+                    <ScrollView
+                        style={{ width: SCREEN_WIDTH }}
+                        contentContainerStyle={styles.pageContent}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View style={styles.grid}>
+                            <AnimatedExerciseCard
+                                emoji="🦵"
+                                name="Squats"
+                                desc="Track depth & form"
+                                href="/workout-config"
+                            />
 
-                        <AnimatedExerciseCard
-                            emoji="💪"
-                            name="Push-ups"
-                            desc="Track form & reps"
-                            href="/workout-config?exercise=pushup"
-                        />
-                    </View>
+                            <AnimatedExerciseCard
+                                emoji="💪"
+                                name="Push-ups"
+                                desc="Track form & reps"
+                                href="/workout-config?exercise=pushup"
+                            />
+                        </View>
 
-                    <Text style={styles.sectionTitle}>Coming Soon</Text>
+                        <Text style={styles.sectionTitle}>Coming Soon</Text>
 
-                    <View style={styles.grid}>
-                        {comingSoonExercises.map((exercise) => (
-                            <View key={exercise.name} style={styles.gridItem}>
-                                <View style={[styles.exerciseCard, styles.comingSoonCard]}>
-                                    <Text style={styles.exerciseEmoji}>{exercise.emoji}</Text>
-                                    <Text style={[styles.exerciseName, styles.comingSoonText]}>
-                                        {exercise.name}
-                                    </Text>
-                                    <Text style={styles.exerciseDesc}>{exercise.desc}</Text>
-                                    <View style={styles.badge}>
-                                        <Text style={styles.badgeText}>Coming Soon</Text>
+                        <View style={styles.grid}>
+                            {comingSoonExercises.map((exercise) => (
+                                <View key={exercise.name} style={styles.gridItem}>
+                                    <View style={[styles.exerciseCard, styles.comingSoonCard]}>
+                                        <Text style={styles.exerciseEmoji}>{exercise.emoji}</Text>
+                                        <Text style={[styles.exerciseName, styles.comingSoonText]}>
+                                            {exercise.name}
+                                        </Text>
+                                        <Text style={styles.exerciseDesc}>{exercise.desc}</Text>
+                                        <View style={styles.badge}>
+                                            <Text style={styles.badgeText}>Coming Soon</Text>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
-                        ))}
+                            ))}
+                        </View>
+
+                        <Text style={styles.footer}>
+                            Run the backend first:{'\n'}
+                            <Text style={styles.code}>python backend/server.py</Text>
+                        </Text>
+                    </ScrollView>
+
+                    {/* ─── Page 2: Physical Therapy ─── */}
+                    <View style={[styles.ptPage, { width: SCREEN_WIDTH }]}>
+                        <Text style={styles.ptEmoji}>🩺</Text>
+                        <Text style={styles.ptTitle}>Coming Soon</Text>
+                        <Text style={styles.ptDesc}>
+                            Guided physical therapy routines with real-time form tracking to support your recovery.
+                        </Text>
                     </View>
-
-                    <Text style={styles.footer}>
-                        Run the backend first:{'\n'}
-                        <Text style={styles.code}>python backend/server.py</Text>
-                    </Text>
                 </ScrollView>
-
-                {/* ─── Page 2: Physical Therapy ─── */}
-                <View style={[styles.ptPage, { width: SCREEN_WIDTH }]}>
-                    <Text style={styles.ptEmoji}>🩺</Text>
-                    <Text style={styles.ptTitle}>Coming Soon</Text>
-                    <Text style={styles.ptDesc}>
-                        Guided physical therapy routines with real-time form tracking to support your recovery.
-                    </Text>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+            </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F7F7F8',
+        backgroundColor: '#F7F7F8', // Main background color for the app
+    },
+    safeArea: {
+        flex: 1,
+        backgroundColor: 'transparent',
     },
     header: {
         alignItems: 'center',
-        paddingTop: 24,
+        paddingTop: 8,
         paddingBottom: 16,
-    },
-    logo: {
-        fontSize: 72,
-        marginBottom: 12,
     },
     title: {
         fontSize: 30,
