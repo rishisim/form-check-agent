@@ -10,16 +10,20 @@ import { FeedbackToast } from '../components/FeedbackToast';
 import { useTTS } from '../hooks/useTTS';
 
 // ─── Configuration ───────────────────────────────────────
-const SERVER_URL = 'ws://10.194.82.50:8000/ws/video';
-const SERVER_HTTP_URL = SERVER_URL.replace('ws://', 'http://').replace('/ws/video', '');
+const SERVER_BASE = 'ws://10.194.82.50:8000/ws/video';
 
 export default function FormCheckScreen() {
     const router = useRouter();
-    const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string }>();
+    const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string; exercise?: string }>();
 
     const totalSets = parseInt(params.sets || '3', 10);
     const repsPerSet = parseInt(params.reps || '10', 10);
     const initialTimer = parseInt(params.timerSeconds || '10', 10);
+    const exercise = (params.exercise || 'squat').toLowerCase();
+    const isPushup = exercise === 'pushup';
+
+    const SERVER_URL = `${SERVER_BASE}?exercise=${exercise}`;
+    const SERVER_HTTP_URL = SERVER_BASE.replace('ws://', 'http://').replace(/\/ws\/video.*$/, '');
 
     // ─── Camera / Connection ─────────────────────
     const [permission, requestPermission] = useCameraPermissions();
@@ -94,14 +98,15 @@ export default function FormCheckScreen() {
         if (!isCountdownActive) return;
         if (countdown <= 0) {
             setIsCountdownActive(false);
-            setFeedback('Go! Start your squats!');
+            const goMsg = isPushup ? 'Go! Start your pushups!' : 'Go! Start your squats!';
+            setFeedback(goMsg);
             setFeedbackLevel('success');
-            speakTTS('Go! Start your squats!');
+            speakTTS(goMsg);
             return;
         }
         const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
         return () => clearTimeout(timer);
-    }, [countdown, isCountdownActive]);
+    }, [countdown, isCountdownActive, isPushup]);
 
     // ─── Set Completion Detection ────────────────
     useEffect(() => {
@@ -517,6 +522,7 @@ export default function FormCheckScreen() {
                             targetDepthY={targetDepthY}
                             currentDepthY={currentDepthY}
                             isValid={!!targetDepthY}
+                            label={isPushup ? 'CHEST' : 'HIPS'}
                         />
                         <SkeletonOverlay
                             landmarks={landmarks}
@@ -582,13 +588,13 @@ export default function FormCheckScreen() {
                                 {/* Angle Metrics */}
                                 <View style={styles.metricsGroup}>
                                     <View style={styles.metricItem}>
-                                        <Text style={styles.hudLabel}>KNEE</Text>
+                                        <Text style={styles.hudLabel}>{isPushup ? 'ELBOW' : 'KNEE'}</Text>
                                         <Text style={[styles.hudValue, { color: '#41719C' }]}>
                                             {kneeAngle !== null ? `${kneeAngle}°` : '--'}
                                         </Text>
                                     </View>
                                     <View style={styles.metricItem}>
-                                        <Text style={styles.hudLabel}>BACK</Text>
+                                        <Text style={styles.hudLabel}>{isPushup ? 'BODY' : 'BACK'}</Text>
                                         <Text style={[styles.hudValue, { color: '#7030A0' }]}>
                                             {hipAngle !== null ? `${hipAngle}°` : '--'}
                                         </Text>
@@ -621,7 +627,7 @@ export default function FormCheckScreen() {
                                 <Text style={styles.countdownLabel}>Get Ready!</Text>
                                 <Text style={styles.countdownNumber}>{countdown}</Text>
                                 <Text style={styles.countdownHint}>
-                                    {totalSets} × {repsPerSet} Squats
+                                    {totalSets} × {repsPerSet} {isPushup ? 'Push-ups' : 'Squats'}
                                 </Text>
                             </View>
                         )}

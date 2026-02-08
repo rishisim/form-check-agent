@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 export default function WorkoutConfigScreen() {
     const router = useRouter();
+    const params = useLocalSearchParams<{ exercise?: string }>();
+    const exercise = (params.exercise || 'squat').toLowerCase();
+
     const [sets, setSets] = useState(3);
     const [reps, setReps] = useState(10);
     const [timerSeconds, setTimerSeconds] = useState(10);
 
     const handleStartWorkout = () => {
-        router.push(`/form-check?sets=${sets}&reps=${reps}&timerSeconds=${timerSeconds}`);
+        router.push(`/form-check?sets=${sets}&reps=${reps}&timerSeconds=${timerSeconds}&exercise=${exercise}`);
     };
+
+    const isPushup = exercise === 'pushup';
 
     const adjust = (
         setter: React.Dispatch<React.SetStateAction<number>>,
@@ -33,8 +38,8 @@ export default function WorkoutConfigScreen() {
             </TouchableOpacity>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.emoji}>🦵</Text>
-                <Text style={styles.title}>Squats</Text>
+                <Text style={styles.emoji}>{isPushup ? '💪' : '🦵'}</Text>
+                <Text style={styles.title}>{isPushup ? 'Push-ups' : 'Squats'}</Text>
                 <Text style={styles.subtitle}>Configure your workout</Text>
 
                 {/* ── Sets ────────────────────────── */}

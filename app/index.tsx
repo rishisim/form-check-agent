@@ -20,14 +20,13 @@ export default function HomeScreen() {
                     </View>
                 </Link>
 
-                {/* Future exercises – disabled */}
-                <View style={[styles.exerciseCard, styles.disabled]}>
+                <Link href="/workout-config?exercise=pushup" style={styles.exerciseCard}>
                     <View style={styles.cardInner}>
                         <Text style={styles.exerciseEmoji}>💪</Text>
                         <Text style={styles.exerciseName}>Push-ups</Text>
-                        <Text style={styles.exerciseDesc}>Coming soon</Text>
+                        <Text style={styles.exerciseDesc}>Track form & reps</Text>
                     </View>
-                </View>
+                </Link>
             </View>
 
             <Text style={styles.footer}>

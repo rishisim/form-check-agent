@@ -6,6 +6,7 @@ const MIN_SPEAK_INTERVAL_MS = 3000; // Minimum gap between TTS calls
 const SKIP_MESSAGES = new Set([
     'Position yourself in frame',
     'Start Squatting',
+    'Start Push-ups',
     'Chest up a bit more',      // minor warning, not worth vocalizing
 ]);
 
