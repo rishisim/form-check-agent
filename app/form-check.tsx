@@ -69,6 +69,7 @@ export default function FormCheckScreen() {
     const lastUpdateRef = useRef(0);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const reconnectDelayRef = useRef(1000);
+    const lastFeedbackRef = useRef('');
 
     // Workout refs (avoid stale closures)
     const currentSetRef = useRef(1);
@@ -202,11 +203,15 @@ export default function FormCheckScreen() {
                     if (analysis) {
                         setHipTrajectory(analysis.hip_trajectory || []);
 
-                        // Feedback text + TTS: update IMMEDIATELY (no throttle)
+                        // Feedback text + TTS: only update when text actually changes
                         if (!isSetTransitionRef.current && !isWorkoutCompleteRef.current) {
-                            setFeedback(analysis.feedback);
-                            setFeedbackLevel(analysis.feedback_level || 'success');
-                            speakTTS(analysis.feedback);
+                            const newFeedback = analysis.feedback;
+                            if (newFeedback && newFeedback !== lastFeedbackRef.current) {
+                                lastFeedbackRef.current = newFeedback;
+                                setFeedback(newFeedback);
+                                setFeedbackLevel(analysis.feedback_level || 'success');
+                                speakTTS(newFeedback);
+                            }
                         }
                     }
 

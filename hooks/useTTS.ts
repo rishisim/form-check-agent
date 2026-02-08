@@ -2,10 +2,11 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useAudioPlayer, AudioSource } from 'expo-audio';
 
 // ─── Configuration ───────────────────────────────────────
-const MIN_SPEAK_INTERVAL_MS = 2500; // Minimum gap between TTS calls
+const MIN_SPEAK_INTERVAL_MS = 3000; // Minimum gap between TTS calls
 const SKIP_MESSAGES = new Set([
     'Position yourself in frame',
     'Start Squatting',
+    'Chest up a bit more',      // minor warning, not worth vocalizing
 ]);
 
 interface UseTTSOptions {

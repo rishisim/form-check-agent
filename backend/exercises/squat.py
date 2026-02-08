@@ -42,25 +42,40 @@ class SquatAnalyzer:
     BACK_BAD_ANGLE        = 45    # Torso too horizontal – error
 
     # Knee valgus: max inward drift as fraction of hip-width
-    KNEE_VALGUS_THRESHOLD = 0.15
+    KNEE_VALGUS_THRESHOLD = 0.28
 
-    # Forward knee travel: knee X beyond toe X (pixels, side-view)
-    KNEE_OVER_TOE_PX      = 20
+    # Forward knee travel: knee X beyond ankle X as fraction of shin length
+    KNEE_OVER_TOE_RATIO   = 0.45
 
     # Minimum visibility score (0-1) for the side being used
-    MIN_VISIBILITY        = 0.45
+    MIN_VISIBILITY        = 0.50
 
     # Minimum time (seconds) between two counted reps
     MIN_REP_INTERVAL      = 0.8
 
     # How many consecutive "deep" frames are required before counting
-    MIN_DEEP_FRAMES       = 1
+    MIN_DEEP_FRAMES       = 2
 
     # Smoothing factor for EMA (0-1).  Higher = more responsive.
     SMOOTH_ALPHA          = 0.55
 
     # Side-stickiness: minimum frames before switching detected side
     SIDE_STICKY_FRAMES    = 5
+
+    # ---- Feedback debounce: consecutive frames required to emit a warning ---
+    WARN_FRAMES_BACK      = 6   # "Keep chest up" needs 6 bad frames in a row
+    WARN_FRAMES_VALGUS    = 10  # "Push knees out" needs 10 bad frames
+    WARN_FRAMES_KNEE_TOE  = 8   # "Sit back more" needs 8 bad frames
+    WARN_FRAMES_DEEPER    = 8   # "Squat deeper" needs 8 frames
+
+    # Minimum time (seconds) a feedback message stays on screen before changing
+    FEEDBACK_HOLD_TIME    = 2.5
+
+    # Priority order for warnings (lower index = higher priority).
+    # When multiple warnings fire, only the highest-priority one is shown.
+    # Once shown, it stays until resolved (counter drops to 0).
+    WARN_PRIORITY = ["Keep chest up!", "Push knees out!", "Sit back more",
+                     "Chest up a bit more", "Squat deeper"]
 
     def __init__(self):
         self.stage = "up"        # "up" | "descending" | "bottom" | "ascending"
@@ -88,6 +103,23 @@ class SquatAnalyzer:
         self._current_side: str | None = None
         self._side_frame_count: int = 0
 
+        # ---- Debounce counters for each form warning ----
+        self._back_warn_frames: int = 0
+        self._valgus_warn_frames: int = 0
+        self._knee_toe_warn_frames: int = 0
+        self._deeper_warn_frames: int = 0
+
+        # ---- Feedback stabilization ----
+        self._stable_feedback: str = "Start Squatting"
+        self._stable_feedback_level: str = "success"
+        self._stable_feedback_time: float = 0.0
+        self._candidate_feedback: str = ""
+        self._candidate_count: int = 0
+        self._candidate_threshold: int = 5  # frames of same message to promote
+
+        # Active-warning lock: once a warning is shown, it stays until resolved
+        self._active_warning: str | None = None
+
     def reset(self):
         """Resets the analyzer state for a new set."""
         self.stage = "up"
@@ -104,6 +136,16 @@ class SquatAnalyzer:
         self._rep_had_good_depth = False
         self._current_side = None
         self._side_frame_count = 0
+        self._back_warn_frames = 0
+        self._valgus_warn_frames = 0
+        self._knee_toe_warn_frames = 0
+        self._deeper_warn_frames = 0
+        self._stable_feedback = "Start Squatting"
+        self._stable_feedback_level = "success"
+        self._stable_feedback_time = 0.0
+        self._candidate_feedback = ""
+        self._candidate_count = 0
+        self._active_warning = None
 
     # ------------------------------------------------------------------
     # Main analysis (called by server for every frame)
@@ -177,39 +219,68 @@ class SquatAnalyzer:
 
         now = time.monotonic()
 
-        # ---- Real-time form checks (every frame) ----------------------
+        # ---- Real-time form checks (every frame, with debounce) --------
         feedback_list: list[str] = []
         frame_good_form = True
 
-        # Back angle checks (two tiers)
-        if hip_angle < self.BACK_BAD_ANGLE:
-            feedback_list.append("Keep chest up!")
-            frame_good_form = False
-        elif hip_angle < self.BACK_WARNING_ANGLE:
-            feedback_list.append("Chest up a bit more")
+        # Only run form checks when actively squatting (not standing idle)
+        actively_squatting = self.stage in ("descending", "bottom", "ascending")
+
+        # Back angle checks (two tiers) – only during active squat
+        if actively_squatting:
+            if hip_angle < self.BACK_BAD_ANGLE:
+                self._back_warn_frames += 1
+            elif hip_angle < self.BACK_WARNING_ANGLE:
+                self._back_warn_frames += 1
+            else:
+                self._back_warn_frames = max(0, self._back_warn_frames - 2)  # decay faster than buildup
+
+            if self._back_warn_frames >= self.WARN_FRAMES_BACK:
+                if hip_angle < self.BACK_BAD_ANGLE:
+                    feedback_list.append("Keep chest up!")
+                    frame_good_form = False
+                else:
+                    feedback_list.append("Chest up a bit more")
+        else:
+            self._back_warn_frames = max(0, self._back_warn_frames - 1)
 
         # Knee valgus (frontal view) – check if knees collapse inward
         hip_width = abs(right_hip_x - left_hip_x)
-        if hip_width > 20:  # Only check when we have a reasonable frontal view
-            # Compare knee spread to ankle spread relative to hip width
+        if hip_width > 20 and actively_squatting:
             knee_spread = abs(right_knee_x - left_knee_x)
             ankle_spread = abs(right_ankle_x - left_ankle_x)
             if ankle_spread > 0 and knee_spread < ankle_spread * (1 - self.KNEE_VALGUS_THRESHOLD):
+                self._valgus_warn_frames += 1
+            else:
+                self._valgus_warn_frames = max(0, self._valgus_warn_frames - 2)
+
+            if self._valgus_warn_frames >= self.WARN_FRAMES_VALGUS:
                 feedback_list.append("Push knees out!")
                 frame_good_form = False
+        else:
+            self._valgus_warn_frames = max(0, self._valgus_warn_frames - 1)
 
-        # Forward knee travel (side view) – knee past toes
-        # In side view, if knee X goes significantly past ankle X
+        # Forward knee travel (side view) – use ratio of shin length
         if self.stage in ("descending", "bottom"):
-            # Determine direction: which way the person faces
             knee_x, ankle_x = knee[0], ankle[0]
+            shin_len = max(abs(knee[1] - ankle[1]), 1)  # vertical shin length in px
             forward_travel = abs(knee_x - ankle_x)
-            if forward_travel > self.KNEE_OVER_TOE_PX:
-                # Only flag if knee is actually past the ankle in the direction of travel
-                if (side_used == "right" and knee_x > ankle_x + self.KNEE_OVER_TOE_PX) or \
-                   (side_used == "left" and knee_x < ankle_x - self.KNEE_OVER_TOE_PX):
-                    feedback_list.append("Sit back more")
-                    frame_good_form = False
+            travel_ratio = forward_travel / shin_len
+
+            if travel_ratio > self.KNEE_OVER_TOE_RATIO:
+                if (side_used == "right" and knee_x > ankle_x) or \
+                   (side_used == "left" and knee_x < ankle_x):
+                    self._knee_toe_warn_frames += 1
+                else:
+                    self._knee_toe_warn_frames = max(0, self._knee_toe_warn_frames - 1)
+            else:
+                self._knee_toe_warn_frames = max(0, self._knee_toe_warn_frames - 2)
+
+            if self._knee_toe_warn_frames >= self.WARN_FRAMES_KNEE_TOE:
+                feedback_list.append("Sit back more")
+                frame_good_form = False
+        else:
+            self._knee_toe_warn_frames = max(0, self._knee_toe_warn_frames - 1)
 
         # ---- State machine with 4 stages & hysteresis ------------------
         if self.stage == "up":
@@ -219,9 +290,11 @@ class SquatAnalyzer:
                 self._rep_form_issues = []
                 self._rep_had_good_depth = False
                 self._deep_frame_count = 0
-
-            if knee_angle < 140 and knee_angle > 100:
-                feedback_list.append("Squat deeper")
+                # Reset warning counters for the new rep
+                self._back_warn_frames = 0
+                self._valgus_warn_frames = 0
+                self._knee_toe_warn_frames = 0
+                self._deeper_warn_frames = 0
 
         elif self.stage == "descending":
             # Accumulate form issues while going down
@@ -232,11 +305,20 @@ class SquatAnalyzer:
 
             if knee_angle <= self.KNEE_DEEP_ANGLE:
                 self._deep_frame_count += 1
+                self._deeper_warn_frames = 0  # they're deep enough, reset
             else:
                 self._deep_frame_count = max(0, self._deep_frame_count - 1)
+                # Track how long they've been in a "not deep enough" zone
+                if knee_angle < self.KNEE_LOCKOUT_ANGLE:
+                    self._deeper_warn_frames += 1
 
             if is_deep_enough:
                 self._rep_had_good_depth = True
+
+            # Only show "Squat deeper" if they've been hovering above depth for a while
+            if self._deeper_warn_frames >= self.WARN_FRAMES_DEEPER and not is_deep_enough:
+                if "Squat deeper" not in feedback_list:
+                    feedback_list.append("Squat deeper")
 
             if self._deep_frame_count >= self.MIN_DEEP_FRAMES:
                 self.stage = "bottom"
@@ -246,6 +328,7 @@ class SquatAnalyzer:
             if knee_angle > self.KNEE_STANDING_ANGLE:
                 self.stage = "up"
                 self._deep_frame_count = 0
+                self._deeper_warn_frames = 0
 
         elif self.stage == "bottom":
             # Still at the bottom – keep tracking form
@@ -295,15 +378,72 @@ class SquatAnalyzer:
                 self.stage = "up"
                 self._deep_frame_count = 0
 
-        # ---- Build final feedback string --------------------------------
-        final_feedback = self.feedback
-        feedback_level = 'success'
+        # ---- Build final feedback with warning-lock logic -----------------
+        # Map warnings to their debounce counters so we can check "resolved"
+        _warn_counter = {
+            "Keep chest up!": self._back_warn_frames,
+            "Chest up a bit more": self._back_warn_frames,
+            "Push knees out!": self._valgus_warn_frames,
+            "Sit back more": self._knee_toe_warn_frames,
+            "Squat deeper": self._deeper_warn_frames,
+        }
 
+        # If the currently-locked warning is still in the feedback list, keep it.
+        # If it has been resolved (counter dropped to 0), release the lock.
+        if self._active_warning is not None:
+            counter_val = _warn_counter.get(self._active_warning, 0)
+            if counter_val == 0:
+                self._active_warning = None  # resolved → release
+
+        # Pick which warning to show using priority order
+        chosen_warning: str | None = None
         if feedback_list:
-            final_feedback = feedback_list[0]
-            feedback_level = 'warning'
-        if not frame_good_form:
-            feedback_level = 'error'
+            if self._active_warning and self._active_warning in feedback_list:
+                # Locked warning is still active → keep it
+                chosen_warning = self._active_warning
+            else:
+                # Pick the highest-priority warning from the list
+                for w in self.WARN_PRIORITY:
+                    if w in feedback_list:
+                        chosen_warning = w
+                        break
+                if chosen_warning is None:
+                    chosen_warning = feedback_list[0]
+                self._active_warning = chosen_warning
+
+        # Determine desired feedback and level
+        if chosen_warning:
+            desired_feedback = chosen_warning
+            desired_level = 'error' if not frame_good_form else 'warning'
+        else:
+            desired_feedback = self.feedback
+            desired_level = 'success'
+            self._active_warning = None  # no warnings → clear lock
+
+        # Stabilization: rep-completion messages update immediately;
+        # warnings need N consistent candidate frames OR the hold time to expire.
+        rep_completion_msgs = {"Good rep!", "Deeper! Hips below knees.", "Check form",
+                               "Good depth! Drive up!"}
+        is_priority = desired_feedback in rep_completion_msgs
+
+        if desired_feedback == self._candidate_feedback:
+            self._candidate_count += 1
+        else:
+            self._candidate_feedback = desired_feedback
+            self._candidate_count = 1
+
+        time_since_stable = now - self._stable_feedback_time
+        should_update = (
+            is_priority
+            or self._candidate_count >= self._candidate_threshold
+            or (time_since_stable >= self.FEEDBACK_HOLD_TIME
+                and self._candidate_count >= 2)
+        )
+
+        if should_update and desired_feedback != self._stable_feedback:
+            self._stable_feedback = desired_feedback
+            self._stable_feedback_level = desired_level
+            self._stable_feedback_time = now
 
         return {
             "knee_angle": int(knee_angle),
@@ -312,8 +452,8 @@ class SquatAnalyzer:
             "rep_count": self.counter,
             "valid_reps": self.valid_reps,
             "invalid_reps": self.invalid_reps,
-            "feedback": final_feedback,
-            "feedback_level": feedback_level,
+            "feedback": self._stable_feedback,
+            "feedback_level": self._stable_feedback_level,
             "is_good_form": frame_good_form,
             "depth_status": "Good" if is_deep_enough else "High",
             "target_depth_y": knee_y,
