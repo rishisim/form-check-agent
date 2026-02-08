@@ -22,11 +22,11 @@ const KEY_JOINTS = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28];
 const VISIBILITY_THRESHOLD = 0.45;
 
 // ── Tuning knobs ────────────────────────────────────────────────────────
-const LERP_SPEED = 0.55;           // faster catch-up (was 0.3)
-const VELOCITY_DECAY = 0.88;       // how fast prediction fades (0 = instant, 1 = never)
-const PREDICTION_WEIGHT = 0.45;    // how much velocity-extrapolation contributes
-const SNAP_DISTANCE = 0.15;        // if target jumps > this, snap (no lerp)
-const STALE_MS = 400;              // after this many ms without update, dampen prediction
+const LERP_SPEED = 0.85;           // near-instant snap to target
+const VELOCITY_DECAY = 0.78;       // prediction decays quickly to avoid overshoot
+const PREDICTION_WEIGHT = 0.75;    // aggressive forward prediction between updates
+const SNAP_DISTANCE = 0.12;        // snap sooner on big jumps
+const STALE_MS = 300;              // dampen prediction sooner when data is stale
 
 interface TrackedPoint {
     // Smoothed (rendered) position

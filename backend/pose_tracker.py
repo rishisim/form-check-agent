@@ -3,7 +3,7 @@ import mediapipe as mp
 import numpy as np
 
 class PoseTracker:
-    def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, detection_confidence=0.5, tracking_confidence=0.5):
+    def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, detection_confidence=0.45, tracking_confidence=0.4):
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(

@@ -69,9 +69,9 @@ async def _safe_send(websocket: WebSocket, data: dict) -> bool:
 
 # ---------------------------------------------------------------------------
 # Target resolution for MediaPipe processing (width).  Smaller = faster.
-# MediaPipe Pose Lite works well down to ~320 px wide.
+# MediaPipe Pose Lite works well down to ~192 px wide.
 # ---------------------------------------------------------------------------
-MEDIAPIPE_MAX_WIDTH = 320
+MEDIAPIPE_MAX_WIDTH = 240
 
 
 def _downscale(frame: np.ndarray, max_width: int = MEDIAPIPE_MAX_WIDTH) -> tuple[np.ndarray, float]:

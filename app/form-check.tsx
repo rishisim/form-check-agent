@@ -332,8 +332,9 @@ export default function FormCheckScreen() {
         if (isStreamingRef.current) return;
         isStreamingRef.current = true;
 
-        const intervalMs = 100; // ~10 fps (server drops stale frames)
-
+        // Back-to-back captures: fire the next one as soon as the previous
+        // finishes. The camera hardware is the natural throttle (~5-8 fps).
+        // The server drops stale frames anyway, so flooding is fine.
         const captureLoop = async () => {
             if (!isStreamingRef.current) return;
 
@@ -351,7 +352,7 @@ export default function FormCheckScreen() {
                         shutterSound: false,
                     });
 
-                    if (photo?.base64) {
+                    if (photo?.base64 && wsRef.current?.readyState === WebSocket.OPEN) {
                         wsRef.current.send(JSON.stringify({ type: 'frame', frame: photo.base64 }));
                     }
                 }
@@ -359,7 +360,8 @@ export default function FormCheckScreen() {
                 // Silently fail
             } finally {
                 isCapturingRef.current = false;
-                frameIntervalRef.current = setTimeout(captureLoop, intervalMs);
+                // No delay — immediately start the next capture
+                frameIntervalRef.current = setTimeout(captureLoop, 0);
             }
         };
 
