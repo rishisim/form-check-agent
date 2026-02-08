@@ -1377,3 +1377,24 @@ O] WebSocket disconnect message received in loop
 2026-02-07 22:00:19,636 [INFO] TTS cache hit for: 'Good rep!'
 2026-02-07 22:00:27,913 [INFO] [aa9d6613] Client disconnected normally
 2026-02-07 22:00:27,914 [INFO] [aa9d6613] Connection cleaned up (0 active)
+2026-02-07 22:07:25,391 [INFO] [22d8e47c] WebSocket connection established (1 active, exercise=pushup)
+2026-02-07 22:07:36,136 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:07:36,152 [INFO] TTS generated (24703 bytes) for: 'Go! Start your pushups!'
+2026-02-07 22:07:41,002 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:07:41,008 [INFO] TTS generated (22613 bytes) for: 'Good depth! Push up!'
+2026-02-07 22:07:45,490 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:07:45,496 [INFO] TTS generated (15090 bytes) for: 'Good rep!'
+2026-02-07 22:07:55,294 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:07:55,310 [INFO] TTS generated (24703 bytes) for: 'Lower your chest more'
+2026-02-07 22:08:01,937 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:08:01,959 [INFO] TTS generated (18852 bytes) for: 'Keep body straight!'
+2026-02-07 22:08:07,837 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-07 22:08:11,939 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 22:08:22,926 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 22:08:31,336 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-07 22:08:31,344 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 22:08:31,344 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 22:09:44,795 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 22:09:50,111 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-07 22:09:50,112 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 22:09:50,113 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
