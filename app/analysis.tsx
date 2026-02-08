@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     StyleSheet,
     Text,
@@ -9,11 +9,16 @@ import {
     Animated,
     Easing,
     ActivityIndicator,
+    Modal,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // ─── Simple markdown-ish renderer for Gemini response ────
 function renderAISummary(text: string) {
@@ -264,6 +269,59 @@ export default function AnalysisScreen() {
         fetchAnalysis();
     }, []); // Run once on mount
 
+    // ─── Chat State ──────────────────────────────
+    const [chatOpen, setChatOpen] = useState(false);
+    const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([]);
+    const [chatInput, setChatInput] = useState('');
+    const [chatSending, setChatSending] = useState(false);
+    const chatListRef = useRef<FlatList>(null);
+
+    // Build workout context string for chat
+    const workoutContextStr = [
+        `Exercise: Squat | Plan: ${totalSets}×${repsPerSet} | Duration: ${durationStr}`,
+        `Form: ${formScore}% (${totalValidReps} good, ${totalInvalidReps} bad / ${totalReps} total)`,
+        `Knee angles: min ${kneeMin}°, avg ${kneeAvg}°, max ${kneeMax}°`,
+        `Back angles: min ${hipMin}°, avg ${hipAvg}°, max ${hipMax}°`,
+        setData.map((s, i) => `Set ${i + 1}: ${s.validReps} good, ${s.invalidReps} bad`).join(' | '),
+        aiSummary ? `AI Summary: ${aiSummary}` : '',
+    ].filter(Boolean).join('\n');
+
+    const sendChatMessage = useCallback(async () => {
+        const text = chatInput.trim();
+        if (!text || chatSending) return;
+
+        const serverUrl = params.serverUrl;
+        if (!serverUrl) return;
+
+        const userMsg = { role: 'user' as const, text };
+        setChatMessages((prev) => [...prev, userMsg]);
+        setChatInput('');
+        setChatSending(true);
+
+        try {
+            const res = await fetch(`${serverUrl}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    workoutContext: workoutContextStr,
+                    history: chatMessages,
+                    message: text,
+                }),
+            });
+            const data = await res.json();
+            if (data.reply) {
+                setChatMessages((prev) => [...prev, { role: 'assistant', text: data.reply }]);
+            } else {
+                setChatMessages((prev) => [...prev, { role: 'assistant', text: data.error || 'No response' }]);
+            }
+        } catch (e: any) {
+            setChatMessages((prev) => [...prev, { role: 'assistant', text: `Error: ${e.message}` }]);
+        } finally {
+            setChatSending(false);
+            setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100);
+        }
+    }, [chatInput, chatSending, chatMessages, workoutContextStr, params.serverUrl]);
+
     // ─── Render ──────────────────────────────────
     return (
         <SafeAreaView style={styles.container}>
@@ -329,6 +387,18 @@ export default function AnalysisScreen() {
                                     : 'AI analysis unavailable'}
                             </Text>
                         </View>
+                    )}
+
+                    {/* Ask AI Button */}
+                    {!aiLoading && (
+                        <TouchableOpacity
+                            style={styles.askButton}
+                            onPress={() => setChatOpen(true)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.askButtonIcon}>💬</Text>
+                            <Text style={styles.askButtonText}>Ask AI Coach</Text>
+                        </TouchableOpacity>
                     )}
                 </View>
 
@@ -581,6 +651,110 @@ export default function AnalysisScreen() {
 
                 <View style={{ height: 24 }} />
             </ScrollView>
+
+            {/* ── Chat Modal ─── */}
+            <Modal
+                visible={chatOpen}
+                animationType="slide"
+                presentationStyle="pageSheet"
+                onRequestClose={() => setChatOpen(false)}
+            >
+                <SafeAreaView style={chatStyles.container}>
+                    {/* Chat Header */}
+                    <View style={chatStyles.header}>
+                        <View style={chatStyles.headerLeft}>
+                            <Text style={chatStyles.headerIcon}>✨</Text>
+                            <Text style={chatStyles.headerTitle}>AI Coach</Text>
+                        </View>
+                        <TouchableOpacity
+                            style={chatStyles.closeButton}
+                            onPress={() => setChatOpen(false)}
+                        >
+                            <Text style={chatStyles.closeText}>Done</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Messages */}
+                    <FlatList
+                        ref={chatListRef}
+                        data={chatMessages}
+                        keyExtractor={(_, i) => i.toString()}
+                        contentContainerStyle={chatStyles.messageList}
+                        ListHeaderComponent={
+                            <View style={chatStyles.welcomeBubble}>
+                                <Text style={chatStyles.welcomeText}>
+                                    👋 Ask me anything about your workout — form tips, what to improve, exercise alternatives, or recovery advice!
+                                </Text>
+                            </View>
+                        }
+                        renderItem={({ item }) => (
+                            <View
+                                style={[
+                                    chatStyles.messageBubble,
+                                    item.role === 'user'
+                                        ? chatStyles.userBubble
+                                        : chatStyles.aiBubble,
+                                ]}
+                            >
+                                {item.role === 'assistant' && (
+                                    <Text style={chatStyles.aiLabel}>✨ Coach</Text>
+                                )}
+                                <Text
+                                    style={[
+                                        chatStyles.messageText,
+                                        item.role === 'user'
+                                            ? chatStyles.userText
+                                            : chatStyles.aiText,
+                                    ]}
+                                >
+                                    {item.text}
+                                </Text>
+                            </View>
+                        )}
+                        onContentSizeChange={() =>
+                            chatListRef.current?.scrollToEnd({ animated: true })
+                        }
+                    />
+
+                    {/* Typing indicator */}
+                    {chatSending && (
+                        <View style={chatStyles.typingRow}>
+                            <ActivityIndicator size="small" color="#88B04B" />
+                            <Text style={chatStyles.typingText}>Coach is typing…</Text>
+                        </View>
+                    )}
+
+                    {/* Input Bar */}
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    >
+                        <View style={chatStyles.inputBar}>
+                            <TextInput
+                                style={chatStyles.input}
+                                placeholder="Ask about your workout…"
+                                placeholderTextColor="#BBB"
+                                value={chatInput}
+                                onChangeText={setChatInput}
+                                onSubmitEditing={sendChatMessage}
+                                returnKeyType="send"
+                                editable={!chatSending}
+                                multiline={false}
+                            />
+                            <TouchableOpacity
+                                style={[
+                                    chatStyles.sendButton,
+                                    (!chatInput.trim() || chatSending) && chatStyles.sendButtonDisabled,
+                                ]}
+                                onPress={sendChatMessage}
+                                disabled={!chatInput.trim() || chatSending}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={chatStyles.sendButtonText}>↑</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </KeyboardAvoidingView>
+                </SafeAreaView>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -706,6 +880,26 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#C65911',
         lineHeight: 21,
+    },
+    askButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 16,
+        paddingVertical: 12,
+        backgroundColor: '#F5FAF0',
+        borderRadius: 14,
+        borderWidth: 1.5,
+        borderColor: '#D4E8C4',
+    },
+    askButtonIcon: {
+        fontSize: 16,
+        marginRight: 8,
+    },
+    askButtonText: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#6B9E3C',
     },
 
     /* ── Form Score Card ─── */
@@ -998,5 +1192,152 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: '#fff',
         letterSpacing: 0.3,
+    },
+});
+
+// ─── Chat Modal Styles ──────────────────────────────────
+const chatStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F7F7F8',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ECECEC',
+        backgroundColor: '#fff',
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    headerIcon: {
+        fontSize: 20,
+        marginRight: 8,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#444',
+    },
+    closeButton: {
+        paddingVertical: 6,
+        paddingHorizontal: 16,
+        backgroundColor: '#F0F0F0',
+        borderRadius: 14,
+    },
+    closeText: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#666',
+    },
+    messageList: {
+        padding: 16,
+        paddingBottom: 8,
+    },
+    welcomeBubble: {
+        backgroundColor: '#E2F0D9',
+        borderRadius: 18,
+        padding: 16,
+        marginBottom: 16,
+    },
+    welcomeText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#5A8A3C',
+        lineHeight: 21,
+    },
+    messageBubble: {
+        maxWidth: '82%',
+        borderRadius: 18,
+        padding: 14,
+        marginBottom: 10,
+    },
+    userBubble: {
+        backgroundColor: '#88B04B',
+        alignSelf: 'flex-end',
+        borderBottomRightRadius: 6,
+    },
+    aiBubble: {
+        backgroundColor: '#fff',
+        alignSelf: 'flex-start',
+        borderBottomLeftRadius: 6,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 4,
+        elevation: 1,
+    },
+    aiLabel: {
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#88B04B',
+        marginBottom: 4,
+        letterSpacing: 0.3,
+    },
+    messageText: {
+        fontSize: 15,
+        lineHeight: 22,
+    },
+    userText: {
+        color: '#fff',
+        fontWeight: '600',
+    },
+    aiText: {
+        color: '#444',
+        fontWeight: '500',
+    },
+    typingRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 8,
+    },
+    typingText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#AAA',
+        marginLeft: 8,
+    },
+    inputBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#ECECEC',
+    },
+    input: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 20,
+        paddingHorizontal: 18,
+        paddingVertical: 12,
+        fontSize: 15,
+        fontWeight: '500',
+        color: '#333',
+        marginRight: 10,
+    },
+    sendButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#88B04B',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    sendButtonDisabled: {
+        backgroundColor: '#D8D8D8',
+    },
+    sendButtonText: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#fff',
+        marginTop: -1,
     },
 });

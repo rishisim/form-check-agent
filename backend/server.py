@@ -186,6 +186,54 @@ Write a SHORT personalized summary — around 4-6 sentences total. Cover: how th
         return {"summary": None, "error": str(e)}
 
 
+# ---------------------------------------------------------------------------
+# POST /chat – Follow-up Q&A about the workout via Gemini
+# ---------------------------------------------------------------------------
+class ChatMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    text: str
+
+class ChatRequest(BaseModel):
+    workoutContext: str  # the AI summary + raw stats as a string
+    history: list[ChatMessage] = []
+    message: str
+
+
+@app.post("/chat")
+async def chat_workout(req: ChatRequest):
+    """Multi-turn chat about the workout using Gemini."""
+    if not gemini_service.client:
+        return {"reply": None, "error": "Gemini API key not configured"}
+
+    system_prompt = f"""You are a friendly, expert personal trainer chatbot embedded in a workout analysis app. 
+The user just finished a workout and is reviewing their analysis. Answer their questions using the workout data below.
+Be concise (2-4 sentences max), specific, encouraging, and reference actual numbers when relevant.
+If they ask something unrelated to fitness/workout, gently steer them back.
+
+=== WORKOUT CONTEXT ===
+{req.workoutContext}
+"""
+
+    # Build conversation as a single prompt (Gemini flash works well with this)
+    conversation = system_prompt + "\n\n"
+    for msg in req.history:
+        prefix = "User" if msg.role == "user" else "Coach"
+        conversation += f"{prefix}: {msg.text}\n"
+    conversation += f"User: {req.message}\nCoach:"
+
+    try:
+        response = await asyncio.to_thread(
+            gemini_service.client.models.generate_content,
+            model="gemini-3-flash-preview",
+            contents=conversation,
+        )
+        reply = response.text.strip() if response.text else None
+        return {"reply": reply, "error": None}
+    except Exception as e:
+        logger.error(f"Gemini chat error: {e}")
+        return {"reply": None, "error": str(e)}
+
+
 async def _safe_send(websocket: WebSocket, data: dict) -> bool:
     """Send JSON, return False if the socket is already gone."""
     try:

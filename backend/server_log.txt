@@ -1146,3 +1146,20 @@ O] WebSocket disconnect message received in loop
 2026-02-07 20:25:07,335 [INFO] [ad51dcf1] WebSocket connection established (2 active)
 2026-02-07 20:25:09,685 [INFO] [ad51dcf1] Client disconnected normally
 2026-02-07 20:25:09,686 [INFO] [ad51dcf1] Connection cleaned up (1 active)
+2026-02-07 20:25:15,839 [INFO] [0aec919f] WebSocket connection established (2 active)
+2026-02-07 20:26:05,347 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 20:26:13,559 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-07 20:26:13,560 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:26:13,560 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:26:17,153 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 20:26:24,190 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 20:26:24,750 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-07 20:26:24,842 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:26:24,842 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:26:30,778 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-07 20:26:30,782 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:26:30,783 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:26:36,622 [INFO] [0aec919f] Client disconnected normally
+2026-02-07 20:26:36,623 [INFO] [0aec919f] Connection cleaned up (1 active)
+2026-02-07 20:26:49,004 [INFO] [72d72636] Client disconnected normally
+2026-02-07 20:26:49,004 [INFO] [72d72636] Connection cleaned up (0 active)
