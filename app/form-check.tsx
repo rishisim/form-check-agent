@@ -600,6 +600,35 @@ export default function FormCheckScreen() {
         backArrow: { color: isDark ? '#ccc' : '#444' },
         completeButton: { backgroundColor: theme.accent, shadowColor: theme.accent },
         progressBarFill: { backgroundColor: theme.accent },
+        // Countdown and rest overlay themed styles
+        centerCard: { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)' },
+        countdownLabel: { color: theme.textPrimary },
+        countdownNumber: { color: theme.accent },
+        countdownHint: { color: theme.textSecondary },
+        restOverlay: {
+            backgroundColor: isDark ? 'rgba(30, 30, 30, 0.96)' : 'rgba(255, 255, 255, 0.96)',
+            shadowColor: theme.shadow,
+        },
+        transitionEmoji: {},
+        transitionTitle: { color: theme.textPrimary },
+        transitionHint: { color: theme.textSecondary },
+        restLabel: { color: theme.textMuted },
+        restTimer: { color: theme.accent },
+        restNextSet: { color: theme.textSecondary },
+        skipButton: {
+            backgroundColor: theme.accent,
+            borderColor: theme.accent,
+            shadowColor: theme.accent,
+        },
+        skipButtonText: { color: '#fff' },
+        // Complete overlay themed styles
+        completeOverlay: { backgroundColor: isDark ? 'rgba(18, 18, 18, 0.96)' : 'rgba(247, 247, 248, 0.96)' },
+        completeEmoji: {},
+        completeTitle: { color: theme.textPrimary },
+        completeStats: { color: theme.textSecondary },
+        completeDivider: { backgroundColor: theme.border },
+        completeButtonSecondary: { borderColor: theme.border },
+        completeButtonSecondaryText: { color: theme.textSecondary },
     }), [theme, isDark]);
 
     // ─── Permission Screens ──────────────────────
@@ -756,10 +785,10 @@ export default function FormCheckScreen() {
                     <View style={styles.centerSection}>
                         {/* Countdown Overlay */}
                         {isCountdownActive && (
-                            <View style={styles.centerCard}>
-                                <Text style={[styles.countdownLabel, isLandscape && { fontSize: 20 }]}>Get Ready!</Text>
-                                <Text style={[styles.countdownNumber, isLandscape && { fontSize: 72 }]}>{countdown}</Text>
-                                <Text style={styles.countdownHint}>
+                            <View style={[styles.centerCard, themedStyles.centerCard]}>
+                                <Text style={[styles.countdownLabel, themedStyles.countdownLabel, isLandscape && { fontSize: 20 }]}>Get Ready!</Text>
+                                <Text style={[styles.countdownNumber, themedStyles.countdownNumber, isLandscape && { fontSize: 72 }]}>{countdown}</Text>
+                                <Text style={[styles.countdownHint, themedStyles.countdownHint]}>
                                     {totalSets} × {repsPerSet} {isPushup ? 'Push-ups' : 'Squats'}
                                 </Text>
                             </View>
@@ -767,28 +796,28 @@ export default function FormCheckScreen() {
 
                         {/* Rest Break Overlay */}
                         {isSetTransition && !isWorkoutComplete && (
-                            <View style={styles.restOverlay}>
+                            <View style={[styles.restOverlay, themedStyles.restOverlay]}>
                                 <Text style={styles.transitionEmoji}>✅</Text>
-                                <Text style={styles.transitionTitle}>
+                                <Text style={[styles.transitionTitle, themedStyles.transitionTitle]}>
                                     Set {currentSet} Complete!
                                 </Text>
                                 {isRestActive && restCountdown > 0 ? (
                                     <>
-                                        <Text style={styles.restLabel}>Rest Break</Text>
-                                        <Text style={styles.restTimer}>
+                                        <Text style={[styles.restLabel, themedStyles.restLabel]}>Rest Break</Text>
+                                        <Text style={[styles.restTimer, themedStyles.restTimer]}>
                                             {Math.floor(restCountdown / 60)}:{String(restCountdown % 60).padStart(2, '0')}
                                         </Text>
-                                        <Text style={styles.restNextSet}>Next: Set {currentSet + 1} of {totalSets}</Text>
+                                        <Text style={[styles.restNextSet, themedStyles.restNextSet]}>Next: Set {currentSet + 1} of {totalSets}</Text>
                                         <TouchableOpacity
-                                            style={styles.skipButton}
+                                            style={[styles.skipButton, themedStyles.skipButton]}
                                             onPress={skipRest}
                                             activeOpacity={0.8}
                                         >
-                                            <Text style={styles.skipButtonText}>Skip Rest →</Text>
+                                            <Text style={[styles.skipButtonText, themedStyles.skipButtonText]}>Skip Rest →</Text>
                                         </TouchableOpacity>
                                     </>
                                 ) : (
-                                    <Text style={styles.transitionHint}>
+                                    <Text style={[styles.transitionHint, themedStyles.transitionHint]}>
                                         Starting next set…
                                     </Text>
                                 )}
@@ -804,13 +833,13 @@ export default function FormCheckScreen() {
 
                 {/* ─── WORKOUT COMPLETE (Full-screen overlay) ─── */}
                 {isWorkoutComplete && (
-                    <View style={styles.completeOverlay}>
+                    <View style={[styles.completeOverlay, themedStyles.completeOverlay]}>
                         <Text style={styles.completeEmoji}>🏆</Text>
-                        <Text style={styles.completeTitle}>Workout Complete!</Text>
-                        <Text style={styles.completeStats}>
+                        <Text style={[styles.completeTitle, themedStyles.completeTitle]}>Workout Complete!</Text>
+                        <Text style={[styles.completeStats, themedStyles.completeStats]}>
                             {totalSets} sets × {repsPerSet} reps finished
                         </Text>
-                        <View style={styles.completeDivider} />
+                        <View style={[styles.completeDivider, themedStyles.completeDivider]} />
                         <TouchableOpacity
                             style={[styles.completeButton, themedStyles.completeButton]}
                             onPress={handleShowAnalysis}
@@ -819,11 +848,11 @@ export default function FormCheckScreen() {
                             <Text style={styles.completeButtonText}>📊  Show Analysis</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.completeButtonSecondary}
+                            style={[styles.completeButtonSecondary, themedStyles.completeButtonSecondary]}
                             onPress={() => router.replace('/')}
                             activeOpacity={0.85}
                         >
-                            <Text style={styles.completeButtonSecondaryText}>Back to Home</Text>
+                            <Text style={[styles.completeButtonSecondaryText, themedStyles.completeButtonSecondaryText]}>Back to Home</Text>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -1005,43 +1034,41 @@ const styles = StyleSheet.create({
     },
     centerCard: {
         alignItems: 'center',
+        borderRadius: 28,
+        paddingVertical: 32,
+        paddingHorizontal: 44,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        elevation: 6,
     },
 
     /* ── Countdown ────────────────────────── */
     countdownLabel: {
         fontSize: 26,
         fontWeight: '700',
-        color: '#fff',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 8,
         marginBottom: 4,
     },
     countdownNumber: {
         fontSize: 120,
         fontWeight: '900',
-        color: '#fff',
-        textShadowColor: 'rgba(0,0,0,0.4)',
-        textShadowOffset: { width: 0, height: 4 },
-        textShadowRadius: 14,
     },
     countdownHint: {
         fontSize: 18,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.8)',
         marginTop: 8,
-        textShadowColor: 'rgba(0,0,0,0.3)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 4,
     },
 
     /* ── Set Transition / Rest Break ─────── */
     restOverlay: {
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.6)',
         borderRadius: 28,
         paddingVertical: 28,
         paddingHorizontal: 36,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        elevation: 6,
     },
     transitionEmoji: {
         fontSize: 72,
@@ -1050,24 +1077,15 @@ const styles = StyleSheet.create({
     transitionTitle: {
         fontSize: 30,
         fontWeight: '800',
-        color: '#fff',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 8,
     },
     transitionHint: {
         fontSize: 17,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.8)',
         marginTop: 8,
-        textShadowColor: 'rgba(0,0,0,0.3)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 4,
     },
     restLabel: {
         fontSize: 18,
         fontWeight: '700',
-        color: 'rgba(255,255,255,0.7)',
         marginTop: 16,
         letterSpacing: 1,
         textTransform: 'uppercase',
@@ -1075,37 +1093,31 @@ const styles = StyleSheet.create({
     restTimer: {
         fontSize: 72,
         fontWeight: '900',
-        color: '#fff',
         marginVertical: 4,
-        textShadowColor: 'rgba(0,0,0,0.4)',
-        textShadowOffset: { width: 0, height: 4 },
-        textShadowRadius: 14,
     },
     restNextSet: {
         fontSize: 15,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.6)',
         marginBottom: 20,
     },
     skipButton: {
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.5)',
         paddingVertical: 14,
         paddingHorizontal: 36,
         borderRadius: 22,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        elevation: 4,
     },
     skipButtonText: {
         fontSize: 17,
         fontWeight: '800',
-        color: '#fff',
         letterSpacing: 0.3,
     },
 
     /* ── Workout Complete Overlay ──────────── */
     completeOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.78)',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,
@@ -1119,28 +1131,23 @@ const styles = StyleSheet.create({
     completeTitle: {
         fontSize: 34,
         fontWeight: '900',
-        color: '#fff',
         marginBottom: 8,
     },
     completeStats: {
         fontSize: 18,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.75)',
         marginBottom: 24,
     },
     completeDivider: {
         width: 60,
         height: 3,
         borderRadius: 2,
-        backgroundColor: 'rgba(255,255,255,0.2)',
         marginBottom: 28,
     },
     completeButton: {
-        backgroundColor: '#88B04B',
         paddingVertical: 16,
         paddingHorizontal: 44,
         borderRadius: 22,
-        shadowColor: '#88B04B',
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.35,
         shadowRadius: 10,
@@ -1158,12 +1165,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 44,
         borderRadius: 22,
         borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.3)',
     },
     completeButtonSecondaryText: {
         fontSize: 16,
         fontWeight: '700',
-        color: 'rgba(255,255,255,0.85)',
         letterSpacing: 0.3,
     },
 

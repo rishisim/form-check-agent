@@ -2023,3 +2023,13 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-02-08 09:22:52,033 [INFO] TTS cache hit for: 'Great depth, push it up!'
 2026-02-08 09:23:01,220 [INFO] [cfdabd61] Client disconnected normally
 2026-02-08 09:23:01,220 [INFO] [cfdabd61] Connection cleaned up (0 active)
+2026-02-08 09:29:04,965 [INFO] [d0c8100f] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 09:29:10,338 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 09:29:11,657 [INFO] [d0c8100f] Client disconnected normally
+2026-02-08 09:29:11,657 [INFO] [d0c8100f] Connection cleaned up (0 active)
+2026-02-08 09:31:16,397 [INFO] [4a035786] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 09:31:18,917 [INFO] [4a035786] Client disconnected normally
+2026-02-08 09:31:18,917 [INFO] [4a035786] Connection cleaned up (0 active)
+2026-02-08 09:31:23,579 [INFO] [c97e85a1] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 09:31:28,051 [INFO] [c97e85a1] Client disconnected normally
+2026-02-08 09:31:28,051 [INFO] [c97e85a1] Connection cleaned up (0 active)
