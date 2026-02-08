@@ -76,6 +76,7 @@ export default function FormCheckScreen() {
     const setDataRef = useRef<Array<{ validReps: number; invalidReps: number }>>([]);
     const kneeAngleStatsRef = useRef({ min: Infinity, max: -Infinity, sum: 0, count: 0 });
     const hipAngleStatsRef = useRef({ min: Infinity, max: -Infinity, sum: 0, count: 0 });
+    const feedbackLogRef = useRef<Array<{ msg: string; level: string; ts: number }>>([]);
 
     // Workout refs (avoid stale closures)
     const currentSetRef = useRef(1);
@@ -218,8 +219,15 @@ export default function FormCheckScreen() {
                             if (newFeedback && newFeedback !== lastFeedbackRef.current) {
                                 lastFeedbackRef.current = newFeedback;
                                 setFeedback(newFeedback);
-                                setFeedbackLevel(analysis.feedback_level || 'success');
+                                const lvl = analysis.feedback_level || 'success';
+                                setFeedbackLevel(lvl);
                                 speakTTS(newFeedback);
+                                // Log for post-workout AI analysis
+                                feedbackLogRef.current.push({
+                                    msg: newFeedback,
+                                    level: lvl,
+                                    ts: Math.round((Date.now() - (workoutStartRef.current || Date.now())) / 1000),
+                                });
                             }
                         }
                     }
@@ -451,6 +459,8 @@ export default function FormCheckScreen() {
                 hipMin: hs.count ? Math.round(hs.min).toString() : '0',
                 hipMax: hs.count ? Math.round(hs.max).toString() : '0',
                 hipAvg: hs.count ? Math.round(hs.sum / hs.count).toString() : '0',
+                feedbackLog: JSON.stringify(feedbackLogRef.current),
+                serverUrl: SERVER_HTTP_URL,
             },
         });
     }, [router, totalSets, repsPerSet]);

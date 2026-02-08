@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     StyleSheet,
     Text,
@@ -6,11 +6,114 @@ import {
     TouchableOpacity,
     ScrollView,
     Dimensions,
+    Animated,
+    Easing,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ─── Simple markdown-ish renderer for Gemini response ────
+function renderAISummary(text: string) {
+    const lines = text.split('\n');
+    const elements: React.ReactNode[] = [];
+    let key = 0;
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) {
+            elements.push(<View key={key++} style={{ height: 8 }} />);
+            continue;
+        }
+
+        // Bold header: **text**
+        if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+            const headerText = trimmed.replace(/\*\*/g, '');
+            // Pick icon based on header
+            let icon = '📋';
+            if (/overall/i.test(headerText)) icon = '📋';
+            else if (/went well|strength/i.test(headerText)) icon = '✅';
+            else if (/improve|work on/i.test(headerText)) icon = '🔧';
+            else if (/next|tip/i.test(headerText)) icon = '🎯';
+
+            elements.push(
+                <View key={key++} style={aiStyles.sectionHeader}>
+                    <Text style={aiStyles.sectionIcon}>{icon}</Text>
+                    <Text style={aiStyles.sectionTitle}>{headerText}</Text>
+                </View>,
+            );
+            continue;
+        }
+
+        // Bullet point: - text
+        if (trimmed.startsWith('- ')) {
+            const bulletText = trimmed.substring(2);
+            elements.push(
+                <View key={key++} style={aiStyles.bulletRow}>
+                    <Text style={aiStyles.bulletDot}>•</Text>
+                    <Text style={aiStyles.bulletText}>{bulletText}</Text>
+                </View>,
+            );
+            continue;
+        }
+
+        // Regular paragraph
+        elements.push(
+            <Text key={key++} style={aiStyles.paragraph}>
+                {trimmed}
+            </Text>,
+        );
+    }
+
+    return elements;
+}
+
+const aiStyles = StyleSheet.create({
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 14,
+        marginBottom: 6,
+    },
+    sectionIcon: {
+        fontSize: 16,
+        marginRight: 8,
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#444',
+    },
+    bulletRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 5,
+        paddingLeft: 8,
+    },
+    bulletDot: {
+        fontSize: 14,
+        color: '#88B04B',
+        fontWeight: '800',
+        marginRight: 10,
+        marginTop: 1,
+    },
+    bulletText: {
+        flex: 1,
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#555',
+        lineHeight: 21,
+    },
+    paragraph: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#555',
+        lineHeight: 21,
+        marginBottom: 4,
+    },
+});
 
 export default function AnalysisScreen() {
     const router = useRouter();
@@ -25,6 +128,8 @@ export default function AnalysisScreen() {
         hipMin: string;
         hipMax: string;
         hipAvg: string;
+        feedbackLog: string;
+        serverUrl: string;
     }>();
 
     const totalSets = parseInt(params.totalSets || '0', 10);
@@ -91,6 +196,74 @@ export default function AnalysisScreen() {
     const kneeAssessment = getKneeAssessment();
     const hipAssessment = getHipAssessment();
 
+    // ─── AI Summary State ────────────────────────
+    const [aiSummary, setAiSummary] = useState<string | null>(null);
+    const [aiLoading, setAiLoading] = useState(true);
+    const [aiError, setAiError] = useState<string | null>(null);
+    const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+    // Shimmer animation for loading state
+    useEffect(() => {
+        if (!aiLoading) return;
+        const loop = Animated.loop(
+            Animated.timing(shimmerAnim, {
+                toValue: 1,
+                duration: 1500,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            }),
+        );
+        loop.start();
+        return () => loop.stop();
+    }, [aiLoading, shimmerAnim]);
+
+    // Fetch AI analysis from Gemini via backend
+    useEffect(() => {
+        const serverUrl = params.serverUrl;
+        if (!serverUrl) {
+            setAiLoading(false);
+            setAiError('No server URL');
+            return;
+        }
+
+        const feedbackLog = JSON.parse(params.feedbackLog || '[]');
+
+        const fetchAnalysis = async () => {
+            try {
+                const res = await fetch(`${serverUrl}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        exercise: 'squat',
+                        totalSets,
+                        repsPerSet,
+                        setData,
+                        workoutDuration,
+                        kneeMin,
+                        kneeMax,
+                        kneeAvg,
+                        hipMin,
+                        hipMax,
+                        hipAvg,
+                        feedbackLog,
+                    }),
+                });
+                const data = await res.json();
+                if (data.summary) {
+                    setAiSummary(data.summary);
+                } else {
+                    setAiError(data.error || 'No summary returned');
+                }
+            } catch (e: any) {
+                setAiError(e.message || 'Failed to connect');
+            } finally {
+                setAiLoading(false);
+            }
+        };
+
+        fetchAnalysis();
+    }, []); // Run once on mount
+
     // ─── Render ──────────────────────────────────
     return (
         <SafeAreaView style={styles.container}>
@@ -110,6 +283,54 @@ export default function AnalysisScreen() {
                 <Text style={styles.headerSubtitle}>
                     Squats · {totalSets} sets × {repsPerSet} reps
                 </Text>
+
+                {/* ── AI Coach Summary ─── */}
+                <View style={styles.aiCard}>
+                    <View style={styles.aiHeader}>
+                        <Text style={styles.aiHeaderIcon}>✨</Text>
+                        <Text style={styles.aiHeaderTitle}>AI Coach Summary</Text>
+                        <View style={styles.aiPoweredBadge}>
+                            <Text style={styles.aiPoweredText}>Gemini</Text>
+                        </View>
+                    </View>
+                    {aiLoading ? (
+                        <View style={styles.aiLoadingContainer}>
+                            {[0, 1, 2, 3].map((i) => (
+                                <Animated.View
+                                    key={i}
+                                    style={[
+                                        styles.shimmerLine,
+                                        i === 3 && { width: '60%' },
+                                        {
+                                            opacity: shimmerAnim.interpolate({
+                                                inputRange: [0, 0.5, 1],
+                                                outputRange: [0.3, 0.7, 0.3],
+                                            }),
+                                        },
+                                    ]}
+                                />
+                            ))}
+                            <View style={styles.aiLoadingLabel}>
+                                <ActivityIndicator size="small" color="#88B04B" />
+                                <Text style={styles.aiLoadingText}>
+                                    Analyzing your workout…
+                                </Text>
+                            </View>
+                        </View>
+                    ) : aiSummary ? (
+                        <View style={styles.aiContent}>
+                            {renderAISummary(aiSummary)}
+                        </View>
+                    ) : (
+                        <View style={styles.aiContent}>
+                            <Text style={styles.aiErrorText}>
+                                {aiError
+                                    ? `Could not generate AI analysis: ${aiError}`
+                                    : 'AI analysis unavailable'}
+                            </Text>
+                        </View>
+                    )}
+                </View>
 
                 {/* ── Form Score Card ─── */}
                 <View style={[styles.scoreCard, { borderColor: formGrade.color }]}>
@@ -349,68 +570,6 @@ export default function AnalysisScreen() {
                     )}
                 </View>
 
-                {/* ── Tips & Recommendations ─── */}
-                <Text style={styles.sectionTitle}>Tips & Recommendations</Text>
-                <View style={styles.tipsCard}>
-                    {formScore >= 80 ? (
-                        <View style={styles.tipRow}>
-                            <Text style={styles.tipIcon}>🌟</Text>
-                            <Text style={styles.tipText}>
-                                Great workout! Your form consistency is strong. Keep
-                                maintaining this quality as you increase weight or volume.
-                            </Text>
-                        </View>
-                    ) : formScore >= 50 ? (
-                        <View style={styles.tipRow}>
-                            <Text style={styles.tipIcon}>💡</Text>
-                            <Text style={styles.tipText}>
-                                Good effort! Focus on controlled movements and maintaining
-                                proper depth throughout each set. Quality over speed.
-                            </Text>
-                        </View>
-                    ) : (
-                        <View style={styles.tipRow}>
-                            <Text style={styles.tipIcon}>🎯</Text>
-                            <Text style={styles.tipText}>
-                                Focus on form fundamentals: keep your chest up, push knees
-                                out over toes, and aim for parallel depth on each rep.
-                            </Text>
-                        </View>
-                    )}
-
-                    {kneeMin > 90 && kneeMin !== 0 && (
-                        <View style={[styles.tipRow, { marginTop: 14 }]}>
-                            <Text style={styles.tipIcon}>📏</Text>
-                            <Text style={styles.tipText}>
-                                Try to break parallel — aim for knee angles below 90° at the
-                                bottom of your squat for full range of motion.
-                            </Text>
-                        </View>
-                    )}
-
-                    {totalInvalidReps > totalValidReps && totalReps > 0 && (
-                        <View style={[styles.tipRow, { marginTop: 14 }]}>
-                            <Text style={styles.tipIcon}>🔄</Text>
-                            <Text style={styles.tipText}>
-                                Consider reducing weight or reps to prioritize proper form.
-                                Building the right movement pattern is key.
-                            </Text>
-                        </View>
-                    )}
-
-                    {setData.length > 1 && (
-                        <View style={[styles.tipRow, { marginTop: 14 }]}>
-                            <Text style={styles.tipIcon}>📈</Text>
-                            <Text style={styles.tipText}>
-                                {setData[setData.length - 1].invalidReps >
-                                setData[0].invalidReps
-                                    ? 'Your form declined in later sets — consider shorter rest periods or fewer sets next time.'
-                                    : 'Your form stayed consistent across sets — great endurance and control!'}
-                            </Text>
-                        </View>
-                    )}
-                </View>
-
                 {/* ── Bottom Button ─── */}
                 <TouchableOpacity
                     style={styles.homeButton}
@@ -473,6 +632,80 @@ const styles = StyleSheet.create({
         color: '#999',
         fontWeight: '500',
         marginBottom: 24,
+    },
+
+    /* ── AI Coach Summary Card ─── */
+    aiCard: {
+        backgroundColor: '#fff',
+        borderRadius: 22,
+        padding: 22,
+        width: '100%',
+        marginBottom: 20,
+        borderWidth: 1.5,
+        borderColor: '#E2F0D9',
+        shadowColor: '#88B04B',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 16,
+        elevation: 4,
+    },
+    aiHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 14,
+    },
+    aiHeaderIcon: {
+        fontSize: 20,
+        marginRight: 8,
+    },
+    aiHeaderTitle: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#444',
+        flex: 1,
+    },
+    aiPoweredBadge: {
+        backgroundColor: '#E2F0D9',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+    },
+    aiPoweredText: {
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#88B04B',
+        letterSpacing: 0.3,
+    },
+    aiLoadingContainer: {
+        paddingVertical: 8,
+    },
+    shimmerLine: {
+        height: 12,
+        backgroundColor: '#E8E8E8',
+        borderRadius: 6,
+        marginBottom: 10,
+        width: '100%',
+    },
+    aiLoadingLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 8,
+    },
+    aiLoadingText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#AAA',
+        marginLeft: 8,
+    },
+    aiContent: {
+        paddingTop: 2,
+    },
+    aiErrorText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#C65911',
+        lineHeight: 21,
     },
 
     /* ── Form Score Card ─── */
@@ -745,36 +978,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: '#CCC',
         fontWeight: '600',
-    },
-
-    /* ── Tips Card ─── */
-    tipsCard: {
-        backgroundColor: '#fff',
-        borderRadius: 20,
-        padding: 22,
-        width: '100%',
-        marginBottom: 24,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 10,
-        elevation: 2,
-    },
-    tipRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-    },
-    tipIcon: {
-        fontSize: 20,
-        marginRight: 12,
-        marginTop: 1,
-    },
-    tipText: {
-        flex: 1,
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#555',
-        lineHeight: 21,
     },
 
     /* ── Home Button ─── */
