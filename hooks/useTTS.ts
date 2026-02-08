@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { useAudioPlayer, AudioSource } from 'expo-audio';
+import { Audio } from 'expo-av';
 
 // ─── Configuration ───────────────────────────────────────
 const MIN_SPEAK_INTERVAL_MS = 3000; // Minimum gap between TTS calls
@@ -21,35 +21,33 @@ interface UseTTSOptions {
 /**
  * Hook that converts real-time feedback text into speech via the backend
  * Eleven Labs TTS endpoint.  De-duplicates and rate-limits automatically.
+ * Uses expo-av Audio.Sound for reliable playback.
  */
 export function useTTS({ serverUrl, enabled = true }: UseTTSOptions) {
     const lastSpokenTextRef = useRef('');
     const lastSpeakTimeRef = useRef(0);
     const isSpeakingRef = useRef(false);
     const mountedRef = useRef(true);
-    const playerRef = useRef<ReturnType<typeof useAudioPlayer> | null>(null);
-
-    // Create a player instance (starts with no source)
-    const player = useAudioPlayer(null);
-    playerRef.current = player;
+    const soundRef = useRef<Audio.Sound | null>(null);
 
     useEffect(() => {
         mountedRef.current = true;
+        // Configure audio mode for playback alongside camera
+        Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            playsInSilentModeIOS: true,
+            staysActiveInBackground: false,
+            shouldDuckAndroid: true,
+        }).catch(() => {});
         return () => {
             mountedRef.current = false;
+            // Cleanup any playing sound
+            if (soundRef.current) {
+                soundRef.current.unloadAsync().catch(() => {});
+                soundRef.current = null;
+            }
         };
     }, []);
-
-    // Listen for playback completion
-    useEffect(() => {
-        const subscription = player.addListener('playbackStatusUpdate', (status) => {
-            if (!mountedRef.current) return;
-            if (status.playing === false && isSpeakingRef.current) {
-                isSpeakingRef.current = false;
-            }
-        });
-        return () => subscription.remove();
-    }, [player]);
 
     /**
      * Speak the given feedback text.
@@ -81,24 +79,48 @@ export function useTTS({ serverUrl, enabled = true }: UseTTSOptions) {
             lastSpeakTimeRef.current = now;
 
             try {
+                // Unload previous sound if any
+                if (soundRef.current) {
+                    await soundRef.current.unloadAsync().catch(() => {});
+                    soundRef.current = null;
+                }
+
                 const uri = `${serverUrl}/tts?text=${encodeURIComponent(text)}`;
-                player.replace({ uri } as AudioSource);
-                player.play();
+                const { sound } = await Audio.Sound.createAsync(
+                    { uri },
+                    { shouldPlay: true, volume: 1.0 },
+                    (status) => {
+                        if (!mountedRef.current) return;
+                        if (status.isLoaded && status.didJustFinish) {
+                            isSpeakingRef.current = false;
+                            // Clean up after playback
+                            sound.unloadAsync().catch(() => {});
+                            if (soundRef.current === sound) {
+                                soundRef.current = null;
+                            }
+                        }
+                    }
+                );
+                soundRef.current = sound;
             } catch (e) {
                 console.warn('TTS playback error:', e);
                 isSpeakingRef.current = false;
             }
         },
-        [serverUrl, enabled, player],
+        [serverUrl, enabled],
     );
 
     /** Stop any currently playing speech */
-    const stop = useCallback(() => {
+    const stop = useCallback(async () => {
         isSpeakingRef.current = false;
         try {
-            player.pause();
+            if (soundRef.current) {
+                await soundRef.current.stopAsync().catch(() => {});
+                await soundRef.current.unloadAsync().catch(() => {});
+                soundRef.current = null;
+            }
         } catch { /* ignore */ }
-    }, [player]);
+    }, []);
 
     return { speak, stop };
 }

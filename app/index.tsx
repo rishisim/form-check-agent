@@ -1,8 +1,10 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
     Animated,
     Dimensions,
+    Image,
+    ImageSourcePropType,
     NativeScrollEvent,
     NativeSyntheticEvent,
     Platform,
@@ -21,14 +23,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Animated Exercise Card with ripple effect on press
 interface AnimatedExerciseCardProps {
-    emoji: string;
+    emoji?: string;
+    image?: ImageSourcePropType;
     name: string;
     desc: string;
     href: string;
     theme: Theme;
 }
 
-function AnimatedExerciseCard({ emoji, name, desc, href, theme }: AnimatedExerciseCardProps) {
+function AnimatedExerciseCard({ emoji, image, name, desc, href, theme }: AnimatedExerciseCardProps) {
     const router = useRouter();
     const rippleScale = useRef(new Animated.Value(0)).current;
     const rippleOpacity = useRef(new Animated.Value(0.4)).current;
@@ -127,7 +130,11 @@ function AnimatedExerciseCard({ emoji, name, desc, href, theme }: AnimatedExerci
 
                 {/* Content */}
                 <View style={styles.cardContent}>
-                    <Text style={styles.exerciseEmoji}>{emoji}</Text>
+                    {image ? (
+                        <Image source={image} style={styles.exerciseImage} resizeMode="contain" />
+                    ) : (
+                        <Text style={styles.exerciseEmoji}>{emoji}</Text>
+                    )}
                     <Text style={[styles.exerciseName, { color: theme.textPrimary }]}>{name}</Text>
                     <Text style={[styles.exerciseDesc, { color: theme.textSecondary }]}>{desc}</Text>
                 </View>
@@ -137,10 +144,8 @@ function AnimatedExerciseCard({ emoji, name, desc, href, theme }: AnimatedExerci
 }
 
 const comingSoonExercises = [
-    { emoji: '🧘', name: 'Planks', desc: 'Core stability tracking' },
-    { emoji: '⭐', name: 'Jumping Jacks', desc: 'Cardio form analysis' },
-    { emoji: '🔥', name: 'Burpees', desc: 'Full-body tracking' },
-    { emoji: '🦿', name: 'Lunges', desc: 'Balance & depth check' },
+    { emoji: '🧘', image: require('../assets/plank.png'), name: 'Planks', desc: 'Core stability tracking' },
+    { emoji: '⭐', image: require('../assets/jumping_jacks.png'), name: 'Jumping Jacks', desc: 'Cardio form analysis' },
 ];
 
 const PAGE_TITLES = ['Body Weight Exercises', 'Physical Therapy'];
@@ -159,6 +164,43 @@ export default function HomeScreen() {
     const onMomentumEnd = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
         const page = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
         setActivePageIndex(page);
+    }, []);
+
+    const fadeAnim1 = useRef(new Animated.Value(0)).current;
+    const fadeAnim2 = useRef(new Animated.Value(0)).current;
+    const slideAnim1 = useRef(new Animated.Value(18)).current;
+    const slideAnim2 = useRef(new Animated.Value(18)).current;
+
+    useEffect(() => {
+        // Staggered fade-in: "Welcome back" first, then "Ready for workout?"
+        Animated.sequence([
+            Animated.delay(300),
+            Animated.parallel([
+                Animated.timing(fadeAnim1, {
+                    toValue: 1,
+                    duration: 900,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim1, {
+                    toValue: 0,
+                    duration: 900,
+                    useNativeDriver: true,
+                }),
+            ]),
+        ]).start(() => {
+            Animated.parallel([
+                Animated.timing(fadeAnim2, {
+                    toValue: 1,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim2, {
+                    toValue: 0,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        });
     }, []);
 
     const goToPage = (index: number) => {
@@ -277,9 +319,34 @@ export default function HomeScreen() {
                         showsVerticalScrollIndicator={false}
                         nestedScrollEnabled={true}
                     >
+                        {/* Animated Welcome Message */}
+                        <View style={{ alignSelf: 'flex-start', marginBottom: 22, paddingLeft: 8 }}>
+                            <Animated.Text style={{
+                                opacity: fadeAnim1,
+                                transform: [{ translateY: slideAnim1 }],
+                                fontSize: 28,
+                                fontWeight: '900',
+                                color: theme.textPrimary,
+                                marginBottom: 4,
+                                textAlign: 'left',
+                            }}>
+                                Welcome back
+                            </Animated.Text>
+                            <Animated.Text style={{
+                                opacity: fadeAnim2,
+                                transform: [{ translateY: slideAnim2 }],
+                                fontSize: 15,
+                                fontWeight: '500',
+                                color: theme.textSecondary,
+                                textAlign: 'left',
+                            }}>
+                                Ready for today's workout?
+                            </Animated.Text>
+                        </View>
+
                         <View style={styles.grid}>
                             <AnimatedExerciseCard
-                                emoji="🦵"
+                                image={require('../assets/squat_icon.png')}
                                 name="Squats"
                                 desc="Track depth & form"
                                 href="/workout-config"
@@ -287,7 +354,7 @@ export default function HomeScreen() {
                             />
 
                             <AnimatedExerciseCard
-                                emoji="💪"
+                                image={require('../assets/pushup.png')}
                                 name="Push-ups"
                                 desc="Track form & reps"
                                 href="/workout-config?exercise=pushup"
@@ -306,7 +373,11 @@ export default function HomeScreen() {
                                         dynamicStyles.comingSoonCard,
                                         { shadowColor: theme.shadow, shadowOpacity: 0 }
                                     ]}>
-                                        <Text style={styles.exerciseEmoji}>{exercise.emoji}</Text>
+                                        {exercise.image ? (
+                                            <Image source={exercise.image} style={styles.exerciseImage} resizeMode="contain" />
+                                        ) : (
+                                            <Text style={styles.exerciseEmoji}>{exercise.emoji}</Text>
+                                        )}
                                         <Text style={[
                                             styles.exerciseName,
                                             dynamicStyles.comingSoonText
@@ -356,7 +427,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     header: {
-        paddingTop: 8,
+        paddingTop: 24,
         paddingBottom: 16,
         paddingHorizontal: 16,
     },
@@ -377,12 +448,12 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     title: {
-        fontSize: 30,
-        fontWeight: '800',
-        marginBottom: 6,
+        fontSize: 22,
+        fontWeight: '700',
+        marginBottom: 4,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 13,
         fontWeight: '500',
     },
     /* ── Tab bar ── */
@@ -430,7 +501,7 @@ const styles = StyleSheet.create({
         width: '47%',
     },
     exerciseCard: {
-        height: 170,
+        height: 200,
         padding: 24,
         borderRadius: 24,
         alignItems: 'center',
@@ -450,6 +521,11 @@ const styles = StyleSheet.create({
     },
     exerciseEmoji: {
         fontSize: 44,
+        marginBottom: 10,
+    },
+    exerciseImage: {
+        width: 100,
+        height: 80,
         marginBottom: 10,
     },
     exerciseName: {

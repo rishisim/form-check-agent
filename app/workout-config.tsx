@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../hooks/useTheme';
@@ -69,7 +69,11 @@ export default function WorkoutConfigScreen() {
             </TouchableOpacity>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.emoji}>{isPushup ? '💪' : '🦵'}</Text>
+                <Image
+                    source={isPushup ? require('../assets/pushup.png') : require('../assets/squat_icon.png')}
+                    style={styles.headerImage}
+                    resizeMode="contain"
+                />
                 <Text style={[styles.title, dynamicStyles.title]}>{isPushup ? 'Push-ups' : 'Squats'}</Text>
                 <Text style={[styles.subtitle, dynamicStyles.subtitle]}>Configure your workout</Text>
 
@@ -290,6 +294,13 @@ const styles = StyleSheet.create({
     },
     emoji: {
         fontSize: 56,
+        marginBottom: 6,
+        marginTop: 4,
+    },
+    headerImage: {
+        width: 120,
+        height: 80,
+        alignSelf: 'center',
         marginBottom: 6,
         marginTop: 4,
     },
