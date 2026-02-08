@@ -201,25 +201,23 @@ export default function FormCheckScreen() {
                     const analysis = data.feedback.analysis;
                     if (analysis) {
                         setHipTrajectory(analysis.hip_trajectory || []);
+
+                        // Feedback text + TTS: update IMMEDIATELY (no throttle)
+                        if (!isSetTransitionRef.current && !isWorkoutCompleteRef.current) {
+                            setFeedback(analysis.feedback);
+                            setFeedbackLevel(analysis.feedback_level || 'success');
+                            speakTTS(analysis.feedback);
+                        }
                     }
 
-                    // Throttled (~15 fps)
-                    if (now - lastUpdateRef.current > 66) {
+                    // Throttled (~30 fps) for numeric / angle displays
+                    if (now - lastUpdateRef.current > 33) {
                         if (analysis) {
                             setValidReps(analysis.valid_reps ?? 0);
                             setInvalidReps(analysis.invalid_reps ?? 0);
                             setKneeAngle(analysis.knee_angle);
                             setHipAngle(analysis.hip_angle);
                             setSideDetected(analysis.side_detected);
-
-                            // Don't override feedback during transitions
-                            if (!isSetTransitionRef.current && !isWorkoutCompleteRef.current) {
-                                setFeedback(analysis.feedback);
-                                setFeedbackLevel(analysis.feedback_level || 'success');
-
-                                // Speak the feedback via TTS
-                                speakTTS(analysis.feedback);
-                            }
 
                             setTargetDepthY(analysis.target_depth_y || 0);
                             setCurrentDepthY(analysis.current_depth_y || 0);

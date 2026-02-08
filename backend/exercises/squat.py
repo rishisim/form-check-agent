@@ -38,7 +38,14 @@ class SquatAnalyzer:
     KNEE_BOTTOM_ANGLE     = 95    # Below this = definitely at the bottom
 
     # Back angle
-    BACK_BAD_ANGLE        = 45    # Torso too horizontal
+    BACK_WARNING_ANGLE    = 55    # Torso getting too horizontal – warn early
+    BACK_BAD_ANGLE        = 45    # Torso too horizontal – error
+
+    # Knee valgus: max inward drift as fraction of hip-width
+    KNEE_VALGUS_THRESHOLD = 0.15
+
+    # Forward knee travel: knee X beyond toe X (pixels, side-view)
+    KNEE_OVER_TOE_PX      = 20
 
     # Minimum visibility score (0-1) for the side being used
     MIN_VISIBILITY        = 0.45
@@ -47,10 +54,13 @@ class SquatAnalyzer:
     MIN_REP_INTERVAL      = 0.8
 
     # How many consecutive "deep" frames are required before counting
-    MIN_DEEP_FRAMES       = 2
+    MIN_DEEP_FRAMES       = 1
 
-    # Smoothing factor for EMA (0-1).  ~0.4 works well at 5 FPS.
-    SMOOTH_ALPHA          = 0.4
+    # Smoothing factor for EMA (0-1).  Higher = more responsive.
+    SMOOTH_ALPHA          = 0.55
+
+    # Side-stickiness: minimum frames before switching detected side
+    SIDE_STICKY_FRAMES    = 5
 
     def __init__(self):
         self.stage = "up"        # "up" | "descending" | "bottom" | "ascending"
@@ -74,6 +84,10 @@ class SquatAnalyzer:
         self._rep_form_issues: list[str] = []
         self._rep_had_good_depth: bool = False
 
+        # Sticky side detection – avoids oscillating between left/right
+        self._current_side: str | None = None
+        self._side_frame_count: int = 0
+
     def reset(self):
         """Resets the analyzer state for a new set."""
         self.stage = "up"
@@ -88,6 +102,8 @@ class SquatAnalyzer:
         self._deep_frame_count = 0
         self._rep_form_issues = []
         self._rep_had_good_depth = False
+        self._current_side = None
+        self._side_frame_count = 0
 
     # ------------------------------------------------------------------
     # Main analysis (called by server for every frame)
@@ -100,24 +116,47 @@ class SquatAnalyzer:
         if len(lm_list) < 33:
             return None
 
-        # ---- Pick the more-visible side --------------------------------
+        # ---- Pick the more-visible side (with stickiness) ----------------
         left_visibility = (lm_list[11][3] + lm_list[23][3] + lm_list[25][3] + lm_list[27][3]) / 4
         right_visibility = (lm_list[12][3] + lm_list[24][3] + lm_list[26][3] + lm_list[28][3]) / 4
 
-        if right_visibility >= left_visibility:
+        preferred_side = "right" if right_visibility >= left_visibility else "left"
+
+        # Sticky side: only switch if the other side has been dominant for
+        # several consecutive frames to prevent jitter.
+        if self._current_side is None:
+            self._current_side = preferred_side
+            self._side_frame_count = 0
+        elif preferred_side != self._current_side:
+            self._side_frame_count += 1
+            if self._side_frame_count >= self.SIDE_STICKY_FRAMES:
+                self._current_side = preferred_side
+                self._side_frame_count = 0
+        else:
+            self._side_frame_count = 0
+
+        side_used = self._current_side
+
+        if side_used == "right":
             shoulder = lm_list[12][1:3]
             hip      = lm_list[24][1:3]
             knee     = lm_list[26][1:3]
             ankle    = lm_list[28][1:3]
             side_vis = right_visibility
-            side_used = "right"
         else:
             shoulder = lm_list[11][1:3]
             hip      = lm_list[23][1:3]
             knee     = lm_list[25][1:3]
             ankle    = lm_list[27][1:3]
             side_vis = left_visibility
-            side_used = "left"
+
+        # Also grab both-side landmarks for frontal checks
+        left_hip_x   = lm_list[23][1]
+        right_hip_x  = lm_list[24][1]
+        left_knee_x  = lm_list[25][1]
+        right_knee_x = lm_list[26][1]
+        left_ankle_x = lm_list[27][1]
+        right_ankle_x = lm_list[28][1]
 
         self.hip_history.append(hip)
 
@@ -130,9 +169,11 @@ class SquatAnalyzer:
         knee_angle = self._knee_smooth.update(raw_knee)
         hip_angle  = self._hip_smooth.update(raw_hip)
 
+        # Angle-based depth (more reliable than pixel comparison)
+        is_deep_enough = knee_angle <= self.KNEE_DEEP_ANGLE
+
         hip_y  = hip[1]
         knee_y = knee[1]
-        is_deep_enough = hip_y >= (knee_y - 10)  # small tolerance (10 px)
 
         now = time.monotonic()
 
@@ -140,9 +181,35 @@ class SquatAnalyzer:
         feedback_list: list[str] = []
         frame_good_form = True
 
+        # Back angle checks (two tiers)
         if hip_angle < self.BACK_BAD_ANGLE:
             feedback_list.append("Keep chest up!")
             frame_good_form = False
+        elif hip_angle < self.BACK_WARNING_ANGLE:
+            feedback_list.append("Chest up a bit more")
+
+        # Knee valgus (frontal view) – check if knees collapse inward
+        hip_width = abs(right_hip_x - left_hip_x)
+        if hip_width > 20:  # Only check when we have a reasonable frontal view
+            # Compare knee spread to ankle spread relative to hip width
+            knee_spread = abs(right_knee_x - left_knee_x)
+            ankle_spread = abs(right_ankle_x - left_ankle_x)
+            if ankle_spread > 0 and knee_spread < ankle_spread * (1 - self.KNEE_VALGUS_THRESHOLD):
+                feedback_list.append("Push knees out!")
+                frame_good_form = False
+
+        # Forward knee travel (side view) – knee past toes
+        # In side view, if knee X goes significantly past ankle X
+        if self.stage in ("descending", "bottom"):
+            # Determine direction: which way the person faces
+            knee_x, ankle_x = knee[0], ankle[0]
+            forward_travel = abs(knee_x - ankle_x)
+            if forward_travel > self.KNEE_OVER_TOE_PX:
+                # Only flag if knee is actually past the ankle in the direction of travel
+                if (side_used == "right" and knee_x > ankle_x + self.KNEE_OVER_TOE_PX) or \
+                   (side_used == "left" and knee_x < ankle_x - self.KNEE_OVER_TOE_PX):
+                    feedback_list.append("Sit back more")
+                    frame_good_form = False
 
         # ---- State machine with 4 stages & hysteresis ------------------
         if self.stage == "up":
@@ -190,8 +257,8 @@ class SquatAnalyzer:
             if is_deep_enough:
                 self._rep_had_good_depth = True
 
-            if knee_angle > self.KNEE_DEEP_ANGLE + 15:
-                # They've started coming up
+            if knee_angle > self.KNEE_DEEP_ANGLE + 10:
+                # They've started coming up (reduced hysteresis for faster detection)
                 self.stage = "ascending"
 
         elif self.stage == "ascending":

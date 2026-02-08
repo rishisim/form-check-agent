@@ -896,3 +896,45 @@ O] WebSocket disconnect message received in loop
 2026-02-07 18:24:13,146 [INFO] [cfebdb5a] Connection cleaned up (1 active)
 2026-02-07 18:31:16,488 [INFO] [f42f8a03] Client disconnected normally
 2026-02-07 18:31:16,491 [INFO] [f42f8a03] Connection cleaned up (0 active)
+2026-02-07 18:33:01,525 [INFO] [6dcbecbb] WebSocket connection established (1 active)
+2026-02-07 18:34:29,405 [INFO] [6dcbecbb] Client disconnected normally
+2026-02-07 18:34:29,405 [INFO] [6dcbecbb] Connection cleaned up (0 active)
+2026-02-07 18:36:53,682 [INFO] [5852c1b9] WebSocket connection established (1 active)
+2026-02-07 18:37:05,654 [INFO] [5852c1b9] Client disconnected normally
+2026-02-07 18:37:05,655 [INFO] [5852c1b9] Connection cleaned up (0 active)
+2026-02-07 18:37:17,211 [INFO] [338f9d1d] WebSocket connection established (1 active)
+2026-02-07 18:37:26,473 [INFO] [338f9d1d] Client disconnected normally
+2026-02-07 18:37:26,473 [INFO] [338f9d1d] Connection cleaned up (0 active)
+2026-02-07 18:38:13,124 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 18:38:13,126 [INFO] TTS generated (16762 bytes) for: 'Good rep'
+2026-02-07 18:38:22,945 [INFO] [52b15eca] WebSocket connection established (1 active)
+2026-02-07 18:38:30,906 [INFO] [52b15eca] Client disconnected normally
+2026-02-07 18:38:30,906 [INFO] [52b15eca] Connection cleaned up (0 active)
+2026-02-07 18:38:59,433 [INFO] [0e597250] WebSocket connection established (1 active)
+2026-02-07 18:39:06,246 [INFO] [ab5e64d1] WebSocket connection established (2 active)
+2026-02-07 18:39:10,199 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 18:39:10,225 [INFO] TTS generated (29301 bytes) for: 'Go! Start your squats!'
+2026-02-07 18:39:13,250 [INFO] [e9be7231] WebSocket connection established (3 active)
+2026-02-07 18:39:17,307 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 18:39:17,323 [INFO] TTS generated (27629 bytes) for: 'Good depth! Drive up!'
+2026-02-07 18:39:21,250 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 18:39:21,256 [INFO] TTS generated (33062 bytes) for: 'Deeper! Hips below knees.'
+2026-02-07 18:39:25,785 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 18:39:25,786 [INFO] TTS generated (20942 bytes) for: 'Squat deeper'
+2026-02-07 18:39:29,902 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 18:39:34,562 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 18:39:34,579 [INFO] TTS generated (21777 bytes) for: 'Keep chest up!'
+2026-02-07 18:39:36,159 [INFO] [0e597250] Client disconnected normally
+2026-02-07 18:39:36,159 [INFO] [0e597250] Connection cleaned up (2 active)
+2026-02-07 18:39:44,090 [INFO] [e9be7231] Client disconnected normally
+2026-02-07 18:39:44,091 [INFO] [e9be7231] Connection cleaned up (1 active)
+2026-02-07 18:40:41,310 [INFO] [b9c68cbd] WebSocket connection established (2 active)
+2026-02-07 18:40:58,215 [INFO] [b9c68cbd] Client disconnected normally
+2026-02-07 18:40:58,215 [INFO] [b9c68cbd] Connection cleaned up (1 active)
+2026-02-07 18:44:05,229 [INFO] [ab5e64d1] Client disconnected normally
+2026-02-07 18:44:05,230 [INFO] [ab5e64d1] Connection cleaned up (0 active)
+2026-02-07 18:44:21,692 [INFO] [148eda11] WebSocket connection established (1 active)
+2026-02-07 18:44:25,607 [INFO] [ef0a6159] WebSocket connection established (2 active)
+2026-02-07 18:44:34,580 [INFO] [ef0a6159] Client disconnected normally
+2026-02-07 18:44:34,580 [INFO] [ef0a6159] Connection cleaned up (1 active)
+2026-02-07 18:44:42,850 [INFO] [1df0fe61] WebSocket connection established (2 active)

@@ -108,6 +108,25 @@ def _downscale(frame: np.ndarray, max_width: int = MEDIAPIPE_MAX_WIDTH) -> tuple
     return cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA), scale
 
 
+def _process_frame_sync(
+    frame: np.ndarray,
+    tracker: PoseTracker,
+) -> list:
+    """Run downscale + pose detection + landmark extraction in ONE thread call.
+
+    Returns the landmark list with coordinates in original-frame space.
+    """
+    small, scale = _downscale(frame)
+    tracker.find_pose(small, draw=False)
+    lm_list = tracker.get_position(small, draw=False)
+    if scale != 1.0 and lm_list:
+        lm_list = [
+            [lid, int(x / scale), int(y / scale), v]
+            for lid, x, y, v in lm_list
+        ]
+    return lm_list
+
+
 @app.websocket("/ws/video")
 async def websocket_video_endpoint(websocket: WebSocket):
     """
@@ -173,13 +192,11 @@ async def websocket_video_endpoint(websocket: WebSocket):
             except Exception:
                 pass
 
-            # Downscale for faster MediaPipe inference
-            small_frame, scale = await asyncio.to_thread(_downscale, frame)
-
-            # Run MediaPipe in a thread so we don't block the event loop
+            # Run downscale + MediaPipe in a SINGLE thread call
             try:
-                processed = await asyncio.to_thread(session_tracker.find_pose, small_frame, False)
-                lm_list = await asyncio.to_thread(session_tracker.get_position, processed, False)
+                lm_list = await asyncio.to_thread(
+                    _process_frame_sync, frame, session_tracker
+                )
             except Exception as e:
                 logger.error(f"[{conn_id}] Pose tracking error: {e}")
                 lm_list = []
@@ -188,10 +205,6 @@ async def websocket_video_endpoint(websocket: WebSocket):
             feedback = None
             if lm_list:
                 try:
-                    # Scale landmarks back to original resolution for analysis
-                    if scale != 1.0:
-                        lm_list = [[lid, int(x / scale), int(y / scale), v]
-                                   for lid, x, y, v in lm_list]
 
                     analysis = session_analyzer.get_analysis(lm_list)
 

@@ -1,7 +1,8 @@
 import os
 import hashlib
 import logging
-import httpx
+import asyncio
+from typing import Optional, Dict
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,28 +11,37 @@ logger = logging.getLogger(__name__)
 
 
 class TTSService:
-    """Eleven Labs Text-to-Speech service with in-memory caching."""
+    """Eleven Labs Text-to-Speech service using the official SDK with in-memory caching."""
 
     def __init__(self):
-        self.api_key = os.environ.get("ELEVEN_LABS_API_KEY", "")
-        # Default voice: "Rachel" – a clear, natural coaching voice
-        self.voice_id = os.environ.get("ELEVEN_LABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+        self.api_key = os.environ.get("ELEVENLABS_API_KEY", "")
+        # Default voice: "Rachel" – clear female coaching voice
+        self.voice_id = os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
         self.model_id = "eleven_turbo_v2_5"
-        self.base_url = "https://api.elevenlabs.io/v1"
+        self.output_format = "mp3_44100_128"
 
         # In-memory cache: md5(text) -> audio bytes
-        self._cache: dict[str, bytes] = {}
+        self._cache: Dict[str, bytes] = {}
+
+        # Lazy-init the client
+        self._client = None
 
         if not self.api_key:
-            logger.warning("ELEVEN_LABS_API_KEY not set – TTS will be disabled")
+            logger.warning("ELEVENLABS_API_KEY not set – TTS will be disabled")
+
+    def _get_client(self):
+        if self._client is None and self.api_key:
+            from elevenlabs.client import ElevenLabs
+            self._client = ElevenLabs(api_key=self.api_key)
+        return self._client
 
     @property
     def is_available(self) -> bool:
         return bool(self.api_key)
 
-    async def synthesize(self, text: str) -> bytes | None:
+    async def synthesize(self, text: str) -> Optional[bytes]:
         """
-        Convert text to speech using Eleven Labs API.
+        Convert text to speech using the ElevenLabs SDK.
         Returns MP3 audio bytes, or None on failure.
         Results are cached in memory so repeated phrases are instant.
         """
@@ -53,44 +63,35 @@ class TTSService:
             logger.info(f"TTS cache hit for: {clean_text!r}")
             return self._cache[cache_key]
 
-        url = f"{self.base_url}/text-to-speech/{self.voice_id}"
-        headers = {
-            "xi-api-key": self.api_key,
-            "Content-Type": "application/json",
-            "Accept": "audio/mpeg",
-        }
-        payload = {
-            "text": clean_text,
-            "model_id": self.model_id,
-            "voice_settings": {
-                "stability": 0.6,
-                "similarity_boost": 0.75,
-                "speed": 1.15,          # slightly faster for coaching cues
-            },
-        }
-
+        # Run the SDK call in a thread to keep the event loop free
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    url, json=payload, headers=headers, timeout=10.0
-                )
-
-            if response.status_code == 200:
-                audio_bytes = response.content
+            audio_bytes = await asyncio.to_thread(self._synthesize_sync, clean_text)
+            if audio_bytes:
                 self._cache[cache_key] = audio_bytes
-                logger.info(
-                    f"TTS generated ({len(audio_bytes)} bytes) for: {clean_text!r}"
-                )
-                return audio_bytes
-            else:
-                logger.error(
-                    f"Eleven Labs API error {response.status_code}: {response.text[:200]}"
-                )
-                return None
-
-        except httpx.TimeoutException:
-            logger.error("TTS request timed out")
-            return None
+                logger.info(f"TTS generated ({len(audio_bytes)} bytes) for: {clean_text!r}")
+            return audio_bytes
         except Exception as e:
             logger.error(f"TTS error: {e}")
+            return None
+
+    def _synthesize_sync(self, text: str) -> Optional[bytes]:
+        """Synchronous TTS call using the ElevenLabs SDK."""
+        client = self._get_client()
+        if not client:
+            return None
+
+        try:
+            audio_iter = client.text_to_speech.convert(
+                text=text,
+                voice_id=self.voice_id,
+                model_id=self.model_id,
+                output_format=self.output_format,
+            )
+            # The SDK returns an iterator of bytes chunks – join them
+            chunks = []
+            for chunk in audio_iter:
+                chunks.append(chunk)
+            return b"".join(chunks)
+        except Exception as e:
+            logger.error(f"ElevenLabs SDK error: {e}")
             return None
