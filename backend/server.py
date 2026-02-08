@@ -14,6 +14,8 @@ from starlette.websockets import WebSocketState
 from pose_tracker import PoseTracker
 from exercises.squat import SquatAnalyzer
 from gemini_service import GeminiService
+from tts_service import TTSService
+import time
 
 # Configure logging
 logging.basicConfig(
@@ -37,8 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize services (Gemini is stateless/buffered, safe to share)
-gemini_service = GeminiService()
+# Initialize services (stateless/buffered per session)
+# gemini_service moved to connection scope
+
 
 # Track active connections for diagnostics
 active_connections: set[str] = set()
@@ -82,8 +85,18 @@ async def websocket_video_endpoint(websocket: WebSocket):
     # Initialize tracker AND analyzer per session (no shared state)
     session_tracker = PoseTracker()
     session_analyzer = SquatAnalyzer()
+    gemini_client = GeminiService()  # Use per-session instance
+    tts_client = TTSService()
+    
     current_session_id = str(uuid.uuid4())
     frame_seq = 0
+    
+    # Session Configuration
+    voice_feedback_enabled = True
+    
+    # Stats
+    last_gemini_time = time.time()
+    GEMINI_INTERVAL = 5.0 # seconds (adjust based on latency/cost)
 
     # --- Keepalive: send a ping every 25 s so the connection doesn't idle-timeout ---
     async def _keepalive():
@@ -125,6 +138,13 @@ async def websocket_video_endpoint(websocket: WebSocket):
             if msg_type == "pong":
                 # Client responded to our keepalive – all good
                 continue
+            
+            if msg_type == "configure":
+                config = data.get("config", {})
+                if "voice_feedback" in config:
+                    voice_feedback_enabled = config["voice_feedback"]
+                    logger.info(f"[{conn_id}] Voice feedback set to: {voice_feedback_enabled}")
+                continue
 
             if msg_type == "frame":
                 frame_base64 = data.get("frame")
@@ -146,7 +166,7 @@ async def websocket_video_endpoint(websocket: WebSocket):
 
                 # Add frame to Gemini buffer
                 try:
-                    gemini_service.add_frame(frame)
+                    gemini_client.add_frame(frame)
                 except Exception:
                     pass  # non-critical
 
@@ -188,9 +208,35 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 if not await _safe_send(websocket, {
                     "type": "analysis",
                     "feedback": feedback,
-                    "buffered_frames": len(gemini_service.frame_buffer),
+                    "buffered_frames": len(gemini_client.frame_buffer),
                 }):
                     break  # socket gone
+            
+            # --- Periodic Gemini Analysis ---
+            current_time = time.time()
+            if (current_time - last_gemini_time > GEMINI_INTERVAL) and (len(gemini_client.frame_buffer) > 45):
+                logger.info(f"[{conn_id}] Triggering Gemini analysis...")
+                last_gemini_time = current_time
+                
+                # Run Gemini in thread to avoid blocking loop
+                analysis_text = await asyncio.to_thread(gemini_client.analyze_current_buffer)
+                
+                if analysis_text and "No feedback" not in analysis_text and "Error" not in analysis_text:
+                    logger.info(f"[{conn_id}] Gemini Feedback: {analysis_text}")
+                    
+                    audio_b64 = None
+                    if voice_feedback_enabled:
+                         # Run TTS in thread
+                         audio_bytes = await asyncio.to_thread(tts_client.generate_audio, analysis_text)
+                         if audio_bytes:
+                             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
+                    
+                    # Send feedback
+                    await _safe_send(websocket, {
+                        "type": "gemini_feedback",
+                        "text": analysis_text,
+                        "audio": audio_b64
+                    })
 
             elif msg_type == "reset_reps":
                 logger.info(f"[{conn_id}] Resetting rep counter")

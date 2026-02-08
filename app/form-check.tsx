@@ -7,17 +7,19 @@ import { SkeletonOverlay } from '../components/SkeletonOverlay';
 import { DepthLine } from '../components/DepthLine';
 import { RepCounter } from '../components/RepCounter';
 import { FeedbackToast } from '../components/FeedbackToast';
+import { Audio } from 'expo-av';
 
 // ─── Configuration ───────────────────────────────────────
 const SERVER_URL = 'ws://10.194.82.50:8000/ws/video';
 
 export default function FormCheckScreen() {
     const router = useRouter();
-    const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string }>();
+    const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string; voiceFeedback: string }>();
 
     const totalSets = parseInt(params.sets || '3', 10);
     const repsPerSet = parseInt(params.reps || '10', 10);
     const initialTimer = parseInt(params.timerSeconds || '10', 10);
+    const voiceFeedbackEnabled = params.voiceFeedback === 'true';
 
     // ─── Camera / Connection ─────────────────────
     const [permission, requestPermission] = useCameraPermissions();
@@ -73,6 +75,9 @@ export default function FormCheckScreen() {
     const isSetTransitionRef = useRef(false);
     const isWorkoutCompleteRef = useRef(false);
 
+    // Audio ref for TTS playback
+    const audioSoundRef = useRef<Audio.Sound | null>(null);
+
     // ─── Countdown Timer ─────────────────────────
     useEffect(() => {
         if (!isCountdownActive) return;
@@ -120,6 +125,40 @@ export default function FormCheckScreen() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [validReps]);
+
+    // ─── Audio Playback ──────────────────────────
+    const playAudio = useCallback(async (audioBase64: string) => {
+        try {
+            // Unload previous audio if any
+            if (audioSoundRef.current) {
+                await audioSoundRef.current.unloadAsync();
+                audioSoundRef.current = null;
+            }
+
+            // Convert base64 to data URI
+            const audioUri = `data:audio/mpeg;base64,${audioBase64}`;
+
+            // Load and play
+            const { sound } = await Audio.Sound.createAsync(
+                { uri: audioUri },
+                { shouldPlay: true }
+            );
+
+            audioSoundRef.current = sound;
+
+            // Auto-cleanup when finished
+            sound.setOnPlaybackStatusUpdate((status) => {
+                if (status.isLoaded && status.didJustFinish) {
+                    sound.unloadAsync();
+                    if (audioSoundRef.current === sound) {
+                        audioSoundRef.current = null;
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Failed to play audio:', error);
+        }
+    }, []);
 
     // ─── WebSocket ───────────────────────────────
     const connectWebSocket = useCallback(() => {
@@ -211,6 +250,25 @@ export default function FormCheckScreen() {
                             setCurrentDepthY(analysis.current_depth_y || 0);
                         }
                         lastUpdateRef.current = now;
+                    }
+                }
+
+                // Handle Gemini TTS feedback
+                if (data.type === 'gemini_feedback') {
+                    const text = data.text;
+                    const audioB64 = data.audio;
+
+                    console.log('Gemini feedback:', text);
+
+                    // Update feedback text
+                    if (text && !isSetTransitionRef.current && !isWorkoutCompleteRef.current) {
+                        setFeedback(text);
+                        setFeedbackLevel('warning'); // Use warning color for AI feedback
+                    }
+
+                    // Play audio if available
+                    if (audioB64) {
+                        playAudio(audioB64).catch(err => console.error('Audio playback error:', err));
                     }
                 }
             } catch (e) {
@@ -378,6 +436,27 @@ export default function FormCheckScreen() {
             startStreaming();
         }
     }, [isConnected, permission, startStreaming, isCountdownActive]);
+
+    // ─── Send Voice Config ───────────────────────
+    useEffect(() => {
+        if (isConnected && wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({
+                type: 'configure',
+                config: {
+                    voice_feedback: voiceFeedbackEnabled
+                }
+            }));
+        }
+    }, [isConnected, voiceFeedbackEnabled]);
+
+    // ─── Audio Cleanup ───────────────────────────
+    useEffect(() => {
+        return () => {
+            if (audioSoundRef.current) {
+                audioSoundRef.current.unloadAsync();
+            }
+        };
+    }, []);
 
     // ─── Progress Calculation ────────────────────
     const totalRepsGoal = totalSets * repsPerSet;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
@@ -8,9 +8,10 @@ export default function WorkoutConfigScreen() {
     const [sets, setSets] = useState(3);
     const [reps, setReps] = useState(10);
     const [timerSeconds, setTimerSeconds] = useState(10);
+    const [voiceFeedback, setVoiceFeedback] = useState(true);
 
     const handleStartWorkout = () => {
-        router.push(`/form-check?sets=${sets}&reps=${reps}&timerSeconds=${timerSeconds}`);
+        router.push(`/form-check?sets=${sets}&reps=${reps}&timerSeconds=${timerSeconds}&voiceFeedback=${voiceFeedback}`);
     };
 
     const adjust = (
@@ -112,6 +113,22 @@ export default function WorkoutConfigScreen() {
                     {timerSeconds > 0 && (
                         <Text style={styles.summarySubtext}>{timerSeconds}s countdown before start</Text>
                     )}
+                </View>
+
+                {/* ── Voice Feedback Toggle ──────── */}
+                <View style={[styles.card, styles.voiceCard]}>
+                    <View style={styles.voiceRow}>
+                        <View>
+                            <Text style={styles.cardLabel}>Voice Feedback 🗣️</Text>
+                            <Text style={styles.cardHint}>Hear coaching cues</Text>
+                        </View>
+                        <Switch
+                            value={voiceFeedback}
+                            onValueChange={setVoiceFeedback}
+                            trackColor={{ false: '#E0E0E0', true: '#88B04B' }}
+                            thumbColor={'#fff'}
+                        />
+                    </View>
                 </View>
             </ScrollView>
 
@@ -247,6 +264,16 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#7DAF60',
         marginTop: 4,
+    },
+    /* ── Voice toggle styles ── */
+    voiceCard: {
+        marginTop: 6,
+        marginBottom: 30,
+    },
+    voiceRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     /* ── Bottom ─── */
     bottomSpacer: {

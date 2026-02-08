@@ -93,15 +93,24 @@ class GeminiService:
             You are an elite gym coach with computer vision expertise. 
             The user is performing a {exercise_name}.
             
-            Analyze the video clip carefully:
-            1. Observe the user's body positioning and movement
-            2. Identify any form issues (depth, alignment, stability)
-            3. Focus on safety and effectiveness
+            Analyze the video clip carefully for temporal changes in form:
+            1. Observe the user's movement sequence over time in the video.
+            2. Identify any form deviations that occur during the movement (e.g., knees caving in at the bottom of a squat, back rounding during the lift).
+            3. Focus on safety and effectiveness.
             
-            Give a concise, actionable coaching cue (max 10 words) to fix their form instantly.
-            If form is perfect, say "Perfect form! Great work!".
+            Provide a SINGLE, clean, actionable coaching cue (max 10 words) optimized for speech synthesis (TTS).
+            - NO special characters, symbols, emojis, or hashtags.
+            - NO technical jargon or complex punctuation.
+            - Just plain text that sounds natural when spoken.
             
-            Be specific and encouraging.
+            Return the output as a JSON object with the following schema:
+            {{
+                "feedback": "string",
+                "is_perfect_form": boolean
+            }}
+            
+            If form is perfect, set "feedback" to "Perfect form! Great work!" and "is_perfect_form" to true.
+            Otherwise, set "feedback" to your corrective cue and "is_perfect_form" to false.
             """
             
             print(f"Requesting analysis from {model_name}...")
@@ -116,7 +125,18 @@ class GeminiService:
                             types.Part.from_text(text=prompt)
                         ]
                     )
-                ]
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=types.Schema(
+                        type=types.Type.OBJECT,
+                        properties={
+                            "feedback": types.Schema(type=types.Type.STRING),
+                            "is_perfect_form": types.Schema(type=types.Type.BOOLEAN)
+                        },
+                        required=["feedback", "is_perfect_form"]
+                    )
+                )
             )
             
             # Cleanup
@@ -126,7 +146,13 @@ class GeminiService:
             
             self.is_analyzing = False
             if response.text:
-                return response.text
+                import json
+                try:
+                    data = json.loads(response.text)
+                    return data.get("feedback", "No feedback generated.")
+                except json.JSONDecodeError:
+                    print(f"Error parsing JSON response: {response.text}")
+                    return response.text # Fallback to raw text if JSON fails
             else:
                 return "No feedback generated."
 
