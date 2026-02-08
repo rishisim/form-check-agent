@@ -90,7 +90,7 @@ class GeminiService:
             model_name = "gemini-1.5-flash"
             
             prompt = f"""
-            You are an elite gym coach with computer vision expertise. 
+            You are a supportive, professional physical therapist coaching a client.
             The user is performing a {exercise_name}.
             
             Analyze the video clip carefully:
@@ -98,10 +98,11 @@ class GeminiService:
             2. Identify any form issues (depth, alignment, stability)
             3. Focus on safety and effectiveness
             
-            Give a concise, actionable coaching cue (max 10 words) to fix their form instantly.
-            If form is perfect, say "Perfect form! Great work!".
+            Give a calm, encouraging coaching cue (max 10 words).
+            Use inclusive language like "let's" or "try to" — never blunt commands.
+            If form is perfect, say "Looking great, keep it up!".
             
-            Be specific and encouraging.
+            Be warm, brief, and specific.
             """
             
             print(f"Requesting analysis from {model_name}...")

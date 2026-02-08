@@ -7,8 +7,8 @@ const SKIP_MESSAGES = new Set([
     'Position yourself in frame',
     'Start Squatting',
     'Start Push-ups',
-    'Chest up a bit more',      // minor warning, not worth vocalizing
-    'Tighten your core',        // mild pushup warning, not worth vocalizing
+    'Nice, just a little more chest lift', // minor warning, not worth vocalizing
+    'Let\'s engage that core',             // mild pushup warning, not worth vocalizing
 ]);
 
 interface UseTTSOptions {

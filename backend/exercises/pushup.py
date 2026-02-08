@@ -31,8 +31,8 @@ class PushupAnalyzer:
     ELBOW_BOTTOM      = 95    # Below this = definitely at the bottom
 
     # ---- Body alignment (shoulder-hip-ankle angle) ----------------------
-    BODY_WARNING_ANGLE = 160  # Mild sag - "Tighten your core"
-    BODY_BAD_ANGLE     = 150  # Severe sag - "Keep body straight!"
+    BODY_WARNING_ANGLE = 160  # Mild sag - engage core
+    BODY_BAD_ANGLE     = 150  # Severe sag - straighten body
 
     # ---- Hip pike detection (positional) --------------------------------
     # Fraction of body-length the hip must be above the shoulder->ankle line
@@ -56,11 +56,11 @@ class PushupAnalyzer:
 
     # Priority order (lower index = higher priority)
     WARN_PRIORITY = [
-        "Keep body straight!",
-        "Don't pike hips up!",
-        "Tighten your core",
-        "Lower your chest more",
-        "Full lockout at top",
+        "Let's keep the body nice and straight",
+        "Try dropping the hips a bit",
+        "Let's engage that core",
+        "Try to lower just a bit more",
+        "Let's lock out at the top",
     ]
 
     # ------------------------------------------------------------------
@@ -100,8 +100,8 @@ class PushupAnalyzer:
         self._stabilizer = FeedbackStabilizer(
             warn_priority=self.WARN_PRIORITY,
             rep_completion_msgs={
-                "Good rep!", "Lower chest more next rep", "Check form",
-                "Good depth! Push up!",
+                "Nice rep, keep it up!", "Try going a bit lower next one", "Let's tighten that up",
+                "Great depth, push it up!",
             },
             candidate_threshold=5,
             feedback_hold_time=self.FEEDBACK_HOLD_TIME,
@@ -213,10 +213,10 @@ class PushupAnalyzer:
 
             if self._body_warn_frames >= self.WARN_FRAMES_BODY:
                 if body_angle < self.BODY_BAD_ANGLE:
-                    feedback_list.append("Keep body straight!")
+                    feedback_list.append("Let's keep the body nice and straight")
                     frame_good_form = False
                 else:
-                    feedback_list.append("Tighten your core")
+                    feedback_list.append("Let's engage that core")
         else:
             self._body_warn_frames = max(0, self._body_warn_frames - 1)
 
@@ -248,7 +248,7 @@ class PushupAnalyzer:
                 self._pike_warn_frames = max(0, self._pike_warn_frames - 2)
 
             if self._pike_warn_frames >= self.WARN_FRAMES_PIKE:
-                feedback_list.append("Don't pike hips up!")
+                feedback_list.append("Try dropping the hips a bit")
                 frame_good_form = False
         else:
             self._pike_warn_frames = max(0, self._pike_warn_frames - 1)
@@ -286,14 +286,14 @@ class PushupAnalyzer:
             if is_deep_enough:
                 self._rep_had_good_depth = True
 
-            # Show "Lower your chest more" after hovering above depth
+            # Show depth cue after hovering above depth
             if self._deeper_warn_frames >= self.WARN_FRAMES_DEEPER and not is_deep_enough:
-                if "Lower your chest more" not in feedback_list:
-                    feedback_list.append("Lower your chest more")
+                if "Try to lower just a bit more" not in feedback_list:
+                    feedback_list.append("Try to lower just a bit more")
 
             if self._deep_frame_count >= self.MIN_DEEP_FRAMES:
                 self.stage = "bottom"
-                self.feedback = "Good depth! Push up!"
+                self.feedback = "Great depth, push it up!"
 
             # If they pop back up without going deep enough
             if elbow_angle > self.ELBOW_EXTENDED:
@@ -342,26 +342,26 @@ class PushupAnalyzer:
 
                     if rep_is_valid:
                         self.valid_reps += 1
-                        self.feedback = "Good rep!"
+                        self.feedback = "Nice rep, keep it up!"
                     else:
                         self.invalid_reps += 1
                         if not self._rep_had_good_depth:
-                            self.feedback = "Lower chest more next rep"
+                            self.feedback = "Try going a bit lower next one"
                         elif self._rep_form_issues:
                             self.feedback = self._rep_form_issues[0]
                         else:
-                            self.feedback = "Check form"
+                            self.feedback = "Let's tighten that up"
 
                 self.stage = "up"
                 self._deep_frame_count = 0
 
         # ---- Build final feedback with stabilizer ---------------------
         warn_counters = {
-            "Keep body straight!":   self._body_warn_frames,
-            "Tighten your core":     self._body_warn_frames,
-            "Don't pike hips up!":   self._pike_warn_frames,
-            "Lower your chest more": self._deeper_warn_frames,
-            "Full lockout at top":   self._lockout_warn_frames,
+            "Let's keep the body nice and straight":   self._body_warn_frames,
+            "Let's engage that core":     self._body_warn_frames,
+            "Try dropping the hips a bit":   self._pike_warn_frames,
+            "Try to lower just a bit more": self._deeper_warn_frames,
+            "Let's lock out at the top":   self._lockout_warn_frames,
         }
 
         stable_feedback, stable_level = self._stabilizer.update(

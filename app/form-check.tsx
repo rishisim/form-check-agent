@@ -123,7 +123,7 @@ export default function FormCheckScreen() {
         if (!isCountdownActive) return;
         if (countdown <= 0) {
             setIsCountdownActive(false);
-            const goMsg = isPushup ? 'Go! Start your pushups!' : 'Go! Start your squats!';
+            const goMsg = isPushup ? 'Let\'s go, you got this!' : 'Let\'s go, you got this!';
             setFeedback(goMsg);
             setFeedbackLevel('success');
             speakTTS(goMsg);
@@ -146,7 +146,7 @@ export default function FormCheckScreen() {
                 setIsWorkoutComplete(true);
                 setFeedback('🏆 Workout Complete!');
                 setFeedbackLevel('success');
-                speakTTS('Workout Complete! Great job!');
+                speakTTS('Amazing work today, well done!');
                 // Stop streaming
                 isStreamingRef.current = false;
                 if (frameIntervalRef.current) {
@@ -159,7 +159,7 @@ export default function FormCheckScreen() {
                 setIsSetTransition(true);
                 setFeedback(`✅ Set ${currentSetRef.current} Complete!`);
                 setFeedbackLevel('success');
-                speakTTS(`Set ${currentSetRef.current} complete! Rest up.`);
+                speakTTS(`Great set! Let's take a breather.`);
 
                 // Stop streaming during rest
                 isStreamingRef.current = false;
@@ -396,7 +396,7 @@ export default function FormCheckScreen() {
 
         setValidReps(0);
         setInvalidReps(0);
-        setFeedback('Next set — get ready!');
+        setFeedback('Next set — let\'s do this!');
         setFeedbackLevel('success');
         lastUpdateRef.current = 0;
         lastFrameSeqRef.current = Number.MAX_SAFE_INTEGER;
@@ -420,8 +420,8 @@ export default function FormCheckScreen() {
             return;
         }
         // Announce at certain milestones
-        if (restCountdown === 30) speakTTS('30 seconds left');
-        if (restCountdown === 10) speakTTS('10 seconds, get ready!');
+        if (restCountdown === 30) speakTTS('30 seconds, you\'re doing great');
+        if (restCountdown === 10) speakTTS('Almost time, let\'s get ready');
 
         const timer = setTimeout(() => {
             restCountdownRef.current -= 1;

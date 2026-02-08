@@ -1779,3 +1779,49 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-02-08 06:53:48,923 [INFO] TTS cache hit for: 'Go! Start your pushups!'
 2026-02-08 06:54:02,440 [INFO] [0253f9a5] Client disconnected normally
 2026-02-08 06:54:02,442 [INFO] [0253f9a5] Connection cleaned up (0 active)
+2026-02-08 07:10:04,942 [INFO] [d5df016c] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 07:10:15,137 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 07:10:15,168 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 07:10:15,186 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 07:10:30,399 [INFO] [d5df016c] Client disconnected normally
+2026-02-08 07:10:30,399 [INFO] [d5df016c] Connection cleaned up (0 active)
+2026-02-08 07:12:53,373 [INFO] [f7ae20b3] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 07:13:03,557 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 07:13:03,590 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 07:13:03,609 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 07:13:08,769 [ERROR] Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\arpit\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arpit\AppData\Local\Programs\Python\Python313\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2026-02-08 07:13:08,784 [INFO] [f7ae20b3] Client disconnected normally
+2026-02-08 07:13:08,785 [INFO] [f7ae20b3] Connection cleaned up (0 active)
+2026-02-08 07:14:13,026 [INFO] [ef7d9084] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 07:14:14,039 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 07:14:14,076 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 07:14:14,096 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 07:14:17,723 [INFO] [ef7d9084] Client disconnected normally
+2026-02-08 07:14:17,725 [INFO] [ef7d9084] Connection cleaned up (0 active)
+2026-02-08 07:37:04,159 [INFO] [160f37e1] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 07:37:05,195 [INFO] [160f37e1] Client disconnected normally
+2026-02-08 07:37:05,195 [INFO] [160f37e1] Connection cleaned up (0 active)
+2026-02-08 07:37:13,287 [INFO] [81d385a9] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 07:37:23,471 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 07:37:23,514 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 07:37:23,535 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 07:37:25,716 [INFO] [81d385a9] Client disconnected normally
+2026-02-08 07:37:25,717 [INFO] [81d385a9] Connection cleaned up (0 active)
+2026-02-08 07:38:28,111 [INFO] [5282860e] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 07:38:38,299 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 07:38:38,342 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 07:38:38,364 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 07:38:45,337 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 07:38:45,362 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 07:38:45,380 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 07:39:16,549 [INFO] [5282860e] Client disconnected normally
+2026-02-08 07:39:16,550 [INFO] [5282860e] Connection cleaned up (0 active)

@@ -37,9 +37,9 @@ class SquatAnalyzer:
     SIDE_STICKY_FRAMES    = 5
 
     # ---- Feedback debounce: consecutive frames required to emit a warning ---
-    WARN_FRAMES_BACK      = 6   # "Keep chest up" needs 6 bad frames in a row
-    WARN_FRAMES_KNEE_TOE  = 8   # "Sit back more" needs 8 bad frames
-    WARN_FRAMES_DEEPER    = 8   # "Squat deeper" needs 8 frames
+    WARN_FRAMES_BACK      = 6   # chest lift warning needs 6 bad frames in a row
+    WARN_FRAMES_KNEE_TOE  = 8   # sit back warning needs 8 bad frames
+    WARN_FRAMES_DEEPER    = 8   # depth warning needs 8 frames
 
     # Minimum time (seconds) a feedback message stays on screen before changing
     FEEDBACK_HOLD_TIME    = 2.5
@@ -47,8 +47,8 @@ class SquatAnalyzer:
     # Priority order for warnings (lower index = higher priority).
     # When multiple warnings fire, only the highest-priority one is shown.
     # Once shown, it stays until resolved (counter drops to 0).
-    WARN_PRIORITY = ["Keep chest up!", "Sit back more",
-                     "Chest up a bit more", "Squat deeper"]
+    WARN_PRIORITY = ["Let's lift that chest up", "Try sitting back a bit",
+                     "Nice, just a little more chest lift", "Let's go a bit deeper"]
 
     def __init__(self):
         self.stage = "up"        # "up" | "descending" | "bottom" | "ascending"
@@ -200,10 +200,10 @@ class SquatAnalyzer:
 
             if self._back_warn_frames >= self.WARN_FRAMES_BACK:
                 if hip_angle < self.BACK_BAD_ANGLE:
-                    feedback_list.append("Keep chest up!")
+                    feedback_list.append("Let's lift that chest up")
                     frame_good_form = False
                 else:
-                    feedback_list.append("Chest up a bit more")
+                    feedback_list.append("Nice, just a little more chest lift")
         else:
             self._back_warn_frames = max(0, self._back_warn_frames - 1)
 
@@ -224,7 +224,7 @@ class SquatAnalyzer:
                 self._knee_toe_warn_frames = max(0, self._knee_toe_warn_frames - 2)
 
             if self._knee_toe_warn_frames >= self.WARN_FRAMES_KNEE_TOE:
-                feedback_list.append("Sit back more")
+                feedback_list.append("Try sitting back a bit")
                 frame_good_form = False
         else:
             self._knee_toe_warn_frames = max(0, self._knee_toe_warn_frames - 1)
@@ -261,14 +261,14 @@ class SquatAnalyzer:
             if is_deep_enough:
                 self._rep_had_good_depth = True
 
-            # Only show "Squat deeper" if they've been hovering above depth for a while
+            # Only show depth cue if they've been hovering above depth for a while
             if self._deeper_warn_frames >= self.WARN_FRAMES_DEEPER and not is_deep_enough:
-                if "Squat deeper" not in feedback_list:
-                    feedback_list.append("Squat deeper")
+                if "Let's go a bit deeper" not in feedback_list:
+                    feedback_list.append("Let's go a bit deeper")
 
             if self._deep_frame_count >= self.MIN_DEEP_FRAMES:
                 self.stage = "bottom"
-                self.feedback = "Good depth! Drive up!"
+                self.feedback = "Great depth, drive it up!"
 
             # If they pop back up without going deep enough
             if knee_angle > self.KNEE_STANDING_ANGLE:
@@ -304,11 +304,11 @@ class SquatAnalyzer:
                     self.counter += 1
                     self._last_rep_time = now
 
-                    # "Squat deeper" is guidance during descent, not a form error.
+                    # "Let's go a bit deeper" is guidance during descent, not a form error.
                     # If they followed through and achieved good depth, exclude it.
                     actual_form_issues = [
                         issue for issue in self._rep_form_issues
-                        if issue != "Squat deeper" or not self._rep_had_good_depth
+                        if issue != "Let's go a bit deeper" or not self._rep_had_good_depth
                     ]
 
                     rep_is_valid = (
@@ -318,15 +318,15 @@ class SquatAnalyzer:
 
                     if rep_is_valid:
                         self.valid_reps += 1
-                        self.feedback = "Good rep!"
+                        self.feedback = "Nice rep, keep it up!"
                     else:
                         self.invalid_reps += 1
                         if not self._rep_had_good_depth:
-                            self.feedback = "Deeper! Hips below knees."
+                            self.feedback = "Try to sink a little deeper"
                         elif actual_form_issues:
                             self.feedback = actual_form_issues[0]
                         else:
-                            self.feedback = "Check form"
+                            self.feedback = "Let's tighten that up"
 
                 self.stage = "up"
                 self._deep_frame_count = 0
@@ -334,10 +334,10 @@ class SquatAnalyzer:
         # ---- Build final feedback with warning-lock logic -----------------
         # Map warnings to their debounce counters so we can check "resolved"
         _warn_counter = {
-            "Keep chest up!": self._back_warn_frames,
-            "Chest up a bit more": self._back_warn_frames,
-            "Sit back more": self._knee_toe_warn_frames,
-            "Squat deeper": self._deeper_warn_frames,
+            "Let's lift that chest up": self._back_warn_frames,
+            "Nice, just a little more chest lift": self._back_warn_frames,
+            "Try sitting back a bit": self._knee_toe_warn_frames,
+            "Let's go a bit deeper": self._deeper_warn_frames,
         }
 
         # If the currently-locked warning is still in the feedback list, keep it.
@@ -374,8 +374,8 @@ class SquatAnalyzer:
 
         # Stabilization: rep-completion messages update immediately;
         # warnings need N consistent candidate frames OR the hold time to expire.
-        rep_completion_msgs = {"Good rep!", "Deeper! Hips below knees.", "Check form",
-                               "Good depth! Drive up!"}
+        rep_completion_msgs = {"Nice rep, keep it up!", "Try to sink a little deeper", "Let's tighten that up",
+                               "Great depth, drive it up!"}
         is_priority = desired_feedback in rep_completion_msgs
 
         if desired_feedback == self._candidate_feedback:
