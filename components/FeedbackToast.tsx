@@ -4,9 +4,10 @@ import { View, Text, StyleSheet } from 'react-native';
 interface FeedbackToastProps {
     message: string;
     level: 'success' | 'warning' | 'error';
+    isLandscape?: boolean;
 }
 
-export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
+export const FeedbackToast = memo(({ message, level, isLandscape = false }: FeedbackToastProps) => {
     if (!message) return null;
 
     const getBgColor = (level: string) => {
@@ -28,8 +29,16 @@ export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: getBgColor(level) }]}>
-            <Text style={[styles.text, { color: getTextColor(level) }]}>
+        <View style={[
+            styles.container,
+            { backgroundColor: getBgColor(level) },
+            isLandscape && styles.containerLandscape,
+        ]}>
+            <Text style={[
+                styles.text,
+                { color: getTextColor(level) },
+                isLandscape && styles.textLandscape,
+            ]}>
                 {message}
             </Text>
         </View>
@@ -51,9 +60,18 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 5,
     },
+    containerLandscape: {
+        bottom: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 24,
+        borderRadius: 16,
+    },
     text: {
         fontSize: 22,
         fontWeight: '800',
         textAlign: 'center',
-    }
+    },
+    textLandscape: {
+        fontSize: 17,
+    },
 });

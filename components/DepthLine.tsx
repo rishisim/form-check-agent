@@ -1,6 +1,6 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import Svg, { Line, Circle, Text as SvgText } from 'react-native-svg';
-import { View, Dimensions, StyleSheet } from 'react-native';
+import { View, StyleSheet, type LayoutChangeEvent } from 'react-native';
 
 interface DepthLineProps {
     targetDepthY: number;   // Target Y (normalized 0-1)
@@ -9,11 +9,17 @@ interface DepthLineProps {
     label?: string;         // Label for current indicator, e.g. "HIPS" or "CHEST"
 }
 
-const { width, height } = Dimensions.get('window');
-
 export const DepthLine = memo(({ targetDepthY, currentDepthY, isValid, label = 'HIPS' }: DepthLineProps) => {
+    const [size, setSize] = useState({ width: 1, height: 1 });
+
+    const onLayout = useCallback((e: LayoutChangeEvent) => {
+        const { width, height } = e.nativeEvent.layout;
+        if (width > 0 && height > 0) setSize({ width, height });
+    }, []);
+
     if (!isValid) return null;
 
+    const { width, height } = size;
     const targetY = targetDepthY * height;
     const currentY = currentDepthY * height;
 
@@ -21,7 +27,7 @@ export const DepthLine = memo(({ targetDepthY, currentDepthY, isValid, label = '
     const color = isGoodDepth ? '#88B04B' : '#BBBBBB'; // Mint or Soft Grey
 
     return (
-        <View style={StyleSheet.absoluteFill}>
+        <View style={StyleSheet.absoluteFill} onLayout={onLayout}>
             <Svg height={height} width={width} style={StyleSheet.absoluteFill}>
                 {/* Fixed Target Line (at Knee Height) */}
                 <Line

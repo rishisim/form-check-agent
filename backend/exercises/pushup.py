@@ -11,6 +11,7 @@ Matches the feature depth of SquatAnalyzer with pushup-specific form checks:
 """
 
 import cv2
+import math
 import time
 from collections import deque
 
@@ -241,13 +242,28 @@ class PushupAnalyzer:
             self._body_warn_frames = max(0, self._body_warn_frames - 1)
 
         # -- 2. Hip pike detection (hips too high) -------------------------
+        #    Uses true perpendicular distance from the shoulder→ankle body
+        #    axis so it works regardless of frame orientation (portrait or
+        #    landscape, person horizontal or diagonal in view).
         if actively_pushing:
-            # Expected hip Y along the shoulder->ankle line (~60% from shoulder)
-            expected_hip_y = shoulder[1] + 0.6 * (ankle[1] - shoulder[1])
-            body_length = max(abs(ankle[1] - shoulder[1]), 1)
-            pike_deviation = (expected_hip_y - hip_y) / body_length
+            body_dx = ankle[0] - shoulder[0]
+            body_dy = ankle[1] - shoulder[1]
+            body_length = max(math.hypot(body_dx, body_dy), 1)
 
-            if pike_deviation > self.BODY_PIKE_THRESHOLD:
+            # Project hip onto the shoulder→ankle line segment
+            t = ((hip[0] - shoulder[0]) * body_dx + (hip[1] - shoulder[1]) * body_dy) / (body_length ** 2)
+            t = max(0.0, min(1.0, t))
+            expected_x = shoulder[0] + t * body_dx
+            expected_y = shoulder[1] + t * body_dy
+
+            # Perpendicular distance, normalised by body length
+            pike_deviation = math.hypot(hip[0] - expected_x, hip[1] - expected_y) / body_length
+
+            # Only flag as pike when hips are *above* the line
+            # (lower Y in image coords = higher in real life)
+            hip_above_line = hip[1] < expected_y - 2
+
+            if hip_above_line and pike_deviation > self.BODY_PIKE_THRESHOLD:
                 self._pike_warn_frames += 1
             else:
                 self._pike_warn_frames = max(0, self._pike_warn_frames - 2)
@@ -278,7 +294,7 @@ class PushupAnalyzer:
         # -- 4. Hand position (side view): wrists under shoulders ----------
         if self.stage in ("descending", "bottom"):
             wrist_x, shoulder_x = wrist[0], shoulder[0]
-            upper_arm_len = max(abs(shoulder[1] - elbow[1]), 1)
+            upper_arm_len = max(math.hypot(shoulder[0] - elbow[0], shoulder[1] - elbow[1]), 1)
             hand_offset = abs(wrist_x - shoulder_x)
             offset_ratio = hand_offset / upper_arm_len
 

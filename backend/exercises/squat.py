@@ -1,4 +1,5 @@
 import cv2
+import math
 import time
 from collections import deque
 
@@ -239,7 +240,7 @@ class SquatAnalyzer:
         # Forward knee travel (side view) – use ratio of shin length
         if self.stage in ("descending", "bottom"):
             knee_x, ankle_x = knee[0], ankle[0]
-            shin_len = max(abs(knee[1] - ankle[1]), 1)  # vertical shin length in px
+            shin_len = max(math.hypot(knee[0] - ankle[0], knee[1] - ankle[1]), 1)
             forward_travel = abs(knee_x - ankle_x)
             travel_ratio = forward_travel / shin_len
 

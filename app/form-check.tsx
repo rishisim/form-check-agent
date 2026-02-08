@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -8,6 +8,7 @@ import { DepthLine } from '../components/DepthLine';
 import { RepCounter } from '../components/RepCounter';
 import { FeedbackToast } from '../components/FeedbackToast';
 import { useTTS } from '../hooks/useTTS';
+import { useOrientation } from '../hooks/useOrientation';
 
 // ─── Configuration ───────────────────────────────────────
 const SERVER_BASE = 'ws://10.194.82.50:8000/ws/video';
@@ -21,6 +22,22 @@ export default function FormCheckScreen() {
     const initialTimer = parseInt(params.timerSeconds || '10', 10);
     const exercise = (params.exercise || 'squat').toLowerCase();
     const isPushup = exercise === 'pushup';
+
+    // ─── Orientation: free rotation — UI + backend adapt dynamically ──
+    const { isLandscape, lockOrientation } = useOrientation({
+        lockTo: 'auto',
+    });
+
+    // Keep a ref so the streaming callback always reads the latest value
+    const isLandscapeRef = useRef(isLandscape);
+    isLandscapeRef.current = isLandscape;
+
+    // Re-lock to portrait on unmount so other screens stay upright
+    useEffect(() => {
+        return () => {
+            lockOrientation('portrait');
+        };
+    }, [lockOrientation]);
 
     const SERVER_URL = `${SERVER_BASE}?exercise=${exercise}`;
     const SERVER_HTTP_URL = SERVER_BASE.replace('ws://', 'http://').replace(/\/ws\/video.*$/, '');
@@ -408,7 +425,11 @@ export default function FormCheckScreen() {
                     });
 
                     if (photo?.base64 && wsRef.current?.readyState === WebSocket.OPEN) {
-                        wsRef.current.send(JSON.stringify({ type: 'frame', frame: photo.base64 }));
+                        wsRef.current.send(JSON.stringify({
+                            type: 'frame',
+                            frame: photo.base64,
+                            orientation: isLandscapeRef.current ? 'landscape' : 'portrait',
+                        }));
                     }
                 }
             } catch {
@@ -533,7 +554,7 @@ export default function FormCheckScreen() {
                     </>
                 )}
 
-                <SafeAreaView style={styles.safeOverlay} pointerEvents="box-none">
+                <SafeAreaView style={[styles.safeOverlay, isLandscape && styles.safeOverlayLandscape]} pointerEvents="box-none">
                     {/* ─── TOP SECTION ─── */}
                     <View>
                         {/* Back + Progress Bar Row */}
@@ -546,8 +567,8 @@ export default function FormCheckScreen() {
                                 <Text style={styles.backArrow}>‹</Text>
                             </TouchableOpacity>
 
-                            <View style={styles.progressPill}>
-                                <Text style={styles.progressLabel}>
+                            <View style={[styles.progressPill, isLandscape && styles.progressPillLandscape]}>
+                                <Text style={[styles.progressLabel, isLandscape && styles.progressLabelLandscape]}>
                                     Set {currentSet}/{totalSets}  ·  Rep {Math.min(validReps, repsPerSet)}/{repsPerSet}
                                 </Text>
                                 <View style={styles.progressBarBg}>
@@ -563,7 +584,7 @@ export default function FormCheckScreen() {
 
                         {/* HUD Metrics Bar — only during analysis */}
                         {showAnalysis && (
-                            <View style={styles.hudBar}>
+                            <View style={[styles.hudBar, isLandscape && styles.hudBarLandscape]}>
                                 {/* Status & Side */}
                                 <TouchableOpacity
                                     style={[
@@ -625,8 +646,8 @@ export default function FormCheckScreen() {
                         {/* Countdown Overlay */}
                         {isCountdownActive && (
                             <View style={styles.centerCard}>
-                                <Text style={styles.countdownLabel}>Get Ready!</Text>
-                                <Text style={styles.countdownNumber}>{countdown}</Text>
+                                <Text style={[styles.countdownLabel, isLandscape && { fontSize: 20 }]}>Get Ready!</Text>
+                                <Text style={[styles.countdownNumber, isLandscape && { fontSize: 72 }]}>{countdown}</Text>
                                 <Text style={styles.countdownHint}>
                                     {totalSets} × {repsPerSet} {isPushup ? 'Push-ups' : 'Squats'}
                                 </Text>
@@ -649,7 +670,7 @@ export default function FormCheckScreen() {
 
                     {/* ─── BOTTOM: Feedback Toast ─── */}
                     {showAnalysis && (
-                        <FeedbackToast message={feedback} level={feedbackLevel} />
+                        <FeedbackToast message={feedback} level={feedbackLevel} isLandscape={isLandscape} />
                     )}
                 </SafeAreaView>
 
@@ -702,6 +723,10 @@ const styles = StyleSheet.create({
     safeOverlay: {
         flex: 1,
         padding: 16,
+    },
+    safeOverlayLandscape: {
+        padding: 8,
+        paddingHorizontal: 48,
     },
     loadingText: {
         color: '#fff',
@@ -769,6 +794,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#88B04B',
         borderRadius: 3,
     },
+    progressPillLandscape: {
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 14,
+    },
+    progressLabelLandscape: {
+        fontSize: 11,
+        marginBottom: 4,
+    },
 
     /* ── HUD Bar ──────────────────────────── */
     hudBar: {
@@ -784,6 +818,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.15,
         shadowRadius: 10,
         elevation: 6,
+    },
+    hudBarLandscape: {
+        paddingVertical: 3,
+        paddingHorizontal: 6,
+        borderRadius: 16,
     },
     hudDivider: {
         width: 1,

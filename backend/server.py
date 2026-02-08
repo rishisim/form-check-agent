@@ -309,7 +309,7 @@ async def websocket_video_endpoint(websocket: WebSocket):
     frame_seq = 0
 
     # Latest-frame slot – written by the reader, consumed by the processor
-    latest_frame: dict = {"frame": None, "seq": 0}
+    latest_frame: dict = {"frame": None, "seq": 0, "orientation": "portrait"}
     frame_event = asyncio.Event()
     connection_alive = True
 
@@ -428,6 +428,9 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 if not frame_base64:
                     continue
 
+                # Track client-reported orientation (portrait / landscape)
+                client_orientation = data.get("orientation", "portrait")
+
                 try:
                     img_bytes = base64.b64decode(frame_base64)
                     nparr = np.frombuffer(img_bytes, np.uint8)
@@ -443,6 +446,7 @@ async def websocket_video_endpoint(websocket: WebSocket):
                 frame_seq += 1
                 latest_frame["frame"] = frame
                 latest_frame["seq"] = frame_seq
+                latest_frame["orientation"] = client_orientation
                 frame_event.set()  # wake the processor
 
             elif msg_type == "reset_reps":
