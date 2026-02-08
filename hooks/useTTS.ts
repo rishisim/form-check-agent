@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { Audio } from 'expo-av';
+import { createAudioPlayer, setAudioModeAsync, AudioPlayer } from 'expo-audio';
 
 // ─── Configuration ───────────────────────────────────────
 const MIN_SPEAK_INTERVAL_MS = 3000; // Minimum gap between TTS calls
@@ -21,30 +21,29 @@ interface UseTTSOptions {
 /**
  * Hook that converts real-time feedback text into speech via the backend
  * Eleven Labs TTS endpoint.  De-duplicates and rate-limits automatically.
- * Uses expo-av Audio.Sound for reliable playback.
+ * Uses expo-audio AudioPlayer for reliable playback.
  */
 export function useTTS({ serverUrl, enabled = true }: UseTTSOptions) {
     const lastSpokenTextRef = useRef('');
     const lastSpeakTimeRef = useRef(0);
     const isSpeakingRef = useRef(false);
     const mountedRef = useRef(true);
-    const soundRef = useRef<Audio.Sound | null>(null);
+    const playerRef = useRef<AudioPlayer | null>(null);
 
     useEffect(() => {
         mountedRef.current = true;
         // Configure audio mode for playback alongside camera
-        Audio.setAudioModeAsync({
-            allowsRecordingIOS: false,
-            playsInSilentModeIOS: true,
-            staysActiveInBackground: false,
-            shouldDuckAndroid: true,
+        setAudioModeAsync({
+            playsInSilentMode: true,
+            shouldPlayInBackground: false,
+            interruptionMode: 'duckOthers',
         }).catch(() => {});
         return () => {
             mountedRef.current = false;
             // Cleanup any playing sound
-            if (soundRef.current) {
-                soundRef.current.unloadAsync().catch(() => {});
-                soundRef.current = null;
+            if (playerRef.current) {
+                playerRef.current.remove();
+                playerRef.current = null;
             }
         };
     }, []);
@@ -79,29 +78,30 @@ export function useTTS({ serverUrl, enabled = true }: UseTTSOptions) {
             lastSpeakTimeRef.current = now;
 
             try {
-                // Unload previous sound if any
-                if (soundRef.current) {
-                    await soundRef.current.unloadAsync().catch(() => {});
-                    soundRef.current = null;
+                // Release previous player if any
+                if (playerRef.current) {
+                    playerRef.current.remove();
+                    playerRef.current = null;
                 }
 
                 const uri = `${serverUrl}/tts?text=${encodeURIComponent(text)}`;
-                const { sound } = await Audio.Sound.createAsync(
-                    { uri },
-                    { shouldPlay: true, volume: 1.0 },
-                    (status) => {
-                        if (!mountedRef.current) return;
-                        if (status.isLoaded && status.didJustFinish) {
-                            isSpeakingRef.current = false;
-                            // Clean up after playback
-                            sound.unloadAsync().catch(() => {});
-                            if (soundRef.current === sound) {
-                                soundRef.current = null;
-                            }
+                const player = createAudioPlayer({ uri });
+                player.volume = 1.0;
+                playerRef.current = player;
+
+                // Listen for playback completion
+                player.addListener('playbackStatusUpdate', (status) => {
+                    if (!mountedRef.current) return;
+                    if (status.didJustFinish) {
+                        isSpeakingRef.current = false;
+                        player.remove();
+                        if (playerRef.current === player) {
+                            playerRef.current = null;
                         }
                     }
-                );
-                soundRef.current = sound;
+                });
+
+                player.play();
             } catch (e) {
                 console.warn('TTS playback error:', e);
                 isSpeakingRef.current = false;
@@ -114,10 +114,10 @@ export function useTTS({ serverUrl, enabled = true }: UseTTSOptions) {
     const stop = useCallback(async () => {
         isSpeakingRef.current = false;
         try {
-            if (soundRef.current) {
-                await soundRef.current.stopAsync().catch(() => {});
-                await soundRef.current.unloadAsync().catch(() => {});
-                soundRef.current = null;
+            if (playerRef.current) {
+                playerRef.current.pause();
+                playerRef.current.remove();
+                playerRef.current = null;
             }
         } catch { /* ignore */ }
     }, []);
