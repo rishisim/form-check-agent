@@ -1685,3 +1685,79 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-02-08 05:13:59,339 [INFO] [cc2a64e4] WebSocket connection established (26 active, exercise=pushup)
 2026-02-08 05:14:00,417 [INFO] [68ce9f65] WebSocket connection established (27 active, exercise=pushup)
 2026-02-08 05:14:01,471 [INFO] [c0ad210e] WebSocket connection established (28 active, exercise=pushup)
+2026-02-08 05:32:07,594 [INFO] [4eadeec0] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:32:18,817 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 05:32:18,833 [INFO] TTS generated (25539 bytes) for: 'Go! Start your pushups!'
+2026-02-08 05:32:18,868 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:32:25,494 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 05:32:25,496 [INFO] TTS generated (15090 bytes) for: 'Good rep!'
+2026-02-08 05:32:25,518 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 05:32:54,639 [INFO] [4eadeec0] Client disconnected normally
+2026-02-08 05:32:54,640 [INFO] [4eadeec0] Connection cleaned up (0 active)
+2026-02-08 05:35:07,746 [INFO] [beeaa945] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:35:17,945 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:35:18,007 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:35:24,374 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 05:35:24,394 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 05:35:30,999 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 05:35:31,015 [INFO] TTS generated (21777 bytes) for: 'Keep body straight!'
+2026-02-08 05:35:31,037 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 05:35:40,925 [ERROR] Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\arpit\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arpit\AppData\Local\Programs\Python\Python313\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2026-02-08 05:35:40,980 [INFO] [beeaa945] Client disconnected normally
+2026-02-08 05:35:40,980 [INFO] [beeaa945] Connection cleaned up (0 active)
+2026-02-08 05:36:08,359 [INFO] [3da62d50] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:36:09,179 [INFO] [3da62d50] Client disconnected normally
+2026-02-08 05:36:09,180 [INFO] [3da62d50] Connection cleaned up (0 active)
+2026-02-08 05:36:10,474 [INFO] [860063ae] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:36:20,710 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:36:20,770 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:36:21,874 [INFO] [860063ae] Client disconnected normally
+2026-02-08 05:36:21,875 [INFO] [860063ae] Connection cleaned up (0 active)
+2026-02-08 05:38:26,292 [INFO] [9d8af641] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:38:36,495 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:38:36,524 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:38:36,541 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:38:47,314 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 05:38:47,339 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 05:38:47,357 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 05:38:51,365 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 05:38:51,381 [INFO] TTS generated (22613 bytes) for: 'Good depth! Push up!'
+2026-02-08 05:38:51,408 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 05:38:51,426 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 05:38:55,406 [INFO] [9d8af641] Client disconnected normally
+2026-02-08 05:38:55,406 [INFO] [9d8af641] Connection cleaned up (0 active)
+2026-02-08 05:38:59,738 [INFO] [0ffb1476] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 05:39:05,054 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 05:39:05,070 [INFO] TTS generated (22613 bytes) for: 'Go! Start your squats!'
+2026-02-08 05:39:05,102 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 05:39:05,125 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 05:39:11,400 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 05:39:11,413 [INFO] TTS generated (23449 bytes) for: 'Good depth! Drive up!'
+2026-02-08 05:39:11,449 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 05:39:11,537 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 05:39:24,156 [INFO] [0ffb1476] Client disconnected normally
+2026-02-08 05:39:24,156 [INFO] [0ffb1476] Connection cleaned up (0 active)
+2026-02-08 05:52:17,685 [INFO] [027a8dca] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:52:27,433 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:52:27,464 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:52:27,481 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 05:52:37,961 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 05:52:37,997 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 05:52:38,016 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 05:52:42,421 [INFO] [027a8dca] Client disconnected normally
+2026-02-08 05:52:42,422 [INFO] [027a8dca] Connection cleaned up (0 active)
+2026-02-08 05:53:39,903 [INFO] [fbc515c9] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:53:48,766 [INFO] [fbc515c9] Client disconnected normally
+2026-02-08 05:53:48,767 [INFO] [fbc515c9] Connection cleaned up (0 active)
+2026-02-08 05:57:07,932 [INFO] [f3e3237f] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 05:57:12,472 [INFO] [f3e3237f] Client disconnected normally
+2026-02-08 05:57:12,472 [INFO] [f3e3237f] Connection cleaned up (0 active)

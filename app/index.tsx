@@ -374,9 +374,9 @@ export default function HomeScreen() {
                                         { shadowColor: theme.shadow, shadowOpacity: 0 }
                                     ]}>
                                         {exercise.image ? (
-                                            <Image source={exercise.image} style={styles.exerciseImage} resizeMode="contain" />
+                                            <Image source={exercise.image} style={styles.comingSoonImage} resizeMode="contain" />
                                         ) : (
-                                            <Text style={styles.exerciseEmoji}>{exercise.emoji}</Text>
+                                            <Text style={[styles.exerciseEmoji, { opacity: 0.5 }]}>{exercise.emoji}</Text>
                                         )}
                                         <Text style={[
                                             styles.exerciseName,
@@ -387,11 +387,6 @@ export default function HomeScreen() {
                                         <Text style={[styles.exerciseDesc, { color: theme.textSecondary }]}>
                                             {exercise.desc}
                                         </Text>
-                                        <View style={[styles.badge, dynamicStyles.badge]}>
-                                            <Text style={[styles.badgeText, dynamicStyles.badgeText]}>
-                                                Coming Soon
-                                            </Text>
-                                        </View>
                                     </View>
                                 </View>
                             ))}
@@ -428,7 +423,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingTop: 24,
-        paddingBottom: 16,
+        paddingBottom: 24,
         paddingHorizontal: 16,
     },
     headerTitleRow: {
@@ -501,10 +496,13 @@ const styles = StyleSheet.create({
         width: '47%',
     },
     exerciseCard: {
-        height: 200,
-        padding: 24,
+        height: 190,
+        paddingHorizontal: 16,
+        paddingTop: 28,
+        paddingBottom: 16,
         borderRadius: 24,
         alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
         shadowOffset: { width: 0, height: 4 },
         shadowRadius: 12,
@@ -524,8 +522,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     exerciseImage: {
-        width: 100,
-        height: 80,
+        width: 80,
+        height: 68,
         marginBottom: 10,
     },
     exerciseName: {
@@ -548,11 +546,17 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     comingSoonCard: {
-        height: 240,
-        opacity: 0.55,
+        height: 180,
+        opacity: 0.4,
         borderStyle: 'dashed',
         borderWidth: 1.5,
         elevation: 0,
+    },
+    comingSoonImage: {
+        width: 80,
+        height: 64,
+        marginBottom: 10,
+        opacity: 0.5,
     },
     badge: {
         marginTop: 8,
