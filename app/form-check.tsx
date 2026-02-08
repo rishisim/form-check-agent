@@ -864,15 +864,15 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     progressBarBg: {
-        height: 6,
+        height: 14,
         backgroundColor: '#E8E8E8',
-        borderRadius: 3,
+        borderRadius: 7,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
         backgroundColor: '#88B04B',
-        borderRadius: 3,
+        borderRadius: 7,
     },
     progressPillLandscape: {
         paddingVertical: 6,

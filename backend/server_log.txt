@@ -1398,3 +1398,19 @@ O] WebSocket disconnect message received in loop
 2026-02-07 22:09:50,111 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
 2026-02-07 22:09:50,112 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
 2026-02-07 22:09:50,113 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 22:40:17,186 [INFO] [80a6f787] WebSocket connection established (1 active, exercise=pushup)
+2026-02-07 22:40:22,256 [INFO] [80a6f787] Client disconnected normally
+2026-02-07 22:40:22,256 [INFO] [80a6f787] Connection cleaned up (0 active)
+2026-02-07 22:42:24,516 [INFO] [9b8c746f] WebSocket connection established (1 active, exercise=squat)
+2026-02-07 22:42:35,526 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:42:35,548 [INFO] TTS generated (25539 bytes) for: 'Go! Start your squats!'
+2026-02-07 22:42:45,220 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:42:45,235 [INFO] TTS generated (22613 bytes) for: 'Good depth! Drive up!'
+2026-02-07 22:42:46,627 [INFO] [9b8c746f] Client disconnected normally
+2026-02-07 22:42:46,627 [INFO] [9b8c746f] Connection cleaned up (0 active)
+2026-02-07 22:44:47,125 [INFO] [998c6296] WebSocket connection established (1 active, exercise=pushup)
+2026-02-07 22:44:57,598 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 22:44:57,614 [INFO] TTS generated (24703 bytes) for: 'Go! Start your pushups!'
+2026-02-07 22:44:57,670 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-07 22:45:06,537 [INFO] [998c6296] Client disconnected normally
+2026-02-07 22:45:06,537 [INFO] [998c6296] Connection cleaned up (0 active)
