@@ -7,13 +7,15 @@ import base64
 import asyncio
 import uuid
 import traceback
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
 
 from pose_tracker import PoseTracker
 from exercises.squat import SquatAnalyzer
 from gemini_service import GeminiService
+from tts_service import TTSService
 
 # Configure logging
 logging.basicConfig(
@@ -39,6 +41,7 @@ app.add_middleware(
 
 # Initialize services (Gemini is stateless/buffered, safe to share)
 gemini_service = GeminiService()
+tts_service = TTSService()
 
 # Track active connections for diagnostics
 active_connections: set[str] = set()
@@ -53,7 +56,27 @@ async def health():
     return {
         "status": "healthy",
         "active_connections": len(active_connections),
+        "tts_available": tts_service.is_available,
     }
+
+
+@app.get("/tts")
+async def text_to_speech(text: str = Query(..., description="Text to convert to speech")):
+    """Convert feedback text to speech using Eleven Labs."""
+    if not text.strip():
+        return Response(status_code=400, content="Text is required")
+
+    audio = await tts_service.synthesize(text)
+    if audio is None:
+        return Response(status_code=503, content="TTS unavailable")
+
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        headers={
+            "Cache-Control": "public, max-age=86400",  # Cache for 24h
+        },
+    )
 
 
 async def _safe_send(websocket: WebSocket, data: dict) -> bool:

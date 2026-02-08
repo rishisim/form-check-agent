@@ -7,9 +7,11 @@ import { SkeletonOverlay } from '../components/SkeletonOverlay';
 import { DepthLine } from '../components/DepthLine';
 import { RepCounter } from '../components/RepCounter';
 import { FeedbackToast } from '../components/FeedbackToast';
+import { useTTS } from '../hooks/useTTS';
 
 // ─── Configuration ───────────────────────────────────────
 const SERVER_URL = 'ws://10.194.82.50:8000/ws/video';
+const SERVER_HTTP_URL = SERVER_URL.replace('ws://', 'http://').replace('/ws/video', '');
 
 export default function FormCheckScreen() {
     const router = useRouter();
@@ -73,6 +75,12 @@ export default function FormCheckScreen() {
     const isSetTransitionRef = useRef(false);
     const isWorkoutCompleteRef = useRef(false);
 
+    // ─── Text-to-Speech ──────────────────────
+    const { speak: speakTTS, stop: stopTTS } = useTTS({
+        serverUrl: SERVER_HTTP_URL,
+        enabled: true,
+    });
+
     // ─── Countdown Timer ─────────────────────────
     useEffect(() => {
         if (!isCountdownActive) return;
@@ -80,6 +88,7 @@ export default function FormCheckScreen() {
             setIsCountdownActive(false);
             setFeedback('Go! Start your squats!');
             setFeedbackLevel('success');
+            speakTTS('Go! Start your squats!');
             return;
         }
         const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
@@ -96,6 +105,7 @@ export default function FormCheckScreen() {
                 setIsWorkoutComplete(true);
                 setFeedback('🏆 Workout Complete!');
                 setFeedbackLevel('success');
+                speakTTS('Workout Complete! Great job!');
                 // Stop streaming
                 isStreamingRef.current = false;
                 if (frameIntervalRef.current) {
@@ -108,6 +118,7 @@ export default function FormCheckScreen() {
                 setIsSetTransition(true);
                 setFeedback(`✅ Set ${currentSetRef.current} Complete!`);
                 setFeedbackLevel('success');
+                speakTTS(`Set ${currentSetRef.current} complete! Rest up.`);
 
                 setTimeout(() => {
                     currentSetRef.current += 1;
@@ -205,6 +216,9 @@ export default function FormCheckScreen() {
                             if (!isSetTransitionRef.current && !isWorkoutCompleteRef.current) {
                                 setFeedback(analysis.feedback);
                                 setFeedbackLevel(analysis.feedback_level || 'success');
+
+                                // Speak the feedback via TTS
+                                speakTTS(analysis.feedback);
                             }
 
                             setTargetDepthY(analysis.target_depth_y || 0);
@@ -371,8 +385,11 @@ export default function FormCheckScreen() {
     // ─── Lifecycle ───────────────────────────────
     useEffect(() => {
         connectWebSocket();
-        return () => disconnectWebSocket();
-    }, [connectWebSocket, disconnectWebSocket]);
+        return () => {
+            disconnectWebSocket();
+            stopTTS();
+        };
+    }, [connectWebSocket, disconnectWebSocket, stopTTS]);
 
     // Only start streaming after countdown finishes
     useEffect(() => {

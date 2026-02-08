@@ -887,3 +887,12 @@ O] WebSocket disconnect message received in loop
 2026-02-07 18:14:14,634 [INFO] [c311a5e9] WebSocket connection established (1 active)
 2026-02-07 18:15:00,603 [INFO] [c311a5e9] Client disconnected normally
 2026-02-07 18:15:00,603 [INFO] [c311a5e9] Connection cleaned up (0 active)
+2026-02-07 18:20:23,318 [INFO] [04c0d03d] WebSocket connection established (1 active)
+2026-02-07 18:20:29,647 [INFO] [04c0d03d] Client disconnected normally
+2026-02-07 18:20:29,647 [INFO] [04c0d03d] Connection cleaned up (0 active)
+2026-02-07 18:20:31,064 [INFO] [f42f8a03] WebSocket connection established (1 active)
+2026-02-07 18:22:17,372 [INFO] [cfebdb5a] WebSocket connection established (2 active)
+2026-02-07 18:24:13,146 [INFO] [cfebdb5a] Client disconnected normally
+2026-02-07 18:24:13,146 [INFO] [cfebdb5a] Connection cleaned up (1 active)
+2026-02-07 18:31:16,488 [INFO] [f42f8a03] Client disconnected normally
+2026-02-07 18:31:16,491 [INFO] [f42f8a03] Connection cleaned up (0 active)
