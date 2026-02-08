@@ -11,18 +11,18 @@ export const FeedbackToast = memo(({ message, level }: FeedbackToastProps) => {
 
     const getBgColor = (level: string) => {
         switch (level) {
-            case 'success': return '#DDEBF7'; // Light Blue
-            case 'warning': return '#FFF2CC'; // Light Yellow
-            case 'error': return '#FCE4D6';   // Light Peach
-            default: return '#FDFDFD';
+            case 'success': return '#D4EDDA'; // Soft Green
+            case 'warning': return '#FFF3CD'; // Warm Amber
+            case 'error': return '#F8D7DA';   // Soft Red
+            default: return '#F0F0F0';
         }
     };
 
     const getTextColor = (level: string) => {
         switch (level) {
-            case 'success': return '#41719C'; // Darker Blue
-            case 'warning': return '#BF8F00'; // Darker Yellow
-            case 'error': return '#C65911';   // Darker Peach/Red
+            case 'success': return '#155724'; // Dark Green
+            case 'warning': return '#856404'; // Dark Amber
+            case 'error': return '#721C24';   // Dark Red
             default: return '#444444';
         }
     };
