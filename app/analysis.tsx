@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
     StyleSheet,
     Text,
@@ -17,14 +17,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTheme } from '../hooks/useTheme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // ─── Simple markdown-ish renderer for Gemini response ────
-function renderAISummary(text: string) {
+function renderAISummary(text: string, isDark: boolean) {
     const lines = text.split('\n');
     const elements: React.ReactNode[] = [];
     let key = 0;
+
+    const textColor = isDark ? '#ccc' : '#555';
+    const titleColor = isDark ? '#fff' : '#333';
+    const accentColor = isDark ? '#A4C969' : '#88B04B';
 
     for (const line of lines) {
         const trimmed = line.trim();
@@ -37,8 +42,8 @@ function renderAISummary(text: string) {
         if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
             const headerText = trimmed.replace(/\*\*/g, '');
             elements.push(
-                <View key={key++} style={aiStyles.sectionHeader}>
-                    <Text style={aiStyles.sectionTitle}>{headerText}</Text>
+                <View key={key++} style={[aiStyles.sectionHeader, { borderLeftColor: accentColor }]}>
+                    <Text style={[aiStyles.sectionTitle, { color: titleColor }]}>{headerText}</Text>
                 </View>,
             );
             continue;
@@ -49,8 +54,8 @@ function renderAISummary(text: string) {
             const bulletText = trimmed.substring(2);
             elements.push(
                 <View key={key++} style={aiStyles.bulletRow}>
-                    <Text style={aiStyles.bulletDot}>•</Text>
-                    <Text style={aiStyles.bulletText}>{bulletText}</Text>
+                    <Text style={[aiStyles.bulletDot, { color: accentColor }]}>•</Text>
+                    <Text style={[aiStyles.bulletText, { color: textColor }]}>{bulletText}</Text>
                 </View>,
             );
             continue;
@@ -58,7 +63,7 @@ function renderAISummary(text: string) {
 
         // Regular paragraph
         elements.push(
-            <Text key={key++} style={aiStyles.paragraph}>
+            <Text key={key++} style={[aiStyles.paragraph, { color: textColor }]}>
                 {trimmed}
             </Text>,
         );
@@ -115,6 +120,7 @@ const aiStyles = StyleSheet.create({
 
 export default function AnalysisScreen() {
     const router = useRouter();
+    const { theme, isDark } = useTheme();
     const params = useLocalSearchParams<{
         exercise: string;
         totalSets: string;
@@ -340,13 +346,32 @@ export default function AnalysisScreen() {
         }
     }, [chatInput, chatSending, chatMessages, workoutContextStr, params.serverUrl]);
 
+    // ─── Dynamic Theme Styles ────────────────────
+    const themedStyles = useMemo(() => ({
+        container: { backgroundColor: theme.background },
+        backArrow: { color: theme.textSecondary },
+        backLabel: { color: theme.textSecondary },
+        headerTitle: { color: theme.textPrimary },
+        headerSubtitle: { color: theme.textSecondary },
+        sectionTitle: { color: theme.textMuted },
+        card: {
+            backgroundColor: theme.cardBackground,
+            shadowColor: theme.shadow,
+            shadowOpacity: theme.shadowOpacity,
+        },
+        cardText: { color: theme.textPrimary },
+        cardSecondaryText: { color: theme.textSecondary },
+        homeButton: { backgroundColor: theme.accent, shadowColor: theme.accent },
+        angleLabel: { color: theme.textPrimary },
+    }), [theme]);
+
     // ─── Render ──────────────────────────────────
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, themedStyles.container]}>
             {/* Back Arrow */}
             <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/')}>
-                <Text style={styles.backArrow}>‹</Text>
-                <Text style={styles.backLabel}>Home</Text>
+                <Text style={[styles.backArrow, themedStyles.backArrow]}>‹</Text>
+                <Text style={[styles.backLabel, themedStyles.backLabel]}>Home</Text>
             </TouchableOpacity>
 
             <ScrollView
@@ -355,16 +380,16 @@ export default function AnalysisScreen() {
             >
                 {/* ── Header ─── */}
                 <Text style={styles.headerEmoji}>📊</Text>
-                <Text style={styles.headerTitle}>Workout Analysis</Text>
-                <Text style={styles.headerSubtitle}>
+                <Text style={[styles.headerTitle, themedStyles.headerTitle]}>Workout Analysis</Text>
+                <Text style={[styles.headerSubtitle, themedStyles.headerSubtitle]}>
                     {exerciseLabel} · {totalSets} sets × {repsPerSet} reps
                 </Text>
 
                 {/* ── AI Coach Summary ─── */}
-                <View style={styles.aiCard}>
+                <View style={[styles.aiCard, themedStyles.card]}>
                     <View style={styles.aiHeader}>
                         <Text style={styles.aiHeaderIcon}>✨</Text>
-                        <Text style={styles.aiHeaderTitle}>AI Coach Summary</Text>
+                        <Text style={[styles.aiHeaderTitle, themedStyles.cardText]}>AI Coach Summary</Text>
                         <View style={styles.aiPoweredBadge}>
                             <Text style={styles.aiPoweredText}>Gemini</Text>
                         </View>
@@ -395,7 +420,7 @@ export default function AnalysisScreen() {
                         </View>
                     ) : aiSummary ? (
                         <View style={styles.aiContent}>
-                            {renderAISummary(aiSummary)}
+                            {renderAISummary(aiSummary, isDark)}
                         </View>
                     ) : (
                         <View style={styles.aiContent}>
@@ -454,35 +479,35 @@ export default function AnalysisScreen() {
 
                 {/* ── Quick Stats Row ─── */}
                 <View style={styles.statsRow}>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, themedStyles.card]}>
                         <Text style={styles.statIcon}>⏱</Text>
-                        <Text style={styles.statValue}>{durationStr}</Text>
-                        <Text style={styles.statLabel}>Duration</Text>
+                        <Text style={[styles.statValue, themedStyles.cardText]}>{durationStr}</Text>
+                        <Text style={[styles.statLabel, themedStyles.cardSecondaryText]}>Duration</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, themedStyles.card]}>
                         <Text style={styles.statIcon}>🔄</Text>
-                        <Text style={styles.statValue}>{setData.length}</Text>
-                        <Text style={styles.statLabel}>Sets Done</Text>
+                        <Text style={[styles.statValue, themedStyles.cardText]}>{setData.length}</Text>
+                        <Text style={[styles.statLabel, themedStyles.cardSecondaryText]}>Sets Done</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, themedStyles.card]}>
                         <Text style={styles.statIcon}>⚡</Text>
-                        <Text style={styles.statValue}>
+                        <Text style={[styles.statValue, themedStyles.cardText]}>
                             {totalReps > 0 && workoutDuration > 0
                                 ? (totalReps / (workoutDuration / 60)).toFixed(1)
                                 : '--'}
                         </Text>
-                        <Text style={styles.statLabel}>Reps/Min</Text>
+                        <Text style={[styles.statLabel, themedStyles.cardSecondaryText]}>Reps/Min</Text>
                     </View>
                 </View>
 
                 {/* ── Per-Set Breakdown ─── */}
-                <Text style={styles.sectionTitle}>Set Breakdown</Text>
+                <Text style={[styles.sectionTitle, themedStyles.sectionTitle]}>Set Breakdown</Text>
                 {setData.map((set, index) => {
                     const setTotal = set.validReps + set.invalidReps;
                     const setPercent = setTotal > 0 ? (set.validReps / setTotal) * 100 : 0;
                     const setComplete = set.validReps >= repsPerSet;
                     return (
-                        <View key={index} style={styles.setCard}>
+                        <View key={index} style={[styles.setCard, themedStyles.card]}>
                             <View style={styles.setHeader}>
                                 <View style={styles.setLabelRow}>
                                     <Text style={styles.setLabel}>Set {index + 1}</Text>
@@ -534,16 +559,16 @@ export default function AnalysisScreen() {
                 })}
 
                 {/* ── Angle Metrics ─── */}
-                <Text style={styles.sectionTitle}>{isPushup ? 'Body Metrics' : 'Joint Angles'}</Text>
+                <Text style={[styles.sectionTitle, themedStyles.sectionTitle]}>{isPushup ? 'Body Metrics' : 'Joint Angles'}</Text>
 
                 {/* Knee Angle Card */}
-                <View style={styles.angleCard}>
+                <View style={[styles.angleCard, themedStyles.card]}>
                     <View style={styles.angleHeader}>
                         <View style={[styles.angleIcon, { backgroundColor: '#E3EFF9' }]}>
                             <Text style={styles.angleIconText}>{primaryAngleEmoji}</Text>
                         </View>
                         <View style={styles.angleInfo}>
-                            <Text style={styles.angleLabel}>{primaryAngleLabel}</Text>
+                            <Text style={[styles.angleLabel, themedStyles.angleLabel]}>{primaryAngleLabel}</Text>
                             <Text
                                 style={[
                                     styles.angleAssessment,
@@ -598,13 +623,13 @@ export default function AnalysisScreen() {
                 </View>
 
                 {/* Hip / Back Angle Card */}
-                <View style={styles.angleCard}>
+                <View style={[styles.angleCard, themedStyles.card]}>
                     <View style={styles.angleHeader}>
                         <View style={[styles.angleIcon, { backgroundColor: '#F0E6F6' }]}>
                             <Text style={styles.angleIconText}>{secondaryAngleEmoji}</Text>
                         </View>
                         <View style={styles.angleInfo}>
-                            <Text style={styles.angleLabel}>{secondaryAngleLabel}</Text>
+                            <Text style={[styles.angleLabel, themedStyles.angleLabel]}>{secondaryAngleLabel}</Text>
                             <Text
                                 style={[
                                     styles.angleAssessment,
@@ -660,7 +685,7 @@ export default function AnalysisScreen() {
 
                 {/* ── Bottom Button ─── */}
                 <TouchableOpacity
-                    style={styles.homeButton}
+                    style={[styles.homeButton, themedStyles.homeButton]}
                     onPress={() => router.replace('/')}
                     activeOpacity={0.85}
                 >

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,12 +9,14 @@ import { RepCounter } from '../components/RepCounter';
 import { FeedbackToast } from '../components/FeedbackToast';
 import { useTTS } from '../hooks/useTTS';
 import { useOrientation } from '../hooks/useOrientation';
+import { useTheme } from '../hooks/useTheme';
 
 // ─── Configuration ───────────────────────────────────────
 const SERVER_BASE = 'ws://10.194.82.50:8000/ws/video';
 
 export default function FormCheckScreen() {
     const router = useRouter();
+    const { theme, isDark } = useTheme();
     const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string; restSeconds?: string; exercise?: string }>();
 
     const totalSets = parseInt(params.sets || '3', 10);
@@ -555,29 +557,52 @@ export default function FormCheckScreen() {
         });
     }, [router, totalSets, repsPerSet]);
 
+    // ─── Dynamic Theme Styles ────────────────────
+    const themedStyles = useMemo(() => ({
+        // Permission screen colors
+        permissionContainer: { backgroundColor: theme.background },
+        permBackArrow: { color: theme.textSecondary },
+        permBackLabel: { color: theme.textSecondary },
+        permTitle: { color: theme.textPrimary },
+        permSubtitle: { color: theme.textSecondary },
+        permButton: { backgroundColor: theme.accent, shadowColor: theme.accent },
+        // HUD and overlay colors - dark translucent in dark mode
+        hudBar: { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)' },
+        hudLabel: { color: isDark ? '#aaa' : '#888888' },
+        hudValue: { color: isDark ? '#fff' : '#444444' },
+        hudItem: { backgroundColor: isDark ? 'rgba(50, 50, 50, 0.8)' : '#E2F0D9' },
+        hudItemError: { backgroundColor: isDark ? 'rgba(60, 30, 30, 0.8)' : '#FCE4D6' },
+        progressPill: { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.92)' : 'rgba(255,255,255,0.92)' },
+        progressLabel: { color: isDark ? '#ccc' : '#555' },
+        backButton: { backgroundColor: isDark ? 'rgba(30, 30, 30, 0.92)' : 'rgba(255,255,255,0.92)' },
+        backArrow: { color: isDark ? '#ccc' : '#444' },
+        completeButton: { backgroundColor: theme.accent, shadowColor: theme.accent },
+        progressBarFill: { backgroundColor: theme.accent },
+    }), [theme, isDark]);
+
     // ─── Permission Screens ──────────────────────
     if (!permission) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.loadingText}>Loading…</Text>
+            <View style={[styles.container, { backgroundColor: theme.background }]}>
+                <Text style={[styles.loadingText, { color: theme.textPrimary }]}>Loading…</Text>
             </View>
         );
     }
 
     if (!permission.granted) {
         return (
-            <SafeAreaView style={styles.permissionContainer}>
+            <SafeAreaView style={[styles.permissionContainer, themedStyles.permissionContainer]}>
                 <TouchableOpacity style={styles.permBackButton} onPress={() => router.back()}>
-                    <Text style={styles.permBackArrow}>‹</Text>
-                    <Text style={styles.permBackLabel}>Back</Text>
+                    <Text style={[styles.permBackArrow, themedStyles.permBackArrow]}>‹</Text>
+                    <Text style={[styles.permBackLabel, themedStyles.permBackLabel]}>Back</Text>
                 </TouchableOpacity>
                 <View style={styles.permContent}>
                     <Text style={styles.permEmoji}>📷</Text>
-                    <Text style={styles.permTitle}>Camera Access Needed</Text>
-                    <Text style={styles.permSubtitle}>
+                    <Text style={[styles.permTitle, themedStyles.permTitle]}>Camera Access Needed</Text>
+                    <Text style={[styles.permSubtitle, themedStyles.permSubtitle]}>
                         We need your camera to analyze your form in real-time
                     </Text>
-                    <TouchableOpacity style={styles.permButton} onPress={requestPermission}>
+                    <TouchableOpacity style={[styles.permButton, themedStyles.permButton]} onPress={requestPermission}>
                         <Text style={styles.permButtonText}>Grant Permission</Text>
                     </TouchableOpacity>
                 </View>
@@ -623,21 +648,22 @@ export default function FormCheckScreen() {
                         {/* Back + Progress Bar Row */}
                         <View style={styles.topRow}>
                             <TouchableOpacity
-                                style={styles.backButton}
+                                style={[styles.backButton, themedStyles.backButton]}
                                 onPress={() => router.back()}
                                 activeOpacity={0.7}
                             >
-                                <Text style={styles.backArrow}>‹</Text>
+                                <Text style={[styles.backArrow, themedStyles.backArrow]}>‹</Text>
                             </TouchableOpacity>
 
-                            <View style={[styles.progressPill, isLandscape && styles.progressPillLandscape]}>
-                                <Text style={[styles.progressLabel, isLandscape && styles.progressLabelLandscape]}>
+                            <View style={[styles.progressPill, themedStyles.progressPill, isLandscape && styles.progressPillLandscape]}>
+                                <Text style={[styles.progressLabel, themedStyles.progressLabel, isLandscape && styles.progressLabelLandscape]}>
                                     Set {currentSet}/{totalSets}  ·  Rep {Math.min(validReps, repsPerSet)}/{repsPerSet}
                                 </Text>
                                 <View style={styles.progressBarBg}>
                                     <View
                                         style={[
                                             styles.progressBarFill,
+                                            themedStyles.progressBarFill,
                                             { width: `${progressPercent}%` },
                                         ]}
                                     />
@@ -647,12 +673,12 @@ export default function FormCheckScreen() {
 
                         {/* HUD Metrics Bar — only during analysis */}
                         {showAnalysis && (
-                            <View style={[styles.hudBar, isLandscape && styles.hudBarLandscape]}>
+                            <View style={[styles.hudBar, themedStyles.hudBar, isLandscape && styles.hudBarLandscape]}>
                                 {/* Status & Side */}
                                 <TouchableOpacity
                                     style={[
                                         styles.hudItem,
-                                        { backgroundColor: isConnected ? '#E2F0D9' : '#FCE4D6' },
+                                        isConnected ? themedStyles.hudItem : themedStyles.hudItemError,
                                     ]}
                                     onPress={connectWebSocket}
                                 >
@@ -662,31 +688,31 @@ export default function FormCheckScreen() {
                                             { backgroundColor: isConnected ? '#88B04B' : '#C65911' },
                                         ]}
                                     />
-                                    <Text style={styles.hudLabel}>SIDE</Text>
-                                    <Text style={[styles.hudValue, { fontSize: 20 }]}>
+                                    <Text style={[styles.hudLabel, themedStyles.hudLabel]}>SIDE</Text>
+                                    <Text style={[styles.hudValue, themedStyles.hudValue, { fontSize: 20 }]}>
                                         {sideDetected === 'left' ? '←' : sideDetected === 'right' ? '→' : '?'}
                                     </Text>
                                 </TouchableOpacity>
 
-                                <View style={styles.hudDivider} />
+                                <View style={[styles.hudDivider, { backgroundColor: isDark ? '#444' : '#EAEAEA' }]} />
 
                                 {/* Angle Metrics */}
                                 <View style={styles.metricsGroup}>
                                     <View style={styles.metricItem}>
-                                        <Text style={styles.hudLabel}>{isPushup ? 'ELBOW' : 'KNEE'}</Text>
-                                        <Text style={[styles.hudValue, { color: '#41719C' }]}>
+                                        <Text style={[styles.hudLabel, themedStyles.hudLabel]}>{isPushup ? 'ELBOW' : 'KNEE'}</Text>
+                                        <Text style={[styles.hudValue, { color: isDark ? '#6BA3D6' : '#41719C' }]}>
                                             {kneeAngle !== null ? `${kneeAngle}°` : '--'}
                                         </Text>
                                     </View>
                                     <View style={styles.metricItem}>
-                                        <Text style={styles.hudLabel}>{isPushup ? 'BODY' : 'BACK'}</Text>
-                                        <Text style={[styles.hudValue, { color: '#7030A0' }]}>
+                                        <Text style={[styles.hudLabel, themedStyles.hudLabel]}>{isPushup ? 'BODY' : 'BACK'}</Text>
+                                        <Text style={[styles.hudValue, { color: isDark ? '#A855F7' : '#7030A0' }]}>
                                             {hipAngle !== null ? `${hipAngle}°` : '--'}
                                         </Text>
                                     </View>
                                 </View>
 
-                                <View style={styles.hudDivider} />
+                                <View style={[styles.hudDivider, { backgroundColor: isDark ? '#444' : '#EAEAEA' }]} />
 
                                 {/* Rep Counter */}
                                 <TouchableOpacity
@@ -764,7 +790,7 @@ export default function FormCheckScreen() {
                         </Text>
                         <View style={styles.completeDivider} />
                         <TouchableOpacity
-                            style={styles.completeButton}
+                            style={[styles.completeButton, themedStyles.completeButton]}
                             onPress={handleShowAnalysis}
                             activeOpacity={0.85}
                         >

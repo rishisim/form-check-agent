@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 import {
     Animated,
     Dimensions,
@@ -14,6 +14,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WaveHeader } from '../components/WaveHeader';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { useTheme, Theme } from '../hooks/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -23,9 +25,10 @@ interface AnimatedExerciseCardProps {
     name: string;
     desc: string;
     href: string;
+    theme: Theme;
 }
 
-function AnimatedExerciseCard({ emoji, name, desc, href }: AnimatedExerciseCardProps) {
+function AnimatedExerciseCard({ emoji, name, desc, href, theme }: AnimatedExerciseCardProps) {
     const router = useRouter();
     const rippleScale = useRef(new Animated.Value(0)).current;
     const rippleOpacity = useRef(new Animated.Value(0.4)).current;
@@ -96,12 +99,21 @@ function AnimatedExerciseCard({ emoji, name, desc, href }: AnimatedExerciseCardP
             onPress={handlePress}
             style={styles.gridItem}
         >
-            <Animated.View style={[styles.exerciseCard, { transform: [{ scale: scaleAnimation }] }]}>
+            <Animated.View style={[
+                styles.exerciseCard,
+                {
+                    backgroundColor: theme.cardBackground,
+                    shadowColor: theme.shadow,
+                    shadowOpacity: theme.shadowOpacity,
+                    transform: [{ scale: scaleAnimation }]
+                }
+            ]}>
                 {/* Ripple effect */}
                 <Animated.View
                     style={[
                         styles.ripple,
                         {
+                            backgroundColor: theme.ripple,
                             width: rippleSize,
                             height: rippleSize,
                             borderRadius: rippleSize / 2,
@@ -116,8 +128,8 @@ function AnimatedExerciseCard({ emoji, name, desc, href }: AnimatedExerciseCardP
                 {/* Content */}
                 <View style={styles.cardContent}>
                     <Text style={styles.exerciseEmoji}>{emoji}</Text>
-                    <Text style={styles.exerciseName}>{name}</Text>
-                    <Text style={styles.exerciseDesc}>{desc}</Text>
+                    <Text style={[styles.exerciseName, { color: theme.textPrimary }]}>{name}</Text>
+                    <Text style={[styles.exerciseDesc, { color: theme.textSecondary }]}>{desc}</Text>
                 </View>
             </Animated.View>
         </Pressable>
@@ -134,6 +146,7 @@ const comingSoonExercises = [
 const PAGE_TITLES = ['Body Weight Exercises', 'Physical Therapy'];
 
 export default function HomeScreen() {
+    const { theme, isDark } = useTheme();
     const [activePageIndex, setActivePageIndex] = useState(0);
     const horizontalRef = useRef<ScrollView>(null);
     const scrollX = useRef(new Animated.Value(0)).current;
@@ -153,24 +166,88 @@ export default function HomeScreen() {
         setActivePageIndex(index);
     };
 
+    // Dynamic styles based on theme
+    const dynamicStyles = useMemo(() => ({
+        container: {
+            backgroundColor: theme.background,
+        },
+        title: {
+            color: theme.textPrimary,
+        },
+        subtitle: {
+            color: theme.textSecondary,
+        },
+        tabText: {
+            color: theme.textMuted,
+        },
+        tabTextActive: {
+            color: theme.textPrimary,
+        },
+        tabIndicator: {
+            backgroundColor: theme.accent,
+        },
+        sectionTitle: {
+            color: theme.textMuted,
+        },
+        comingSoonCard: {
+            borderColor: theme.border,
+            backgroundColor: theme.cardBackgroundHover,
+        },
+        comingSoonText: {
+            color: theme.textSecondary,
+        },
+        badge: {
+            backgroundColor: theme.badgeBackground,
+        },
+        badgeText: {
+            color: theme.textMuted,
+        },
+        footer: {
+            color: theme.textMuted,
+        },
+        code: {
+            color: theme.accent,
+        },
+        ptTitle: {
+            color: theme.textMuted,
+        },
+        ptDesc: {
+            color: theme.textSecondary,
+        },
+    }), [theme]);
+
     return (
-        <View style={styles.container}>
-            <WaveHeader />
+        <View style={[styles.container, dynamicStyles.container]}>
+            <WaveHeader isDark={isDark} />
             <SafeAreaView style={styles.safeArea}>
                 {/* Header – always visible */}
                 <View style={styles.header}>
-                    <Text style={styles.title}>FormFlow</Text>
-                    <Text style={styles.subtitle}>AI-Powered Workout Coach</Text>
+                    <View style={styles.headerTitleRow}>
+                        <View style={styles.headerSpacer} />
+                        <View style={styles.headerCenter}>
+                            <Text style={[styles.title, dynamicStyles.title]}>FormFlow</Text>
+                            <Text style={[styles.subtitle, dynamicStyles.subtitle]}>AI-Powered Workout Coach</Text>
+                        </View>
+                        <View style={styles.headerRight}>
+                            <ThemeToggle />
+                        </View>
+                    </View>
                 </View>
 
                 {/* Page indicator dots + labels */}
                 <View style={styles.tabBar}>
                     {PAGE_TITLES.map((title, i) => (
                         <Pressable key={title} onPress={() => goToPage(i)} style={styles.tab}>
-                            <Text style={[styles.tabText, activePageIndex === i && styles.tabTextActive]}>
+                            <Text style={[
+                                styles.tabText,
+                                dynamicStyles.tabText,
+                                activePageIndex === i && dynamicStyles.tabTextActive
+                            ]}>
                                 {title}
                             </Text>
-                            {activePageIndex === i && <View style={styles.tabIndicator} />}
+                            {activePageIndex === i && (
+                                <View style={[styles.tabIndicator, dynamicStyles.tabIndicator]} />
+                            )}
                         </Pressable>
                     ))}
                 </View>
@@ -206,6 +283,7 @@ export default function HomeScreen() {
                                 name="Squats"
                                 desc="Track depth & form"
                                 href="/workout-config"
+                                theme={theme}
                             />
 
                             <AnimatedExerciseCard
@@ -213,39 +291,52 @@ export default function HomeScreen() {
                                 name="Push-ups"
                                 desc="Track form & reps"
                                 href="/workout-config?exercise=pushup"
+                                theme={theme}
                             />
                         </View>
 
-                        <Text style={styles.sectionTitle}>Coming Soon</Text>
+                        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Coming Soon</Text>
 
                         <View style={styles.grid}>
                             {comingSoonExercises.map((exercise) => (
                                 <View key={exercise.name} style={styles.gridItem}>
-                                    <View style={[styles.exerciseCard, styles.comingSoonCard]}>
+                                    <View style={[
+                                        styles.exerciseCard,
+                                        styles.comingSoonCard,
+                                        dynamicStyles.comingSoonCard,
+                                        { shadowColor: theme.shadow, shadowOpacity: 0 }
+                                    ]}>
                                         <Text style={styles.exerciseEmoji}>{exercise.emoji}</Text>
-                                        <Text style={[styles.exerciseName, styles.comingSoonText]}>
+                                        <Text style={[
+                                            styles.exerciseName,
+                                            dynamicStyles.comingSoonText
+                                        ]}>
                                             {exercise.name}
                                         </Text>
-                                        <Text style={styles.exerciseDesc}>{exercise.desc}</Text>
-                                        <View style={styles.badge}>
-                                            <Text style={styles.badgeText}>Coming Soon</Text>
+                                        <Text style={[styles.exerciseDesc, { color: theme.textSecondary }]}>
+                                            {exercise.desc}
+                                        </Text>
+                                        <View style={[styles.badge, dynamicStyles.badge]}>
+                                            <Text style={[styles.badgeText, dynamicStyles.badgeText]}>
+                                                Coming Soon
+                                            </Text>
                                         </View>
                                     </View>
                                 </View>
                             ))}
                         </View>
 
-                        <Text style={styles.footer}>
+                        <Text style={[styles.footer, dynamicStyles.footer]}>
                             Run the backend first:{'\n'}
-                            <Text style={styles.code}>python backend/server.py</Text>
+                            <Text style={[styles.code, dynamicStyles.code]}>python backend/server.py</Text>
                         </Text>
                     </ScrollView>
 
                     {/* ─── Page 2: Physical Therapy ─── */}
                     <View style={[styles.ptPage, { width: SCREEN_WIDTH }]}>
                         <Text style={styles.ptEmoji}>🩺</Text>
-                        <Text style={styles.ptTitle}>Coming Soon</Text>
-                        <Text style={styles.ptDesc}>
+                        <Text style={[styles.ptTitle, dynamicStyles.ptTitle]}>Coming Soon</Text>
+                        <Text style={[styles.ptDesc, dynamicStyles.ptDesc]}>
                             Guided physical therapy routines with real-time form tracking to support your recovery.
                         </Text>
                     </View>
@@ -258,7 +349,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F7F7F8', // Main background color for the app
     },
     safeArea: {
         flex: 1,
@@ -266,19 +356,33 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     header: {
-        alignItems: 'center',
         paddingTop: 8,
         paddingBottom: 16,
+        paddingHorizontal: 16,
+    },
+    headerTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    headerSpacer: {
+        width: 40,
+    },
+    headerCenter: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    headerRight: {
+        width: 40,
+        alignItems: 'flex-end',
     },
     title: {
         fontSize: 30,
         fontWeight: '800',
-        color: '#333',
         marginBottom: 6,
     },
     subtitle: {
         fontSize: 16,
-        color: '#999',
         fontWeight: '500',
     },
     /* ── Tab bar ── */
@@ -296,17 +400,12 @@ const styles = StyleSheet.create({
     tabText: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#bbb',
-    },
-    tabTextActive: {
-        color: '#333',
     },
     tabIndicator: {
         marginTop: 6,
         width: 28,
         height: 3,
         borderRadius: 2,
-        backgroundColor: '#88B04B',
     },
     /* ── Pager ── */
     pager: {
@@ -331,14 +430,12 @@ const styles = StyleSheet.create({
         width: '47%',
     },
     exerciseCard: {
-        backgroundColor: '#fff',
+        height: 170,
         padding: 24,
         borderRadius: 24,
         alignItems: 'center',
         width: '100%',
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.06,
         shadowRadius: 12,
         elevation: 3,
         overflow: 'hidden',
@@ -346,7 +443,6 @@ const styles = StyleSheet.create({
     },
     ripple: {
         position: 'absolute',
-        backgroundColor: 'rgba(0, 0, 0, 0.08)',
     },
     cardContent: {
         alignItems: 'center',
@@ -357,14 +453,12 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     exerciseName: {
-        color: '#333',
         fontSize: 19,
         fontWeight: '700',
         marginBottom: 4,
         textAlign: 'center',
     },
     exerciseDesc: {
-        color: '#999',
         fontSize: 13,
         fontWeight: '500',
         textAlign: 'center',
@@ -372,28 +466,20 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#bbb',
         textTransform: 'uppercase',
         letterSpacing: 1.2,
         marginBottom: 16,
         alignSelf: 'center',
     },
     comingSoonCard: {
+        height: 240,
         opacity: 0.55,
-        padding: 22,
         borderStyle: 'dashed',
         borderWidth: 1.5,
-        borderColor: '#ddd',
-        backgroundColor: '#FAFAFA',
-        shadowOpacity: 0,
         elevation: 0,
-    },
-    comingSoonText: {
-        color: '#aaa',
     },
     badge: {
         marginTop: 8,
-        backgroundColor: '#F0F0F0',
         paddingHorizontal: 10,
         paddingVertical: 3,
         borderRadius: 10,
@@ -401,18 +487,15 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#bbb',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     footer: {
-        color: '#bbb',
         fontSize: 12,
         textAlign: 'center',
         marginTop: 8,
     },
     code: {
-        color: '#88B04B',
         fontFamily: 'monospace',
     },
     /* ── Physical Therapy page ── */
@@ -429,12 +512,10 @@ const styles = StyleSheet.create({
     ptTitle: {
         fontSize: 26,
         fontWeight: '800',
-        color: '#bbb',
         marginBottom: 12,
     },
     ptDesc: {
         fontSize: 15,
-        color: '#aaa',
         textAlign: 'center',
         lineHeight: 22,
         maxWidth: 280,

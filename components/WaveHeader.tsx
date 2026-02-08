@@ -6,11 +6,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const WAVE_HEIGHT = 160;
 const FLOW_SPEED = 1; // Very slow drift
 
+interface WaveHeaderProps {
+    isDark?: boolean;
+}
+
 /**
  * Slowly flowing parametric wave lines rendered at the top of the screen.
  * Purely decorative – sits behind the header text.
  */
-export function WaveHeader() {
+export function WaveHeader({ isDark = false }: WaveHeaderProps) {
     const [time, setTime] = useState(0);
 
     useEffect(() => {
@@ -45,7 +49,14 @@ export function WaveHeader() {
         return points.join(' ');
     };
 
-    const waves = [
+    // Different wave colors for light and dark modes
+    const waves = isDark ? [
+        { amplitude: 14, frequency: 1.6, phase: 0, y: 55, gradientId: 'wave1', color1: '#6366F1', color2: '#8B5CF6', opacity: 0.25, strokeWidth: 2.5 },
+        { amplitude: 10, frequency: 2.0, phase: 1.2, y: 72, gradientId: 'wave2', color1: '#8B5CF6', color2: '#A78BFA', opacity: 0.30, strokeWidth: 2 },
+        { amplitude: 18, frequency: 1.3, phase: 2.5, y: 90, gradientId: 'wave3', color1: '#4F46E5', color2: '#7C3AED', opacity: 0.20, strokeWidth: 3 },
+        { amplitude: 8, frequency: 2.4, phase: 0.8, y: 105, gradientId: 'wave4', color1: '#A78BFA', color2: '#C4B5FD', opacity: 0.35, strokeWidth: 1.5 },
+        { amplitude: 12, frequency: 1.8, phase: 3.8, y: 120, gradientId: 'wave5', color1: '#7C3AED', color2: '#A78BFA', opacity: 0.22, strokeWidth: 2 },
+    ] : [
         { amplitude: 14, frequency: 1.6, phase: 0, y: 55, gradientId: 'wave1', color1: '#4285F4', color2: '#60A5FA', opacity: 0.18, strokeWidth: 2.5 },
         { amplitude: 10, frequency: 2.0, phase: 1.2, y: 72, gradientId: 'wave2', color1: '#60A5FA', color2: '#93C5FD', opacity: 0.22, strokeWidth: 2 },
         { amplitude: 18, frequency: 1.3, phase: 2.5, y: 90, gradientId: 'wave3', color1: '#3B82F6', color2: '#60A5FA', opacity: 0.13, strokeWidth: 3 },
@@ -92,3 +103,4 @@ const styles = StyleSheet.create({
         zIndex: 0,
     },
 });
+
