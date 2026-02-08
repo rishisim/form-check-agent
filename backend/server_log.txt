@@ -2033,3 +2033,263 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-02-08 09:31:23,579 [INFO] [c97e85a1] WebSocket connection established (1 active, exercise=squat)
 2026-02-08 09:31:28,051 [INFO] [c97e85a1] Client disconnected normally
 2026-02-08 09:31:28,051 [INFO] [c97e85a1] Connection cleaned up (0 active)
+2026-02-08 09:51:12,648 [INFO] [13c5427e] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 09:51:22,457 [INFO] [13c5427e] Client disconnected normally
+2026-02-08 09:51:22,457 [INFO] [13c5427e] Connection cleaned up (0 active)
+2026-02-08 10:40:27,222 [INFO] [fbbb98a9] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 10:40:31,085 [INFO] [fbbb98a9] Client disconnected normally
+2026-02-08 10:40:31,086 [INFO] [fbbb98a9] Connection cleaned up (0 active)
+2026-02-08 10:40:33,475 [INFO] [103580c0] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 10:40:39,237 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:40:39,250 [INFO] TTS generated (24285 bytes) for: "Let's go, you got this!"
+2026-02-08 10:40:56,723 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:40:56,729 [INFO] TTS generated (15926 bytes) for: 'Good rep!'
+2026-02-08 10:41:22,943 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:41:22,960 [INFO] TTS generated (22613 bytes) for: 'Great depth, drive it up!'
+2026-02-08 10:41:31,841 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:41:31,855 [INFO] TTS generated (23449 bytes) for: 'Try sitting back a bit'
+2026-02-08 10:41:34,576 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:41:40,752 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 10:41:49,000 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:41:52,677 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:41:52,695 [INFO] TTS generated (33898 bytes) for: 'Close! Focus on form for the next rep.'
+2026-02-08 10:42:03,326 [INFO] [103580c0] Client disconnected normally
+2026-02-08 10:42:03,326 [INFO] [103580c0] Connection cleaned up (0 active)
+2026-02-08 10:45:06,523 [INFO] [b0d97c93] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 10:45:09,735 [INFO] [b0d97c93] Client disconnected normally
+2026-02-08 10:45:09,735 [INFO] [b0d97c93] Connection cleaned up (0 active)
+2026-02-08 10:45:24,267 [INFO] [a090d03e] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 10:45:29,502 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 10:45:35,752 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:45:40,074 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 10:45:43,505 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:45:43,519 [INFO] TTS generated (23449 bytes) for: 'Nice rep, keep it up!'
+2026-02-08 10:45:48,539 [INFO] [a090d03e] Resetting rep counter
+2026-02-08 10:45:48,829 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:45:48,847 [INFO] TTS generated (20942 bytes) for: "Set 2  let's go!"
+2026-02-08 10:46:05,611 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:46:14,846 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 10:46:14,869 [INFO] TTS generated (35152 bytes) for: "Rep didn't count, let's clean up the form!"
+2026-02-08 10:46:20,533 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:46:26,756 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 10:46:30,792 [INFO] TTS cache hit for: "Rep didn't count, let's clean up the form!"
+2026-02-08 10:46:37,095 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:46:47,331 [INFO] TTS cache hit for: "Rep didn't count, let's clean up the form!"
+2026-02-08 10:46:55,650 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 10:47:02,549 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 10:47:07,758 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 10:47:14,971 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 10:47:14,976 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 10:47:14,976 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 10:47:59,953 [INFO] [a090d03e] Client disconnected normally
+2026-02-08 10:47:59,956 [INFO] [a090d03e] Connection cleaned up (0 active)
+2026-02-08 10:48:23,762 [INFO] [343afdc7] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 10:48:54,693 [INFO] [343afdc7] Client disconnected normally
+2026-02-08 10:48:54,696 [INFO] [343afdc7] Connection cleaned up (0 active)
+2026-02-08 11:06:26,451 [INFO] [26ca8c78] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:06:27,761 [INFO] [26ca8c78] Client disconnected normally
+2026-02-08 11:06:27,761 [INFO] [26ca8c78] Connection cleaned up (0 active)
+2026-02-08 11:10:07,541 [INFO] [38a335ae] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:10:17,742 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:10:17,864 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:10:21,246 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:10:21,260 [INFO] TTS generated (23449 bytes) for: 'Great depth, push it up!'
+2026-02-08 11:10:21,284 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:10:24,163 [INFO] [38a335ae] Client disconnected normally
+2026-02-08 11:10:24,163 [INFO] [38a335ae] Connection cleaned up (0 active)
+2026-02-08 11:12:03,247 [INFO] [bcd9396e] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:12:13,475 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:12:13,508 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:12:27,436 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:12:27,475 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:12:31,596 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:12:31,633 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:12:33,965 [INFO] [bcd9396e] Client disconnected normally
+2026-02-08 11:12:33,965 [INFO] [bcd9396e] Connection cleaned up (0 active)
+2026-02-08 11:12:57,810 [INFO] [500eabbe] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:13:07,951 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:13:07,998 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:13:11,947 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:13:11,974 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:13:15,745 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:13:15,760 [INFO] TTS generated (25539 bytes) for: 'Try to lower just a bit more'
+2026-02-08 11:13:15,783 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 11:13:27,856 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:13:27,893 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:13:54,629 [INFO] [500eabbe] Client disconnected normally
+2026-02-08 11:13:54,629 [INFO] [500eabbe] Connection cleaned up (0 active)
+2026-02-08 11:15:10,136 [INFO] [ab23e3d1] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:15:15,239 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:15:15,278 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:15:19,921 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:15:19,942 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:15:24,265 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:15:24,292 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:15:32,539 [INFO] [ab23e3d1] Resetting rep counter
+2026-02-08 11:15:32,560 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 11:15:32,603 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 11:15:56,152 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:15:56,192 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:16:02,594 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:16:02,635 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:16:07,610 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:16:07,661 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:16:18,103 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 11:16:31,274 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 11:16:31,275 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 11:16:31,275 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 11:17:20,499 [INFO] [ab23e3d1] Client disconnected normally
+2026-02-08 11:17:20,499 [INFO] [ab23e3d1] Connection cleaned up (0 active)
+2026-02-08 11:18:05,639 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:18:05,639 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:18:05,640 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:18:05,640 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 11:18:05,640 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:18:05,640 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:18:05,661 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:18:05,663 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:18:05,676 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:18:05,703 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 11:18:05,714 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:18:05,714 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:18:05,714 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:18:05,714 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:18:06,652 [INFO] [d0837166] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:18:28,335 [INFO] [5239705d] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 11:18:33,407 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:18:33,444 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:18:41,913 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:18:41,952 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:18:48,114 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:18:48,156 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:20:16,828 [INFO] [d0837166] Client disconnected normally
+2026-02-08 11:20:16,831 [INFO] [d0837166] Connection cleaned up (1 active)
+2026-02-08 11:20:18,596 [INFO] [5239705d] Client disconnected normally
+2026-02-08 11:20:18,596 [INFO] [5239705d] Connection cleaned up (0 active)
+2026-02-08 11:20:26,936 [INFO] [5a632cfc] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:21:49,907 [INFO] [bb61bda4] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 11:21:54,901 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:21:54,933 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:22:00,574 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:22:00,604 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:22:06,043 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:22:06,080 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:23:17,057 [INFO] [5a632cfc] Client disconnected normally
+2026-02-08 11:23:17,060 [INFO] [5a632cfc] Connection cleaned up (1 active)
+2026-02-08 11:23:20,021 [INFO] [bb61bda4] Client disconnected normally
+2026-02-08 11:23:20,022 [INFO] [bb61bda4] Connection cleaned up (0 active)
+2026-02-08 11:27:59,985 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:27:59,988 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:28:00,111 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 11:28:00,120 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:28:00,120 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:00,121 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:00,122 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:28:00,123 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:00,136 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:28:00,137 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:28:00,140 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 11:28:00,151 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:28:00,152 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:28:00,153 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:28:00,154 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:28:00,154 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:28:00,166 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:28:00,167 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:00,167 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:00,202 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 11:28:01,005 [INFO] [ce144e6d] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 11:28:01,077 [INFO] [912c65db] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 11:28:01,131 [INFO] [912c65db] Client disconnected normally
+2026-02-08 11:28:01,131 [INFO] [912c65db] Connection cleaned up (1 active)
+2026-02-08 11:28:10,103 [INFO] [ce144e6d] Client disconnected normally
+2026-02-08 11:28:10,106 [INFO] [ce144e6d] Connection cleaned up (0 active)
+2026-02-08 11:28:27,301 [INFO] [acbf4dab] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:28:32,463 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:32,505 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:28:37,284 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:28:37,313 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:28:43,993 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:28:44,030 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:28:53,018 [INFO] [acbf4dab] Client disconnected normally
+2026-02-08 11:28:53,019 [INFO] [acbf4dab] Connection cleaned up (0 active)
+2026-02-08 11:29:18,598 [INFO] [ebd2d01a] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:29:23,570 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:29:23,611 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:29:28,190 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:29:28,215 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:29:33,950 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:29:33,987 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:29:38,513 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:29:38,525 [INFO] TTS generated (21777 bytes) for: "Let's go a bit deeper"
+2026-02-08 11:29:38,558 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 11:29:43,877 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:29:43,917 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:29:47,787 [INFO] [ebd2d01a] Client disconnected normally
+2026-02-08 11:29:47,789 [INFO] [ebd2d01a] Connection cleaned up (0 active)
+2026-02-08 11:30:05,394 [INFO] [e6e01e5d] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:30:10,537 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:30:10,568 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:30:14,216 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:30:14,259 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:30:22,262 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:30:22,297 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:30:25,381 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:30:25,425 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:30:50,459 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:30:50,505 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 11:30:52,688 [INFO] [e6e01e5d] Client disconnected normally
+2026-02-08 11:30:52,689 [INFO] [e6e01e5d] Connection cleaned up (0 active)
+2026-02-08 11:31:20,312 [INFO] [8e442fa6] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:31:30,499 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:31:30,715 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:31:30,739 [INFO] [8e442fa6] Client disconnected normally
+2026-02-08 11:31:30,740 [INFO] [8e442fa6] Connection cleaned up (0 active)
+2026-02-08 11:31:47,637 [INFO] [73419ccc] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:31:52,742 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:31:52,777 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:31:57,615 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:31:57,639 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:32:15,028 [INFO] [73419ccc] Client disconnected normally
+2026-02-08 11:32:15,029 [INFO] [73419ccc] Connection cleaned up (0 active)
+2026-02-08 11:35:37,271 [INFO] [64f2028d] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:35:42,899 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:35:42,913 [INFO] TTS generated (24703 bytes) for: "Let's go, you got this!"
+2026-02-08 11:35:42,948 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:35:46,864 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:35:47,093 [INFO] TTS generated (23449 bytes) for: 'Great depth, drive it up!'
+2026-02-08 11:35:47,118 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:35:52,860 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:35:52,879 [INFO] TTS generated (36824 bytes) for: "Rep didn't count, let's clean up the form!"
+2026-02-08 11:35:52,932 [INFO] TTS cache hit for: "Rep didn't count, let's clean up the form!"
+2026-02-08 11:35:57,636 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:35:57,679 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:37:07,605 [INFO] [64f2028d] Client disconnected normally
+2026-02-08 11:37:07,608 [INFO] [64f2028d] Connection cleaned up (0 active)
+2026-02-08 11:38:33,920 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:38:33,923 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:38:33,924 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:38:34,031 [INFO] TTS cache hit for: "Rep didn't count, let's clean up the form!"
+2026-02-08 11:38:34,749 [INFO] [e98f6cd6] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:38:35,154 [INFO] [e98f6cd6] Client disconnected normally
+2026-02-08 11:38:35,154 [INFO] [e98f6cd6] Connection cleaned up (0 active)
+2026-02-08 11:39:12,936 [INFO] [acbc0c69] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 11:39:18,050 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:39:18,083 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 11:39:23,145 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:39:23,179 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:39:30,294 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:39:30,311 [INFO] TTS generated (33062 bytes) for: 'Close! Focus on form for the next rep.'
+2026-02-08 11:39:30,343 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 11:39:35,711 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:39:35,755 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:39:41,812 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:39:41,829 [INFO] TTS generated (20942 bytes) for: "Let's go a bit deeper"
+2026-02-08 11:39:41,863 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 11:39:45,932 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 11:39:45,937 [INFO] TTS generated (21777 bytes) for: 'Nice rep, keep it up!'
+2026-02-08 11:39:45,959 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:39:53,219 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:39:53,254 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 11:39:59,905 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:39:59,940 [INFO] TTS cache hit for: 'Nice rep, keep it up!'

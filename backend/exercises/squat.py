@@ -115,6 +115,12 @@ class SquatAnalyzer:
         # Active-warning lock: once a warning is shown, it stays until resolved
         self._active_warning: str | None = None
 
+        # ---- Rep-gating: standing confirmation & hysteresis ----
+        # Must detect a standing pose before the state machine starts tracking
+        self._standing_confirmed: bool = False
+        # After each rep, must reach standing angle before new descent starts
+        self._reached_standing: bool = False
+
     def reset(self):
         """Resets the analyzer state for a new set."""
         self.stage = "up"
@@ -140,6 +146,8 @@ class SquatAnalyzer:
         self._candidate_feedback = ""
         self._candidate_count = 0
         self._active_warning = None
+        self._standing_confirmed = False
+        self._reached_standing = False
 
     # ------------------------------------------------------------------
     # Main analysis (called by server for every frame)
@@ -252,11 +260,45 @@ class SquatAnalyzer:
         else:
             self._knee_toe_warn_frames = max(0, self._knee_toe_warn_frames - 1)
 
+        # ---- Standing confirmation gate --------------------------------
+        # Require the person to first be detected standing before tracking.
+        # This prevents a phantom rep from initial positioning.
+        if not self._standing_confirmed:
+            if knee_angle >= self.KNEE_STANDING_ANGLE:
+                self._standing_confirmed = True
+                self._reached_standing = True
+            else:
+                # Not yet confirmed standing – skip state machine entirely
+                return {
+                    "knee_angle": int(knee_angle),
+                    "hip_angle": int(hip_angle),
+                    "stage": self.stage,
+                    "rep_count": self.counter,
+                    "valid_reps": self.valid_reps,
+                    "invalid_reps": self.invalid_reps,
+                    "feedback": self._stable_feedback,
+                    "feedback_level": self._stable_feedback_level,
+                    "is_good_form": frame_good_form,
+                    "depth_status": "Good" if is_deep_enough else "High",
+                    "target_depth_y": knee_y,
+                    "current_depth_y": hip_y,
+                    "hip_trajectory": list(self.hip_history),
+                    "side_detected": side_used,
+                }
+
         # ---- State machine with 4 stages & hysteresis ------------------
         if self.stage == "up":
-            if knee_angle < self.KNEE_LOCKOUT_ANGLE:
+            # Track whether the person has reached full standing after a rep.
+            # This adds a hysteresis band (145° lockout → 155° standing)
+            # that prevents oscillation near the lockout threshold from
+            # triggering a phantom descent cycle.
+            if knee_angle >= self.KNEE_STANDING_ANGLE:
+                self._reached_standing = True
+
+            if self._reached_standing and knee_angle < self.KNEE_LOCKOUT_ANGLE:
                 # Started descending
                 self.stage = "descending"
+                self._reached_standing = False
                 self._rep_form_issues = []
                 self._rep_had_good_depth = False
                 self._deep_frame_count = 0
@@ -319,7 +361,7 @@ class SquatAnalyzer:
                     if issue not in self._rep_form_issues:
                         self._rep_form_issues.append(issue)
 
-            if knee_angle >= self.KNEE_LOCKOUT_ANGLE:
+            if knee_angle >= self.KNEE_STANDING_ANGLE:
                 # ---- Rep completed! ------------------------------------
                 time_since_last = now - self._last_rep_time
 

@@ -22,39 +22,33 @@ const KEY_JOINTS = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28];
 const VISIBILITY_THRESHOLD = 0.45;
 
 // ─────────────────────────────────────────────────────────────────────────
-// Dead-reckoning constants  (same technique as multiplayer game net-code)
-//
-// The skeleton data is ~300-500 ms old by the time we render it (camera
-// capture + encode + network + MediaPipe).  Instead of showing where the
-// body WAS, we extrapolate forward by the pipeline delay so the skeleton
-// appears where the body IS RIGHT NOW.
+// Smooth-lerp approach: instead of predicting where the body WILL be
+// (which amplifies noise), we smoothly interpolate toward where the body
+// IS.  This acts as a low-pass filter — jitter gets absorbed while real
+// movement comes through cleanly.  Trades ~1-2 frames of latency for
+// rock-solid stability.
 // ─────────────────────────────────────────────────────────────────────────
-const LEAD_TIME_S = 0.18;        // extra seconds to predict AHEAD of current time
-const MAX_EXTRAPOLATE_S = 0.55;  // clamp total extrapolation to avoid runaway
-const VELOCITY_BLEND = 0.45;     // EMA blend for new velocity (lower = smoother)
-const SNAP_DISTANCE = 0.12;      // teleport on big jumps
-const JITTER_THRESHOLD = 0.001;  // ignore sub-pixel noise
+const LERP_SPEED = 12;           // higher = more responsive, lower = smoother
+const SNAP_DISTANCE = 0.15;     // teleport threshold for big jumps
+const VISIBILITY_SMOOTHING = 3;  // frames a joint must be invisible before hiding
 
 interface JointState {
-    // Last known target from server (normalized 0-1)
+    // Target position from server (normalized 0-1)
     tx: number;
     ty: number;
-    // Smoothed velocity (normalized units / sec)
-    vx: number;
-    vy: number;
-    // Rendered position (updated every animation frame)
+    // Rendered (smoothed) position
     rx: number;
     ry: number;
     visible: boolean;
-    arrivedAt: number; // performance.now() when last target arrived
+    visibleFrames: number; // positive = visible streak, negative = invisible streak
 }
 
 export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true }: SkeletonOverlayProps) => {
     const [viewSize, setViewSize] = useState({ width: 1, height: 1 });
     const jointsRef = useRef<Map<number, JointState>>(new Map());
-    const prevTargetRef = useRef<Map<number, { x: number; y: number; time: number }>>(new Map());
     const animFrameRef = useRef<number | null>(null);
     const hasLandmarksRef = useRef(false);
+    const lastAnimTimeRef = useRef<number>(0);
     const [, setTick] = useState(0);
 
     const onLayout = useCallback((e: LayoutChangeEvent) => {
@@ -62,17 +56,26 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
         if (width > 0 && height > 0) setViewSize({ width, height });
     }, []);
 
-    // ── New landmarks arrive → update targets + compute velocity ─────────
+    // ── New landmarks arrive → update targets ────────────────────────────
     useEffect(() => {
         if (!landmarks || landmarks.length === 0) {
             hasLandmarksRef.current = false;
             return;
         }
         hasLandmarksRef.current = true;
-        const now = performance.now();
 
         const lmMap = new Map<number, number[]>();
         for (const lm of landmarks) lmMap.set(lm[0], lm);
+
+        // Mark joints not in this frame as trending invisible
+        for (const [id, joint] of jointsRef.current) {
+            if (!lmMap.has(id)) {
+                joint.visibleFrames = Math.min(joint.visibleFrames - 1, -1);
+                if (joint.visibleFrames <= -VISIBILITY_SMOOTHING) {
+                    joint.visible = false;
+                }
+            }
+        }
 
         for (const [id, lm] of lmMap) {
             const rawX = lm[1];
@@ -80,87 +83,75 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
             const visibility = lm.length > 3 ? lm[3] : 1;
             const x = mirrored ? 1 - rawX : rawX;
             const y = rawY;
-            const visible = visibility >= VISIBILITY_THRESHOLD;
-
-            // Velocity from consecutive server updates
-            const prev = prevTargetRef.current.get(id);
-            let newVx = 0;
-            let newVy = 0;
-            if (prev) {
-                const dtSec = (now - prev.time) / 1000;
-                if (dtSec > 0.01 && dtSec < 1.5) {
-                    newVx = (x - prev.x) / dtSec;
-                    newVy = (y - prev.y) / dtSec;
-                }
-            }
-            prevTargetRef.current.set(id, { x, y, time: now });
+            const nowVisible = visibility >= VISIBILITY_THRESHOLD;
 
             const joint = jointsRef.current.get(id);
             if (!joint) {
-                // First sighting — snap everything
+                // First sighting — snap to position
                 jointsRef.current.set(id, {
                     tx: x, ty: y,
-                    vx: newVx, vy: newVy,
                     rx: x, ry: y,
-                    visible,
-                    arrivedAt: now,
+                    visible: nowVisible,
+                    visibleFrames: nowVisible ? 1 : -1,
                 });
             } else {
                 const dist = Math.hypot(x - joint.tx, y - joint.ty);
                 if (dist > SNAP_DISTANCE) {
-                    // Big jump (person re-entered) — hard reset
-                    joint.tx = x; joint.ty = y;
-                    joint.rx = x; joint.ry = y;
-                    joint.vx = 0; joint.vy = 0;
-                } else {
-                    // Smooth velocity with EMA to avoid jittery prediction
-                    joint.vx = newVx * VELOCITY_BLEND + joint.vx * (1 - VELOCITY_BLEND);
-                    joint.vy = newVy * VELOCITY_BLEND + joint.vy * (1 - VELOCITY_BLEND);
-                    joint.tx = x;
-                    joint.ty = y;
-                    // SNAP rendered position to the dead-reckoned spot immediately
-                    // (the animation loop will continue extrapolating from here)
-                    const leadNow = Math.min(LEAD_TIME_S, MAX_EXTRAPOLATE_S);
-                    joint.rx = x + joint.vx * leadNow;
-                    joint.ry = y + joint.vy * leadNow;
+                    // Big jump — teleport to avoid rubber-banding
+                    joint.rx = x;
+                    joint.ry = y;
                 }
-                joint.visible = visible;
-                joint.arrivedAt = now;
+                joint.tx = x;
+                joint.ty = y;
+
+                // Smooth visibility transitions
+                if (nowVisible) {
+                    joint.visibleFrames = Math.max(joint.visibleFrames + 1, 1);
+                    joint.visible = true; // show immediately when detected
+                } else {
+                    joint.visibleFrames = Math.min(joint.visibleFrames - 1, -1);
+                    if (joint.visibleFrames <= -VISIBILITY_SMOOTHING) {
+                        joint.visible = false; // only hide after sustained absence
+                    }
+                }
             }
         }
     }, [landmarks, mirrored]);
 
-    // ── 60 fps dead-reckoning loop ───────────────────────────────────────
-    // Every frame: rendered pos = target + velocity × (timeSinceTarget + LEAD)
-    // No lerp. No smoothing on position. Just pure extrapolation.
-    // This makes the skeleton track where the body IS, not where it WAS.
+    // ── 60 fps smooth-lerp animation loop ────────────────────────────────
+    // Each frame: move rendered position toward target by a fraction
+    // proportional to elapsed time.  This is a simple exponential ease-out
+    // that absorbs jitter while staying responsive to real movement.
     useEffect(() => {
         const animate = (now: number) => {
             if (!hasLandmarksRef.current) {
+                lastAnimTimeRef.current = now;
                 animFrameRef.current = requestAnimationFrame(animate);
                 return;
             }
+
+            const dt = lastAnimTimeRef.current > 0
+                ? Math.min((now - lastAnimTimeRef.current) / 1000, 0.05) // cap at 50ms
+                : 0.016;
+            lastAnimTimeRef.current = now;
+
+            // Lerp factor: 1 - e^(-speed * dt) gives frame-rate-independent smoothing
+            const alpha = 1 - Math.exp(-LERP_SPEED * dt);
 
             let needsUpdate = false;
 
             for (const [, joint] of jointsRef.current) {
                 if (!joint.visible) continue;
 
-                const timeSinceUpdate = (now - joint.arrivedAt) / 1000;
-                // Total time to extrapolate: time elapsed + lead-time, capped
-                const extrapT = Math.min(timeSinceUpdate + LEAD_TIME_S, MAX_EXTRAPOLATE_S);
+                const dx = joint.tx - joint.rx;
+                const dy = joint.ty - joint.ry;
 
-                // Dead-reckoned position
-                const drX = joint.tx + joint.vx * extrapT;
-                const drY = joint.ty + joint.vy * extrapT;
+                // Skip if already at target (within sub-pixel precision)
+                if (Math.abs(dx) < 0.0005 && Math.abs(dy) < 0.0005) continue;
 
-                // Only update if it moved enough (avoids unnecessary renders)
-                if (Math.abs(drX - joint.rx) > JITTER_THRESHOLD ||
-                    Math.abs(drY - joint.ry) > JITTER_THRESHOLD) {
-                    joint.rx = drX;
-                    joint.ry = drY;
-                    needsUpdate = true;
-                }
+                joint.rx += dx * alpha;
+                joint.ry += dy * alpha;
+                needsUpdate = true;
             }
 
             if (needsUpdate) {
