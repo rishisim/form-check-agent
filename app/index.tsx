@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { WaveHeader } from '../components/WaveHeader';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useTheme, Theme } from '../hooks/useTheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -153,8 +154,34 @@ const PAGE_TITLES = ['Body Weight Exercises', 'Physical Therapy'];
 export default function HomeScreen() {
     const { theme, isDark } = useTheme();
     const [activePageIndex, setActivePageIndex] = useState(0);
+    const [streak, setStreak] = useState(0);
     const horizontalRef = useRef<ScrollView>(null);
     const scrollX = useRef(new Animated.Value(0)).current;
+
+    // ─── Streak Tracking ─────────────────────────
+    useEffect(() => {
+        const updateStreak = async () => {
+            try {
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                const lastDate = await AsyncStorage.getItem('@formflow_last_workout_date');
+                const savedStreak = parseInt(await AsyncStorage.getItem('@formflow_streak') || '0', 10);
+
+                if (lastDate === today) {
+                    // Already opened today — keep streak
+                    setStreak(savedStreak);
+                } else {
+                    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                    const newStreak = lastDate === yesterday ? savedStreak + 1 : 1;
+                    setStreak(newStreak);
+                    await AsyncStorage.setItem('@formflow_streak', newStreak.toString());
+                    await AsyncStorage.setItem('@formflow_last_workout_date', today);
+                }
+            } catch {
+                setStreak(1);
+            }
+        };
+        updateStreak();
+    }, []);
 
     const onScroll = Animated.event(
         [{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -320,18 +347,78 @@ export default function HomeScreen() {
                         nestedScrollEnabled={true}
                     >
                         {/* Animated Welcome Message */}
-                        <View style={{ alignSelf: 'flex-start', marginBottom: 22, paddingLeft: 8 }}>
-                            <Animated.Text style={{
-                                opacity: fadeAnim1,
-                                transform: [{ translateY: slideAnim1 }],
-                                fontSize: 28,
-                                fontWeight: '900',
-                                color: theme.textPrimary,
-                                marginBottom: 4,
-                                textAlign: 'left',
-                            }}>
-                                Welcome back
-                            </Animated.Text>
+                        <View style={{ alignSelf: 'stretch', marginBottom: 22, paddingHorizontal: 8 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Animated.Text style={{
+                                    opacity: fadeAnim1,
+                                    transform: [{ translateY: slideAnim1 }],
+                                    fontSize: 28,
+                                    fontWeight: '900',
+                                    color: theme.textPrimary,
+                                    marginBottom: 4,
+                                    textAlign: 'left',
+                                }}>
+                                    Welcome back
+                                </Animated.Text>
+                                {streak > 0 && (
+                                    <Animated.View style={{
+                                        opacity: fadeAnim1,
+                                        transform: [{ translateY: slideAnim1 }],
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginLeft: 8,
+                                        marginBottom: 4,
+                                    }}>
+                                        <Text style={{
+                                            fontSize: 22,
+                                            fontWeight: '900',
+                                            color: '#FF6B00',
+                                            marginRight: 3,
+                                        }}>
+                                            {streak}
+                                        </Text>
+                                        <View style={{ width: 22, height: 28 }}>
+                                            {/* 2D flat fire icon */}
+                                            <View style={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: 2,
+                                                width: 18,
+                                                height: 22,
+                                                borderRadius: 9,
+                                                borderTopLeftRadius: 2,
+                                                borderTopRightRadius: 12,
+                                                backgroundColor: '#FF6B00',
+                                                transform: [{ rotate: '-4deg' }],
+                                            }} />
+                                            <View style={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: 5,
+                                                width: 12,
+                                                height: 16,
+                                                borderRadius: 6,
+                                                borderTopLeftRadius: 1,
+                                                borderTopRightRadius: 8,
+                                                backgroundColor: '#FFAD00',
+                                                transform: [{ rotate: '-2deg' }],
+                                            }} />
+                                            <View style={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: 7,
+                                                width: 8,
+                                                height: 10,
+                                                borderRadius: 4,
+                                                borderTopLeftRadius: 1,
+                                                borderTopRightRadius: 5,
+                                                backgroundColor: '#FFD600',
+                                                transform: [{ rotate: '-1deg' }],
+                                            }} />
+                                        </View>
+                                    </Animated.View>
+                                )}
+                            </View>
                             <Animated.Text style={{
                                 opacity: fadeAnim2,
                                 transform: [{ translateY: slideAnim2 }],
