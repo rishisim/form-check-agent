@@ -87,7 +87,7 @@ class GeminiService:
 
             # 3. Generate Content
             # Using stable Gemini 1.5 Flash
-            model_name = "gemini-1.5-flash"
+            model_name = "gemini-3-flash-preview"
             
             prompt = f"""
             You are an elite gym coach with computer vision expertise. 

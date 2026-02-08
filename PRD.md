@@ -135,7 +135,7 @@ Form Check Agent is an AI-powered fitness application designed to provide real-t
   - Exponential Moving Average smoothing (α = 0.4) for stable readings.
 - **Automatic Side Detection:** Picks the side (left/right) with higher average landmark visibility.
 - **Per-Rep Form Validation:**
-  - Tracks form issues (e.g., "Keep chest up!" when back angle < 45°) across the entire rep cycle.
+  - Tracks form issues (e.g., "Keep chest up!" when back angle < 42°) across the entire rep cycle.
   - Checks depth: hips must reach or pass knee height.
   - A rep is **valid** only if it had good depth AND zero accumulated form issues.
 - **Rep Gating:** Minimum 0.8-second interval between reps; visibility must be above 0.45.

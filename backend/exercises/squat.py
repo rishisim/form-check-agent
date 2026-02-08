@@ -18,7 +18,7 @@ class SquatAnalyzer:
 
     # Back angle
     BACK_WARNING_ANGLE    = 55    # Torso getting too horizontal – warn early
-    BACK_BAD_ANGLE        = 45    # Torso too horizontal – error
+    BACK_BAD_ANGLE        = 42    # Torso too horizontal – error (slightly more forgiving)
 
     # Forward knee travel: knee X beyond ankle X as fraction of shin length
     KNEE_OVER_TOE_RATIO   = 0.45
@@ -368,4 +368,3 @@ class SquatAnalyzer:
             "hip_trajectory": list(self.hip_history),
             "side_detected": side_used,
         }
-

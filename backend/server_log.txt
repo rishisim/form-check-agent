@@ -1654,3 +1654,50 @@ O] WebSocket disconnect message received in loop
 2026-02-08 02:39:43,886 [INFO] REP #1 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
 2026-02-08 02:39:46,668 [INFO] REP #2 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
 2026-02-08 02:39:46,765 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 02:42:52,985 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 02:42:58,835 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 02:42:58,836 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 02:42:58,836 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 02:43:05,499 [INFO] [728835e0] Client disconnected normally
+2026-02-08 02:43:05,500 [INFO] [728835e0] Connection cleaned up (0 active)
+2026-02-08 02:43:23,967 [INFO] [a71b168f] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 02:43:29,067 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 02:43:35,848 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:43:38,079 [INFO] REP #1 COMPLETE: raw_issues=['Keep chest up!'], filtered_issues=['Keep chest up!'], had_good_depth=True, valid=False
+2026-02-08 02:43:43,313 [INFO] REP #2 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:43:43,378 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 02:43:47,438 [INFO] TTS cache hit for: 'Squat deeper'
+2026-02-08 02:43:52,189 [INFO] REP #3 COMPLETE: raw_issues=['Keep chest up!'], filtered_issues=['Keep chest up!'], had_good_depth=True, valid=False
+2026-02-08 02:43:52,391 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 02:43:56,813 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:43:59,085 [INFO] REP #4 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:44:02,537 [INFO] [a71b168f] Resetting rep counter
+2026-02-08 02:44:02,554 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 02:44:11,075 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 02:44:13,279 [INFO] REP #1 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:44:16,679 [INFO] REP #2 COMPLETE: raw_issues=[], filtered_issues=[], had_good_depth=True, valid=True
+2026-02-08 02:44:16,740 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 02:45:17,532 [INFO] [a71b168f] Client disconnected normally
+2026-02-08 02:45:17,533 [INFO] [a71b168f] Connection cleaned up (0 active)
+2026-02-08 02:49:19,299 [INFO] [d027b60b] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 02:49:25,044 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:49:25,063 [INFO] TTS generated (24285 bytes) for: 'Go! Start your pushups!'
+2026-02-08 02:49:31,004 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:49:31,032 [INFO] TTS generated (22613 bytes) for: 'Good depth! Push up!'
+2026-02-08 02:49:36,873 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:49:36,874 [INFO] TTS generated (15090 bytes) for: 'Good rep!'
+2026-02-08 02:49:40,930 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:49:40,939 [INFO] TTS generated (26375 bytes) for: 'Set 1 complete! Rest up.'
+2026-02-08 02:49:52,808 [INFO] [d027b60b] Resetting rep counter
+2026-02-08 02:49:53,264 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:49:53,277 [INFO] TTS generated (20524 bytes) for: "Set 2  let's go!"
+2026-02-08 02:50:02,512 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 02:50:14,261 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 02:50:19,473 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 02:50:19,489 [INFO] TTS generated (25539 bytes) for: 'Workout Complete! Great job!'
+2026-02-08 02:50:29,435 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 02:50:35,846 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 02:50:35,847 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 02:50:35,847 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 02:50:49,064 [INFO] [d027b60b] Client disconnected normally
+2026-02-08 02:50:49,064 [INFO] [d027b60b] Connection cleaned up (0 active)
