@@ -1,34 +1,20 @@
 """
-Push-up analyzer with form feedback.
-Uses same interface as SquatAnalyzer for compatibility with server and mobile app.
+Push-up analyzer with comprehensive form feedback.
+
+Matches the feature depth of SquatAnalyzer with pushup-specific form checks:
+  - Two-tier body alignment (mild sag / severe sag)
+  - Hip pike detection (hips too high)
+  - Elbow flare detection (elbows splaying out - like squat's knee valgus)
+  - Hand position check (wrists under shoulders - like squat's knee-over-toe)
+  - Depth + lockout gating per rep
+  - Priority-based, debounced, stabilised feedback
 """
 
-import os
-import sys
+import cv2
 import time
-
-# Handle import path for server context (running from project root)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from geometry import calculate_angle
-
 from collections import deque
 
-
-class AngleSmoother:
-    """Exponential moving average for a single angle value."""
-    def __init__(self, alpha: float = 0.35):
-        self.alpha = alpha
-        self.value = None
-
-    def update(self, raw: float) -> float:
-        if self.value is None:
-            self.value = raw
-        else:
-            self.value = self.alpha * raw + (1 - self.alpha) * self.value
-        return self.value
-
-    def reset(self):
-        self.value = None
+from .base import AngleSmoother, FeedbackStabilizer, calculate_angle
 
 
 class PushupAnalyzer:
@@ -37,67 +23,103 @@ class PushupAnalyzer:
     Stages: up (arms extended) -> descending -> bottom -> ascending -> up
     """
 
-    # Elbow angle thresholds
-    ELBOW_EXTENDED = 150   # Above this = top position (arms extended)
-    ELBOW_LOCKOUT = 145    # Must pass this on way up to count rep
-    ELBOW_BOTTOM = 100     # Below this = chest low enough to count
-    ELBOW_DEEP = 95        # Definitely at bottom
+    # ---- Elbow-angle thresholds with hysteresis band --------------------
+    ELBOW_EXTENDED    = 155   # Above this = fully extended (top reset)
+    ELBOW_LOCKOUT     = 145   # Must pass on the way up to confirm lockout
+    ELBOW_DEEP        = 100   # Below this = deep enough to *maybe* count
+    ELBOW_BOTTOM      = 95    # Below this = definitely at the bottom
 
-    # Body alignment (shoulder-hip-ankle): straight line ~170-180°
-    BODY_STRAIGHT_MIN = 155   # Below = hip sagging
+    # ---- Body alignment (shoulder-hip-ankle angle) ----------------------
+    BODY_WARNING_ANGLE = 160  # Mild sag - "Tighten your core"
+    BODY_BAD_ANGLE     = 150  # Severe sag - "Keep body straight!"
 
-    # Elbow flare: ideal ~45° from body
-    MIN_VISIBILITY = 0.50
-    MIN_REP_INTERVAL = 0.8
-    MIN_DEEP_FRAMES = 2
-    SMOOTH_ALPHA = 0.55
+    # ---- Hip pike detection (positional) --------------------------------
+    # Fraction of body-length the hip must be above the shoulder->ankle line
+    BODY_PIKE_THRESHOLD = 0.06
+
+    # ---- Elbow flare (frontal view) ------------------------------------
+    # Ratio of elbow spread / shoulder spread.  > threshold = flaring out
+    ELBOW_FLARE_RATIO = 1.40
+
+    # ---- Hand position (side view) -------------------------------------
+    # Max horizontal offset of wrist from shoulder, as fraction of upper-arm length
+    HAND_OFFSET_RATIO = 0.45
+
+    # ---- General thresholds --------------------------------------------
+    MIN_VISIBILITY     = 0.50
+    MIN_REP_INTERVAL   = 0.8
+    MIN_DEEP_FRAMES    = 2
+    SMOOTH_ALPHA       = 0.55
     SIDE_STICKY_FRAMES = 5
 
-    # Feedback debounce
-    WARN_FRAMES_BODY = 6     # "Keep body straight"
-    WARN_FRAMES_DEEPER = 8   # "Lower your chest"
-    WARN_FRAMES_LOCKOUT = 6  # "Full lockout"
+    # ---- Feedback debounce: consecutive frames required to emit ---------
+    WARN_FRAMES_BODY    = 6    # Body sag
+    WARN_FRAMES_PIKE    = 8    # Hip pike
+    WARN_FRAMES_FLARE   = 10   # Elbow flare
+    WARN_FRAMES_HAND    = 8    # Hand position
+    WARN_FRAMES_DEEPER  = 8    # Depth
+    WARN_FRAMES_LOCKOUT = 6    # Lockout
+
+    # Minimum time (seconds) a feedback message stays on screen
     FEEDBACK_HOLD_TIME = 2.5
 
-    # Pushup-specific form tips (no squat language)
+    # Priority order (lower index = higher priority)
     WARN_PRIORITY = [
-        "Engage your core!",
         "Keep body straight!",
+        "Don't pike hips up!",
+        "Tuck elbows in!",
+        "Hands under shoulders",
+        "Tighten your core",
         "Lower your chest more",
         "Full lockout at top",
     ]
 
+    # ------------------------------------------------------------------
     def __init__(self):
-        self.stage = "up"
+        self.stage = "up"        # "up" | "descending" | "bottom" | "ascending"
         self.counter = 0
         self.valid_reps = 0
         self.invalid_reps = 0
         self.feedback = "Start Push-ups"
 
+        # Smoothers
         self._elbow_smooth = AngleSmoother(self.SMOOTH_ALPHA)
-        self._body_smooth = AngleSmoother(self.SMOOTH_ALPHA)
+        self._body_smooth  = AngleSmoother(self.SMOOTH_ALPHA)
 
+        # Trajectory / history
         self.shoulder_history = deque(maxlen=30)
 
+        # Rep-gating state
         self._last_rep_time: float = 0.0
         self._deep_frame_count: int = 0
 
+        # Per-rep form tracking
         self._rep_form_issues: list[str] = []
         self._rep_had_good_depth: bool = False
 
+        # Sticky side detection
         self._current_side: str | None = None
         self._side_frame_count: int = 0
 
+        # ---- Debounce counters ----
         self._body_warn_frames: int = 0
+        self._pike_warn_frames: int = 0
+        self._flare_warn_frames: int = 0
+        self._hand_warn_frames: int = 0
         self._deeper_warn_frames: int = 0
         self._lockout_warn_frames: int = 0
 
-        self._stable_feedback: str = "Start Push-ups"
-        self._stable_feedback_level: str = "success"
-        self._stable_feedback_time: float = 0.0
-        self._candidate_feedback: str = ""
-        self._candidate_count: int = 0
-        self._active_warning: str | None = None
+        # ---- Feedback stabilization (shared logic from base) ----
+        self._stabilizer = FeedbackStabilizer(
+            warn_priority=self.WARN_PRIORITY,
+            rep_completion_msgs={
+                "Good rep!", "Lower chest more next rep", "Check form",
+                "Good depth! Push up!",
+            },
+            candidate_threshold=5,
+            feedback_hold_time=self.FEEDBACK_HOLD_TIME,
+            initial_feedback="Start Push-ups",
+        )
 
     def reset(self):
         """Resets the analyzer state for a new set."""
@@ -116,25 +138,25 @@ class PushupAnalyzer:
         self._current_side = None
         self._side_frame_count = 0
         self._body_warn_frames = 0
+        self._pike_warn_frames = 0
+        self._flare_warn_frames = 0
+        self._hand_warn_frames = 0
         self._deeper_warn_frames = 0
         self._lockout_warn_frames = 0
-        self._stable_feedback = "Start Push-ups"
-        self._stable_feedback_level = "success"
-        self._stable_feedback_time = 0.0
-        self._candidate_feedback = ""
-        self._candidate_count = 0
-        self._active_warning = None
+        self._stabilizer.reset("Start Push-ups")
 
+    # ------------------------------------------------------------------
+    # Main analysis (called by server for every frame)
+    # ------------------------------------------------------------------
     def get_analysis(self, lm_list):
         """
         Returns structured analysis data (same interface as SquatAnalyzer).
-        Maps: knee_angle -> elbow_angle, hip_angle -> body_angle,
-        target_depth_y/current_depth_y for DepthLine (chest depth).
+        Maps: knee_angle -> elbow_angle, hip_angle -> body_angle.
         """
         if len(lm_list) < 33:
             return None
 
-        # Pick more visible side
+        # ---- Pick the more-visible side (with stickiness) ----------------
         left_vis = (lm_list[11][3] + lm_list[13][3] + lm_list[15][3] + lm_list[23][3]) / 4
         right_vis = (lm_list[12][3] + lm_list[14][3] + lm_list[16][3] + lm_list[24][3]) / 4
 
@@ -155,84 +177,158 @@ class PushupAnalyzer:
 
         if side == "right":
             shoulder = lm_list[12][1:3]
-            elbow = lm_list[14][1:3]
-            wrist = lm_list[16][1:3]
-            hip = lm_list[24][1:3]
-            ankle = lm_list[28][1:3]
+            elbow    = lm_list[14][1:3]
+            wrist    = lm_list[16][1:3]
+            hip      = lm_list[24][1:3]
+            ankle    = lm_list[28][1:3]
             side_vis = right_vis
         else:
             shoulder = lm_list[11][1:3]
-            elbow = lm_list[13][1:3]
-            wrist = lm_list[15][1:3]
-            hip = lm_list[23][1:3]
-            ankle = lm_list[27][1:3]
+            elbow    = lm_list[13][1:3]
+            wrist    = lm_list[15][1:3]
+            hip      = lm_list[23][1:3]
+            ankle    = lm_list[27][1:3]
             side_vis = left_vis
+
+        # Also grab both-side landmarks for frontal checks
+        left_shoulder_x  = lm_list[11][1]
+        right_shoulder_x = lm_list[12][1]
+        left_elbow_x     = lm_list[13][1]
+        right_elbow_x    = lm_list[14][1]
 
         self.shoulder_history.append(shoulder)
 
+        # ---- Visibility gate ------------------------------------------
         low_confidence = side_vis < self.MIN_VISIBILITY
 
-        # Elbow angle: shoulder-elbow-wrist. 180 = extended, 90 = bottom
+        # ---- Calculate & smooth angles ---------------------------------
         raw_elbow = calculate_angle(shoulder, elbow, wrist)
-        raw_body = calculate_angle(shoulder, hip, ankle)
+        raw_body  = calculate_angle(shoulder, hip, ankle)
 
         elbow_angle = self._elbow_smooth.update(raw_elbow)
-        body_angle = self._body_smooth.update(raw_body)
+        body_angle  = self._body_smooth.update(raw_body)
 
-        is_deep_enough = elbow_angle <= self.ELBOW_BOTTOM
+        # Angle-based depth
+        is_deep_enough = elbow_angle <= self.ELBOW_DEEP
 
         shoulder_y = shoulder[1]
-        hip_y = hip[1]
+        hip_y      = hip[1]
 
         now = time.monotonic()
 
-        # Form checks
+        # ---- Real-time form checks (every frame, with debounce) --------
         feedback_list: list[str] = []
         frame_good_form = True
 
         actively_pushing = self.stage in ("descending", "bottom", "ascending")
 
-        # Body alignment: hip sagging or piking (pushup-specific cues)
+        # -- 1. Body alignment: two-tier sag detection (like squat back) --
         if actively_pushing:
-            if body_angle < self.BODY_STRAIGHT_MIN:
+            if body_angle < self.BODY_BAD_ANGLE:
+                self._body_warn_frames += 1
+            elif body_angle < self.BODY_WARNING_ANGLE:
                 self._body_warn_frames += 1
             else:
                 self._body_warn_frames = max(0, self._body_warn_frames - 2)
 
             if self._body_warn_frames >= self.WARN_FRAMES_BODY:
-                feedback_list.append("Engage your core!")
-                frame_good_form = False
+                if body_angle < self.BODY_BAD_ANGLE:
+                    feedback_list.append("Keep body straight!")
+                    frame_good_form = False
+                else:
+                    feedback_list.append("Tighten your core")
         else:
             self._body_warn_frames = max(0, self._body_warn_frames - 1)
 
-        # State machine
+        # -- 2. Hip pike detection (hips too high) -------------------------
+        if actively_pushing:
+            # Expected hip Y along the shoulder->ankle line (~60% from shoulder)
+            expected_hip_y = shoulder[1] + 0.6 * (ankle[1] - shoulder[1])
+            body_length = max(abs(ankle[1] - shoulder[1]), 1)
+            pike_deviation = (expected_hip_y - hip_y) / body_length
+
+            if pike_deviation > self.BODY_PIKE_THRESHOLD:
+                self._pike_warn_frames += 1
+            else:
+                self._pike_warn_frames = max(0, self._pike_warn_frames - 2)
+
+            if self._pike_warn_frames >= self.WARN_FRAMES_PIKE:
+                feedback_list.append("Don't pike hips up!")
+                frame_good_form = False
+        else:
+            self._pike_warn_frames = max(0, self._pike_warn_frames - 1)
+
+        # -- 3. Elbow flare detection (frontal view) -----------------------
+        shoulder_spread = abs(right_shoulder_x - left_shoulder_x)
+        if shoulder_spread > 15 and actively_pushing:
+            elbow_spread = abs(right_elbow_x - left_elbow_x)
+            flare_ratio = elbow_spread / shoulder_spread
+
+            if flare_ratio > self.ELBOW_FLARE_RATIO:
+                self._flare_warn_frames += 1
+            else:
+                self._flare_warn_frames = max(0, self._flare_warn_frames - 2)
+
+            if self._flare_warn_frames >= self.WARN_FRAMES_FLARE:
+                feedback_list.append("Tuck elbows in!")
+                frame_good_form = False
+        else:
+            self._flare_warn_frames = max(0, self._flare_warn_frames - 1)
+
+        # -- 4. Hand position (side view): wrists under shoulders ----------
+        if self.stage in ("descending", "bottom"):
+            wrist_x, shoulder_x = wrist[0], shoulder[0]
+            upper_arm_len = max(abs(shoulder[1] - elbow[1]), 1)
+            hand_offset = abs(wrist_x - shoulder_x)
+            offset_ratio = hand_offset / upper_arm_len
+
+            if offset_ratio > self.HAND_OFFSET_RATIO:
+                self._hand_warn_frames += 1
+            else:
+                self._hand_warn_frames = max(0, self._hand_warn_frames - 2)
+
+            if self._hand_warn_frames >= self.WARN_FRAMES_HAND:
+                feedback_list.append("Hands under shoulders")
+                frame_good_form = False
+        else:
+            self._hand_warn_frames = max(0, self._hand_warn_frames - 1)
+
+        # ---- State machine with 4 stages & hysteresis ------------------
         if self.stage == "up":
             if elbow_angle < self.ELBOW_LOCKOUT:
+                # Started descending
                 self.stage = "descending"
                 self._rep_form_issues = []
                 self._rep_had_good_depth = False
                 self._deep_frame_count = 0
+                # Reset warning counters for the new rep
                 self._body_warn_frames = 0
+                self._pike_warn_frames = 0
+                self._flare_warn_frames = 0
+                self._hand_warn_frames = 0
                 self._deeper_warn_frames = 0
                 self._lockout_warn_frames = 0
 
         elif self.stage == "descending":
+            # Accumulate form issues while going down
             if not frame_good_form:
                 for issue in feedback_list:
                     if issue not in self._rep_form_issues:
                         self._rep_form_issues.append(issue)
 
-            if elbow_angle <= self.ELBOW_DEEP:
+            if elbow_angle <= self.ELBOW_BOTTOM:
                 self._deep_frame_count += 1
-                self._deeper_warn_frames = 0
+                self._deeper_warn_frames = 0  # deep enough, reset
             else:
                 self._deep_frame_count = max(0, self._deep_frame_count - 1)
+                # Track how long they've been hovering above depth
                 if elbow_angle < self.ELBOW_LOCKOUT:
                     self._deeper_warn_frames += 1
 
             if is_deep_enough:
                 self._rep_had_good_depth = True
 
+            # Show "Lower your chest more" after hovering above depth
             if self._deeper_warn_frames >= self.WARN_FRAMES_DEEPER and not is_deep_enough:
                 if "Lower your chest more" not in feedback_list:
                     feedback_list.append("Lower your chest more")
@@ -241,12 +337,14 @@ class PushupAnalyzer:
                 self.stage = "bottom"
                 self.feedback = "Good depth! Push up!"
 
+            # If they pop back up without going deep enough
             if elbow_angle > self.ELBOW_EXTENDED:
                 self.stage = "up"
                 self._deep_frame_count = 0
                 self._deeper_warn_frames = 0
 
         elif self.stage == "bottom":
+            # Still at the bottom - keep tracking form
             if not frame_good_form:
                 for issue in feedback_list:
                     if issue not in self._rep_form_issues:
@@ -255,7 +353,8 @@ class PushupAnalyzer:
             if is_deep_enough:
                 self._rep_had_good_depth = True
 
-            if elbow_angle > self.ELBOW_BOTTOM + 15:
+            if elbow_angle > self.ELBOW_DEEP + 10:
+                # Started coming up (reduced hysteresis for faster detection)
                 self.stage = "ascending"
 
         elif self.stage == "ascending":
@@ -271,6 +370,7 @@ class PushupAnalyzer:
                 self._lockout_warn_frames = max(0, self._lockout_warn_frames - 1)
 
             if elbow_angle >= self.ELBOW_LOCKOUT:
+                # ---- Rep completed! ------------------------------------
                 time_since_last = now - self._last_rep_time
 
                 if time_since_last >= self.MIN_REP_INTERVAL and not low_confidence:
@@ -297,66 +397,26 @@ class PushupAnalyzer:
                 self.stage = "up"
                 self._deep_frame_count = 0
 
-        # Feedback stabilization (all pushup-specific tips)
-        _warn_counter = {
-            "Engage your core!": self._body_warn_frames,
-            "Keep body straight!": self._body_warn_frames,
+        # ---- Build final feedback with stabilizer ---------------------
+        warn_counters = {
+            "Keep body straight!":   self._body_warn_frames,
+            "Tighten your core":     self._body_warn_frames,
+            "Don't pike hips up!":   self._pike_warn_frames,
+            "Tuck elbows in!":       self._flare_warn_frames,
+            "Hands under shoulders": self._hand_warn_frames,
             "Lower your chest more": self._deeper_warn_frames,
-            "Full lockout at top": self._lockout_warn_frames,
+            "Full lockout at top":   self._lockout_warn_frames,
         }
 
-        if self._active_warning is not None:
-            counter_val = _warn_counter.get(self._active_warning, 0)
-            if counter_val == 0:
-                self._active_warning = None
-
-        chosen_warning: str | None = None
-        if feedback_list:
-            if self._active_warning and self._active_warning in feedback_list:
-                chosen_warning = self._active_warning
-            else:
-                for w in self.WARN_PRIORITY:
-                    if w in feedback_list:
-                        chosen_warning = w
-                        break
-                if chosen_warning is None:
-                    chosen_warning = feedback_list[0]
-                self._active_warning = chosen_warning
-
-        if chosen_warning:
-            desired_feedback = chosen_warning
-            desired_level = 'error' if not frame_good_form else 'warning'
-        else:
-            desired_feedback = self.feedback
-            desired_level = 'success'
-            self._active_warning = None
-
-        rep_completion_msgs = {
-            "Good rep!", "Lower chest more next rep", "Check form",
-            "Good depth! Push up!",
-        }
-        is_priority = desired_feedback in rep_completion_msgs
-
-        if desired_feedback == self._candidate_feedback:
-            self._candidate_count += 1
-        else:
-            self._candidate_feedback = desired_feedback
-            self._candidate_count = 1
-
-        time_since_stable = now - self._stable_feedback_time
-        should_update = (
-            is_priority
-            or self._candidate_count >= 5
-            or (time_since_stable >= self.FEEDBACK_HOLD_TIME and self._candidate_count >= 2)
+        stable_feedback, stable_level = self._stabilizer.update(
+            feedback_list=feedback_list,
+            warn_counters=warn_counters,
+            frame_good_form=frame_good_form,
+            default_feedback=self.feedback,
+            now=now,
         )
 
-        if should_update and desired_feedback != self._stable_feedback:
-            self._stable_feedback = desired_feedback
-            self._stable_feedback_level = desired_level
-            self._stable_feedback_time = now
-
-        # For DepthLine: target = wrist Y (floor level, how low chest should go)
-        # current = shoulder Y (chest height) - when shoulder approaches wrist, good depth
+        # DepthLine: target = wrist Y (floor), current = shoulder Y (chest)
         if side == "right":
             wrist_y = lm_list[16][2]
         else:
@@ -365,14 +425,14 @@ class PushupAnalyzer:
         current_depth_y = shoulder_y
 
         return {
-            "knee_angle": int(elbow_angle),
-            "hip_angle": int(body_angle),
+            "knee_angle": int(elbow_angle),      # mapped for UI compatibility
+            "hip_angle": int(body_angle),         # mapped for UI compatibility
             "stage": self.stage,
             "rep_count": self.counter,
             "valid_reps": self.valid_reps,
             "invalid_reps": self.invalid_reps,
-            "feedback": self._stable_feedback,
-            "feedback_level": self._stable_feedback_level,
+            "feedback": stable_feedback,
+            "feedback_level": stable_level,
             "is_good_form": frame_good_form,
             "depth_status": "Good" if is_deep_enough else "High",
             "target_depth_y": target_depth_y,
@@ -380,3 +440,35 @@ class PushupAnalyzer:
             "hip_trajectory": list(self.shoulder_history),
             "side_detected": side,
         }
+
+    # ------------------------------------------------------------------
+    # Legacy local-webcam method
+    # ------------------------------------------------------------------
+    def analyze(self, img, lm_list):
+        """Original method for local webcam testing with drawing."""
+        if len(lm_list) != 0:
+            left_v = lm_list[11][3] + lm_list[13][3] + lm_list[15][3]
+            right_v = lm_list[12][3] + lm_list[14][3] + lm_list[16][3]
+
+            if right_v >= left_v:
+                shoulder = lm_list[12][1:3]
+                elbow = lm_list[14][1:3]
+                wrist = lm_list[16][1:3]
+            else:
+                shoulder = lm_list[11][1:3]
+                elbow = lm_list[13][1:3]
+                wrist = lm_list[15][1:3]
+
+            angle_elbow = calculate_angle(shoulder, elbow, wrist)
+
+            cv2.putText(img, str(int(angle_elbow)), (elbow[0] + 10, elbow[1]),
+                        cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
+
+            if angle_elbow > 150:
+                self.stage = "up"
+            if angle_elbow < 90 and self.stage == "up":
+                self.stage = "down"
+                self.counter += 1
+                print("Push-up count:", self.counter)
+
+            return img

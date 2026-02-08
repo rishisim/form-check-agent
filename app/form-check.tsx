@@ -454,6 +454,7 @@ export default function FormCheckScreen() {
         router.push({
             pathname: '/analysis',
             params: {
+                exercise: exercise,
                 totalSets: totalSets.toString(),
                 repsPerSet: repsPerSet.toString(),
                 setData: JSON.stringify(setDataRef.current),

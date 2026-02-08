@@ -14,10 +14,11 @@ from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
 from pose_tracker import PoseTracker
+from exercises import get_analyzer
 from exercises.squat import SquatAnalyzer
 from exercises.pushup import PushupAnalyzer
-from gemini_service import GeminiService
-from tts_service import TTSService
+from services.gemini_service import GeminiService
+from services.tts_service import TTSService
 
 # Configure logging
 logging.basicConfig(
@@ -303,7 +304,7 @@ async def websocket_video_endpoint(websocket: WebSocket):
 
     # Per-session state
     session_tracker = PoseTracker()
-    session_analyzer = PushupAnalyzer() if ex == "pushup" else SquatAnalyzer()
+    session_analyzer = get_analyzer(ex)
     current_session_id = str(uuid.uuid4())
     frame_seq = 0
 

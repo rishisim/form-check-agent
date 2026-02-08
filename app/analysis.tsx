@@ -123,6 +123,7 @@ const aiStyles = StyleSheet.create({
 export default function AnalysisScreen() {
     const router = useRouter();
     const params = useLocalSearchParams<{
+        exercise: string;
         totalSets: string;
         repsPerSet: string;
         setData: string;
@@ -136,6 +137,14 @@ export default function AnalysisScreen() {
         feedbackLog: string;
         serverUrl: string;
     }>();
+
+    const exercise = (params.exercise || 'squat').toLowerCase();
+    const isPushup = exercise === 'pushup';
+    const exerciseLabel = isPushup ? 'Push-ups' : 'Squats';
+    const primaryAngleLabel = isPushup ? 'Elbow Angle' : 'Knee Angle';
+    const secondaryAngleLabel = isPushup ? 'Body Angle' : 'Back Angle';
+    const primaryAngleEmoji = isPushup ? '💪' : '🦵';
+    const secondaryAngleEmoji = isPushup ? '📐' : '🔄';
 
     const totalSets = parseInt(params.totalSets || '0', 10);
     const repsPerSet = parseInt(params.repsPerSet || '0', 10);
@@ -176,10 +185,18 @@ export default function AnalysisScreen() {
     };
     const formGrade = getFormGrade(formScore);
 
-    // Knee angle assessment
+    // Knee / elbow angle assessment
     const getKneeAssessment = () => {
         if (kneeMin === 0 && kneeMax === 0)
             return { text: 'No data recorded', color: '#999' };
+        if (isPushup) {
+            // Elbow angle: lower = deeper pushup
+            if (kneeMin < 80)
+                return { text: 'Great depth! Chest near floor.', color: '#88B04B' };
+            if (kneeMin < 100)
+                return { text: 'Good depth. Keep going lower.', color: '#5B9BD5' };
+            return { text: 'Try going deeper for full ROM.', color: '#ED7D31' };
+        }
         if (kneeMin < 70)
             return { text: 'Great depth! Below parallel.', color: '#88B04B' };
         if (kneeMin < 90)
@@ -187,10 +204,18 @@ export default function AnalysisScreen() {
         return { text: 'Try going deeper for full ROM.', color: '#ED7D31' };
     };
 
-    // Hip / back angle assessment
+    // Hip / back / body angle assessment
     const getHipAssessment = () => {
         if (hipMin === 0 && hipMax === 0)
             return { text: 'No data recorded', color: '#999' };
+        if (isPushup) {
+            // Body angle: closer to 180 = straighter plank
+            if (hipAvg >= 160)
+                return { text: 'Excellent body alignment.', color: '#88B04B' };
+            if (hipAvg >= 150)
+                return { text: 'Good alignment. Tighten core.', color: '#5B9BD5' };
+            return { text: 'Body sagging. Engage your core.', color: '#ED7D31' };
+        }
         if (hipAvg >= 40 && hipAvg <= 70)
             return { text: 'Good back angle maintained.', color: '#88B04B' };
         if (hipAvg < 40)
@@ -239,7 +264,7 @@ export default function AnalysisScreen() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        exercise: 'squat',
+                        exercise,
                         totalSets,
                         repsPerSet,
                         setData,
@@ -278,10 +303,10 @@ export default function AnalysisScreen() {
 
     // Build workout context string for chat
     const workoutContextStr = [
-        `Exercise: Squat | Plan: ${totalSets}×${repsPerSet} | Duration: ${durationStr}`,
+        `Exercise: ${exerciseLabel} | Plan: ${totalSets}×${repsPerSet} | Duration: ${durationStr}`,
         `Form: ${formScore}% (${totalValidReps} good, ${totalInvalidReps} bad / ${totalReps} total)`,
-        `Knee angles: min ${kneeMin}°, avg ${kneeAvg}°, max ${kneeMax}°`,
-        `Back angles: min ${hipMin}°, avg ${hipAvg}°, max ${hipMax}°`,
+        `${primaryAngleLabel}: min ${kneeMin}°, avg ${kneeAvg}°, max ${kneeMax}°`,
+        `${secondaryAngleLabel}: min ${hipMin}°, avg ${hipAvg}°, max ${hipMax}°`,
         setData.map((s, i) => `Set ${i + 1}: ${s.validReps} good, ${s.invalidReps} bad`).join(' | '),
         aiSummary ? `AI Summary: ${aiSummary}` : '',
     ].filter(Boolean).join('\n');
@@ -339,7 +364,7 @@ export default function AnalysisScreen() {
                 <Text style={styles.headerEmoji}>📊</Text>
                 <Text style={styles.headerTitle}>Workout Analysis</Text>
                 <Text style={styles.headerSubtitle}>
-                    Squats · {totalSets} sets × {repsPerSet} reps
+                    {exerciseLabel} · {totalSets} sets × {repsPerSet} reps
                 </Text>
 
                 {/* ── AI Coach Summary ─── */}
@@ -516,16 +541,16 @@ export default function AnalysisScreen() {
                 })}
 
                 {/* ── Angle Metrics ─── */}
-                <Text style={styles.sectionTitle}>Joint Angles</Text>
+                <Text style={styles.sectionTitle}>{isPushup ? 'Body Metrics' : 'Joint Angles'}</Text>
 
                 {/* Knee Angle Card */}
                 <View style={styles.angleCard}>
                     <View style={styles.angleHeader}>
                         <View style={[styles.angleIcon, { backgroundColor: '#E3EFF9' }]}>
-                            <Text style={styles.angleIconText}>🦵</Text>
+                            <Text style={styles.angleIconText}>{primaryAngleEmoji}</Text>
                         </View>
                         <View style={styles.angleInfo}>
-                            <Text style={styles.angleLabel}>Knee Angle</Text>
+                            <Text style={styles.angleLabel}>{primaryAngleLabel}</Text>
                             <Text
                                 style={[
                                     styles.angleAssessment,
@@ -583,10 +608,10 @@ export default function AnalysisScreen() {
                 <View style={styles.angleCard}>
                     <View style={styles.angleHeader}>
                         <View style={[styles.angleIcon, { backgroundColor: '#F0E6F6' }]}>
-                            <Text style={styles.angleIconText}>🔄</Text>
+                            <Text style={styles.angleIconText}>{secondaryAngleEmoji}</Text>
                         </View>
                         <View style={styles.angleInfo}>
-                            <Text style={styles.angleLabel}>Back Angle</Text>
+                            <Text style={styles.angleLabel}>{secondaryAngleLabel}</Text>
                             <Text
                                 style={[
                                     styles.angleAssessment,

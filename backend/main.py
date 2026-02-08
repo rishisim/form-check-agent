@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.pose_tracker import PoseTracker
 from backend.exercises.squat import SquatAnalyzer
-from backend.gemini_service import GeminiService
+from backend.services.gemini_service import GeminiService
 
 def main():
     cap = cv2.VideoCapture(0) # 0 for default webcam

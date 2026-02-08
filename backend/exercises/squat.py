@@ -1,32 +1,8 @@
 import cv2
-import os
-import sys
 import time
-
-# Handle import path for server context (running from project root)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from geometry import calculate_angle
-
 from collections import deque
 
-# ---------------------------------------------------------------------------
-# Smoothing helper – exponential moving average
-# ---------------------------------------------------------------------------
-class AngleSmoother:
-    """Exponential moving average for a single angle value."""
-    def __init__(self, alpha: float = 0.35):
-        self.alpha = alpha   # higher = more responsive, lower = smoother
-        self.value = None
-
-    def update(self, raw: float) -> float:
-        if self.value is None:
-            self.value = raw
-        else:
-            self.value = self.alpha * raw + (1 - self.alpha) * self.value
-        return self.value
-
-    def reset(self):
-        self.value = None
+from .base import AngleSmoother, calculate_angle
 
 
 class SquatAnalyzer:
