@@ -38,14 +38,6 @@ class PushupAnalyzer:
     # Fraction of body-length the hip must be above the shoulder->ankle line
     BODY_PIKE_THRESHOLD = 0.06
 
-    # ---- Elbow flare (frontal view) ------------------------------------
-    # Ratio of elbow spread / shoulder spread.  > threshold = flaring out
-    ELBOW_FLARE_RATIO = 1.40
-
-    # ---- Hand position (side view) -------------------------------------
-    # Max horizontal offset of wrist from shoulder, as fraction of upper-arm length
-    HAND_OFFSET_RATIO = 0.45
-
     # ---- General thresholds --------------------------------------------
     MIN_VISIBILITY     = 0.50
     MIN_REP_INTERVAL   = 0.8
@@ -56,8 +48,6 @@ class PushupAnalyzer:
     # ---- Feedback debounce: consecutive frames required to emit ---------
     WARN_FRAMES_BODY    = 6    # Body sag
     WARN_FRAMES_PIKE    = 8    # Hip pike
-    WARN_FRAMES_FLARE   = 10   # Elbow flare
-    WARN_FRAMES_HAND    = 8    # Hand position
     WARN_FRAMES_DEEPER  = 8    # Depth
     WARN_FRAMES_LOCKOUT = 6    # Lockout
 
@@ -68,8 +58,6 @@ class PushupAnalyzer:
     WARN_PRIORITY = [
         "Keep body straight!",
         "Don't pike hips up!",
-        "Tuck elbows in!",
-        "Hands under shoulders",
         "Tighten your core",
         "Lower your chest more",
         "Full lockout at top",
@@ -105,8 +93,6 @@ class PushupAnalyzer:
         # ---- Debounce counters ----
         self._body_warn_frames: int = 0
         self._pike_warn_frames: int = 0
-        self._flare_warn_frames: int = 0
-        self._hand_warn_frames: int = 0
         self._deeper_warn_frames: int = 0
         self._lockout_warn_frames: int = 0
 
@@ -140,8 +126,6 @@ class PushupAnalyzer:
         self._side_frame_count = 0
         self._body_warn_frames = 0
         self._pike_warn_frames = 0
-        self._flare_warn_frames = 0
-        self._hand_warn_frames = 0
         self._deeper_warn_frames = 0
         self._lockout_warn_frames = 0
         self._stabilizer.reset("Start Push-ups")
@@ -158,8 +142,9 @@ class PushupAnalyzer:
             return None
 
         # ---- Pick the more-visible side (with stickiness) ----------------
-        left_vis = (lm_list[11][3] + lm_list[13][3] + lm_list[15][3] + lm_list[23][3]) / 4
-        right_vis = (lm_list[12][3] + lm_list[14][3] + lm_list[16][3] + lm_list[24][3]) / 4
+        # Score ALL landmarks we actually use: shoulder, elbow, wrist, hip, ankle
+        left_vis = (lm_list[11][3] + lm_list[13][3] + lm_list[15][3] + lm_list[23][3] + lm_list[27][3]) / 5
+        right_vis = (lm_list[12][3] + lm_list[14][3] + lm_list[16][3] + lm_list[24][3] + lm_list[28][3]) / 5
 
         preferred = "right" if right_vis >= left_vis else "left"
 
@@ -190,12 +175,6 @@ class PushupAnalyzer:
             hip      = lm_list[23][1:3]
             ankle    = lm_list[27][1:3]
             side_vis = left_vis
-
-        # Also grab both-side landmarks for frontal checks
-        left_shoulder_x  = lm_list[11][1]
-        right_shoulder_x = lm_list[12][1]
-        left_elbow_x     = lm_list[13][1]
-        right_elbow_x    = lm_list[14][1]
 
         self.shoulder_history.append(shoulder)
 
@@ -274,41 +253,6 @@ class PushupAnalyzer:
         else:
             self._pike_warn_frames = max(0, self._pike_warn_frames - 1)
 
-        # -- 3. Elbow flare detection (frontal view) -----------------------
-        shoulder_spread = abs(right_shoulder_x - left_shoulder_x)
-        if shoulder_spread > 15 and actively_pushing:
-            elbow_spread = abs(right_elbow_x - left_elbow_x)
-            flare_ratio = elbow_spread / shoulder_spread
-
-            if flare_ratio > self.ELBOW_FLARE_RATIO:
-                self._flare_warn_frames += 1
-            else:
-                self._flare_warn_frames = max(0, self._flare_warn_frames - 2)
-
-            if self._flare_warn_frames >= self.WARN_FRAMES_FLARE:
-                feedback_list.append("Tuck elbows in!")
-                frame_good_form = False
-        else:
-            self._flare_warn_frames = max(0, self._flare_warn_frames - 1)
-
-        # -- 4. Hand position (side view): wrists under shoulders ----------
-        if self.stage in ("descending", "bottom"):
-            wrist_x, shoulder_x = wrist[0], shoulder[0]
-            upper_arm_len = max(math.hypot(shoulder[0] - elbow[0], shoulder[1] - elbow[1]), 1)
-            hand_offset = abs(wrist_x - shoulder_x)
-            offset_ratio = hand_offset / upper_arm_len
-
-            if offset_ratio > self.HAND_OFFSET_RATIO:
-                self._hand_warn_frames += 1
-            else:
-                self._hand_warn_frames = max(0, self._hand_warn_frames - 2)
-
-            if self._hand_warn_frames >= self.WARN_FRAMES_HAND:
-                feedback_list.append("Hands under shoulders")
-                frame_good_form = False
-        else:
-            self._hand_warn_frames = max(0, self._hand_warn_frames - 1)
-
         # ---- State machine with 4 stages & hysteresis ------------------
         if self.stage == "up":
             if elbow_angle < self.ELBOW_LOCKOUT:
@@ -320,8 +264,6 @@ class PushupAnalyzer:
                 # Reset warning counters for the new rep
                 self._body_warn_frames = 0
                 self._pike_warn_frames = 0
-                self._flare_warn_frames = 0
-                self._hand_warn_frames = 0
                 self._deeper_warn_frames = 0
                 self._lockout_warn_frames = 0
 
@@ -418,8 +360,6 @@ class PushupAnalyzer:
             "Keep body straight!":   self._body_warn_frames,
             "Tighten your core":     self._body_warn_frames,
             "Don't pike hips up!":   self._pike_warn_frames,
-            "Tuck elbows in!":       self._flare_warn_frames,
-            "Hands under shoulders": self._hand_warn_frames,
             "Lower your chest more": self._deeper_warn_frames,
             "Full lockout at top":   self._lockout_warn_frames,
         }

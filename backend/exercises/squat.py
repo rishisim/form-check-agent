@@ -18,9 +18,6 @@ class SquatAnalyzer:
     BACK_WARNING_ANGLE    = 55    # Torso getting too horizontal – warn early
     BACK_BAD_ANGLE        = 45    # Torso too horizontal – error
 
-    # Knee valgus: max inward drift as fraction of hip-width
-    KNEE_VALGUS_THRESHOLD = 0.28
-
     # Forward knee travel: knee X beyond ankle X as fraction of shin length
     KNEE_OVER_TOE_RATIO   = 0.45
 
@@ -41,7 +38,6 @@ class SquatAnalyzer:
 
     # ---- Feedback debounce: consecutive frames required to emit a warning ---
     WARN_FRAMES_BACK      = 6   # "Keep chest up" needs 6 bad frames in a row
-    WARN_FRAMES_VALGUS    = 10  # "Push knees out" needs 10 bad frames
     WARN_FRAMES_KNEE_TOE  = 8   # "Sit back more" needs 8 bad frames
     WARN_FRAMES_DEEPER    = 8   # "Squat deeper" needs 8 frames
 
@@ -51,7 +47,7 @@ class SquatAnalyzer:
     # Priority order for warnings (lower index = higher priority).
     # When multiple warnings fire, only the highest-priority one is shown.
     # Once shown, it stays until resolved (counter drops to 0).
-    WARN_PRIORITY = ["Keep chest up!", "Push knees out!", "Sit back more",
+    WARN_PRIORITY = ["Keep chest up!", "Sit back more",
                      "Chest up a bit more", "Squat deeper"]
 
     def __init__(self):
@@ -82,7 +78,6 @@ class SquatAnalyzer:
 
         # ---- Debounce counters for each form warning ----
         self._back_warn_frames: int = 0
-        self._valgus_warn_frames: int = 0
         self._knee_toe_warn_frames: int = 0
         self._deeper_warn_frames: int = 0
 
@@ -114,7 +109,6 @@ class SquatAnalyzer:
         self._current_side = None
         self._side_frame_count = 0
         self._back_warn_frames = 0
-        self._valgus_warn_frames = 0
         self._knee_toe_warn_frames = 0
         self._deeper_warn_frames = 0
         self._stable_feedback = "Start Squatting"
@@ -169,14 +163,6 @@ class SquatAnalyzer:
             ankle    = lm_list[27][1:3]
             side_vis = left_visibility
 
-        # Also grab both-side landmarks for frontal checks
-        left_hip_x   = lm_list[23][1]
-        right_hip_x  = lm_list[24][1]
-        left_knee_x  = lm_list[25][1]
-        right_knee_x = lm_list[26][1]
-        left_ankle_x = lm_list[27][1]
-        right_ankle_x = lm_list[28][1]
-
         self.hip_history.append(hip)
 
         # ---- Visibility gate ------------------------------------------
@@ -221,22 +207,6 @@ class SquatAnalyzer:
         else:
             self._back_warn_frames = max(0, self._back_warn_frames - 1)
 
-        # Knee valgus (frontal view) – check if knees collapse inward
-        hip_width = abs(right_hip_x - left_hip_x)
-        if hip_width > 20 and actively_squatting:
-            knee_spread = abs(right_knee_x - left_knee_x)
-            ankle_spread = abs(right_ankle_x - left_ankle_x)
-            if ankle_spread > 0 and knee_spread < ankle_spread * (1 - self.KNEE_VALGUS_THRESHOLD):
-                self._valgus_warn_frames += 1
-            else:
-                self._valgus_warn_frames = max(0, self._valgus_warn_frames - 2)
-
-            if self._valgus_warn_frames >= self.WARN_FRAMES_VALGUS:
-                feedback_list.append("Push knees out!")
-                frame_good_form = False
-        else:
-            self._valgus_warn_frames = max(0, self._valgus_warn_frames - 1)
-
         # Forward knee travel (side view) – use ratio of shin length
         if self.stage in ("descending", "bottom"):
             knee_x, ankle_x = knee[0], ankle[0]
@@ -269,7 +239,6 @@ class SquatAnalyzer:
                 self._deep_frame_count = 0
                 # Reset warning counters for the new rep
                 self._back_warn_frames = 0
-                self._valgus_warn_frames = 0
                 self._knee_toe_warn_frames = 0
                 self._deeper_warn_frames = 0
 
@@ -360,7 +329,6 @@ class SquatAnalyzer:
         _warn_counter = {
             "Keep chest up!": self._back_warn_frames,
             "Chest up a bit more": self._back_warn_frames,
-            "Push knees out!": self._valgus_warn_frames,
             "Sit back more": self._knee_toe_warn_frames,
             "Squat deeper": self._deeper_warn_frames,
         }
