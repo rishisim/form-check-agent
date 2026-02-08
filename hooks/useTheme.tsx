@@ -83,14 +83,21 @@ interface ThemeProviderProps {
     children: ReactNode;
 }
 
+// Circle reveal: one circle expands from the toggle button (top-right)
+// Only animates scale + opacity → 100% GPU composited, 60fps guaranteed.
+const DIAGONAL = Math.sqrt(SCREEN_W * SCREEN_W + SCREEN_H * SCREEN_H);
+const CIRCLE_SIZE = DIAGONAL * 2.2;
+// Toggle button position (top-right corner, inset)
+const ORIGIN_X = SCREEN_W - 36;
+const ORIGIN_Y = 56;
+
 export function ThemeProvider({ children }: ThemeProviderProps) {
     const [isDark, setIsDark] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
-
-    // Overlay panels: two diagonal strips that sweep across
-    const overlayAnim = useRef(new Animated.Value(0)).current;
-    // Store the "next" background color for the overlay
     const nextBgRef = useRef('');
+
+    // Single animated value: 0 → 1 (expand in) → 2 (fade out)
+    const anim = useRef(new Animated.Value(0)).current;
 
     // Load saved theme preference on mount
     useEffect(() => {
@@ -107,36 +114,34 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         loadTheme();
     }, []);
 
-    // Animated toggle with sweep overlay
     const toggleTheme = useCallback(async () => {
         if (isTransitioning) return;
 
         const newIsDark = !isDark;
-        const nextTheme = newIsDark ? darkTheme : lightTheme;
-        nextBgRef.current = nextTheme.background;
+        nextBgRef.current = (newIsDark ? darkTheme : lightTheme).background;
 
         setIsTransitioning(true);
-        overlayAnim.setValue(0);
+        anim.setValue(0);
 
-        // Phase 1: Diagonal sweep in (top-right → bottom-left), fading in
-        Animated.timing(overlayAnim, {
+        // Phase 1: Circle expands from toggle button to cover screen
+        Animated.timing(anim, {
             toValue: 1,
-            duration: 300,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+            duration: 320,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
             useNativeDriver: true,
         }).start(() => {
-            // Flip the actual theme while fully covered
+            // Flip theme while fully covered
             setIsDark(newIsDark);
 
-            // Phase 2: Continue diagonal sweep out, fading out
-            Animated.timing(overlayAnim, {
+            // Phase 2: Circle fades out, revealing new theme
+            Animated.timing(anim, {
                 toValue: 2,
-                duration: 280,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+                duration: 200,
+                easing: Easing.bezier(0.4, 0, 0.2, 1),
                 useNativeDriver: true,
             }).start(() => {
                 setIsTransitioning(false);
-                overlayAnim.setValue(0);
+                anim.setValue(0);
             });
         });
 
@@ -145,28 +150,20 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         } catch (error) {
             console.log('Error saving theme preference:', error);
         }
-    }, [isDark, isTransitioning, overlayAnim]);
+    }, [isDark, isTransitioning, anim]);
 
     const theme = isDark ? darkTheme : lightTheme;
 
-    // Diagonal sweep: translate on both X and Y simultaneously
-    // Enters from top-right, exits toward bottom-left
-    const diagonal = Math.sqrt(SCREEN_W * SCREEN_W + SCREEN_H * SCREEN_H);
-
-    const overlayTranslateX = overlayAnim.interpolate({
+    // Scale: 0 → 1 during expand, stays 1 during fade-out
+    const circleScale = anim.interpolate({
         inputRange: [0, 1, 2],
-        outputRange: [diagonal * 0.7, 0, -diagonal * 0.7],
+        outputRange: [0, 1, 1],
     });
 
-    const overlayTranslateY = overlayAnim.interpolate({
-        inputRange: [0, 1, 2],
-        outputRange: [-diagonal * 0.35, 0, diagonal * 0.35],
-    });
-
-    // Soft fade: starts transparent, builds to full, then fades out
-    const overlayOpacity = overlayAnim.interpolate({
-        inputRange: [0, 0.3, 0.7, 1, 1.3, 1.7, 2],
-        outputRange: [0, 0.85, 1, 1, 1, 0.85, 0],
+    // Opacity: soft fade in during expand, fade out after flip
+    const circleOpacity = anim.interpolate({
+        inputRange: [0, 0.15, 0.85, 1, 1.6, 2],
+        outputRange: [0, 0.9, 1, 1, 0.4, 0],
     });
 
     return (
@@ -177,15 +174,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
                     <Animated.View
                         pointerEvents="none"
                         style={[
-                            overlayStyles.overlay,
+                            overlayStyles.circle,
                             {
                                 backgroundColor: nextBgRef.current,
-                                opacity: overlayOpacity,
-                                transform: [
-                                    { translateX: overlayTranslateX },
-                                    { translateY: overlayTranslateY },
-                                    { rotate: '-25deg' },
-                                ],
+                                opacity: circleOpacity,
+                                transform: [{ scale: circleScale }],
                             },
                         ]}
                     />
@@ -207,13 +200,13 @@ const overlayStyles = StyleSheet.create({
     root: {
         flex: 1,
     },
-    overlay: {
+    circle: {
         position: 'absolute',
-        // Make panel large enough to cover screen even when rotated 25°
-        width: SCREEN_W * 2.5,
-        height: SCREEN_H * 2.5,
-        top: -SCREEN_H * 0.75,
-        left: -SCREEN_W * 0.75,
+        width: CIRCLE_SIZE,
+        height: CIRCLE_SIZE,
+        borderRadius: CIRCLE_SIZE / 2,
+        left: ORIGIN_X - CIRCLE_SIZE / 2,
+        top: ORIGIN_Y - CIRCLE_SIZE / 2,
         zIndex: 9999,
         elevation: 9999,
     },

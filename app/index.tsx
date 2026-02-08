@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     },
     comingSoonCard: {
         height: 180,
-        opacity: 0.4,
+        opacity: 0.65,
         borderStyle: 'dashed',
         borderWidth: 1.5,
         elevation: 0,
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 64,
         marginBottom: 10,
-        opacity: 0.5,
+        opacity: 0.7,
     },
     badge: {
         marginTop: 8,

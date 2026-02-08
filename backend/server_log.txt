@@ -1761,3 +1761,15 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-02-08 05:57:07,932 [INFO] [f3e3237f] WebSocket connection established (1 active, exercise=pushup)
 2026-02-08 05:57:12,472 [INFO] [f3e3237f] Client disconnected normally
 2026-02-08 05:57:12,472 [INFO] [f3e3237f] Connection cleaned up (0 active)
+2026-02-08 06:17:30,378 [INFO] [9a75b9ca] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 06:17:40,553 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 06:17:40,590 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 06:17:40,620 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 06:17:45,943 [INFO] [9a75b9ca] Client disconnected normally
+2026-02-08 06:17:45,944 [INFO] [9a75b9ca] Connection cleaned up (0 active)
+2026-02-08 06:18:55,457 [INFO] [26f2f325] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 06:18:57,437 [INFO] [dd47b07b] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 06:18:57,711 [INFO] [26f2f325] Client disconnected normally
+2026-02-08 06:18:57,712 [INFO] [26f2f325] Connection cleaned up (1 active)
+2026-02-08 06:19:02,736 [INFO] [dd47b07b] Client disconnected normally
+2026-02-08 06:19:02,736 [INFO] [dd47b07b] Connection cleaned up (0 active)
