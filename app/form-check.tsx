@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { SkeletonOverlay } from '../components/SkeletonOverlay';
 import { DepthLine } from '../components/DepthLine';
-import { RepCounter } from '../components/RepCounter';
+import { RepBreakdown } from '../components/RepBreakdown';
 import { FeedbackToast } from '../components/FeedbackToast';
 import { colors, spacing, radius } from '../constants/theme';
 
@@ -28,7 +28,8 @@ export default function FormCheckScreen() {
     const [isProMode, setIsProMode] = useState(false); // Toggle for Skeleton/Details
 
     // Analysis State
-    const [repCount, setRepCount] = useState(0);
+    const [validReps, setValidReps] = useState(0);
+    const [invalidReps, setInvalidReps] = useState(0);
     const [feedback, setFeedback] = useState('Position yourself in frame');
     const [feedbackLevel, setFeedbackLevel] = useState<'success' | 'warning' | 'error'>('success');
     const [aiFeedback, setAiFeedback] = useState('');
@@ -70,7 +71,8 @@ export default function FormCheckScreen() {
                     if (now - lastUpdateRef.current > 66) {
                         const analysis = data.feedback.analysis;
                         if (analysis) {
-                            setRepCount(analysis.rep_count || 0);
+                            setValidReps(analysis.valid_reps ?? 0);
+                            setInvalidReps(analysis.invalid_reps ?? 0);
                             setKneeAngle(analysis.knee_angle);
                             setFeedback(analysis.feedback);
                             setFeedbackLevel(analysis.feedback_level || 'success');
@@ -276,8 +278,8 @@ export default function FormCheckScreen() {
                         <View style={[styles.statusDot, { backgroundColor: isConnected ? colors.success : colors.error }]} />
                     </View>
 
-                    {/* Right Side: Rep Counter */}
-                    <RepCounter count={repCount} />
+                    {/* Right Side: Rep Breakdown */}
+                    <RepBreakdown validReps={validReps} invalidReps={invalidReps} />
 
                     {/* Center: Feedback Toast */}
                     <FeedbackToast message={feedback} level={feedbackLevel} />

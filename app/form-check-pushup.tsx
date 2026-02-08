@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { SkeletonOverlay } from '../components/SkeletonOverlay';
 import { DepthLine } from '../components/DepthLine';
-import { RepCounter } from '../components/RepCounter';
+import { RepBreakdown } from '../components/RepBreakdown';
 import { FeedbackToast } from '../components/FeedbackToast';
 import { colors, spacing, radius } from '../constants/theme';
 
@@ -20,7 +20,8 @@ export default function FormCheckPushupScreen() {
     const [pictureSize, setPictureSize] = useState<string | undefined>(undefined);
     const [isProMode, setIsProMode] = useState(false);
 
-    const [repCount, setRepCount] = useState(0);
+    const [validReps, setValidReps] = useState(0);
+    const [invalidReps, setInvalidReps] = useState(0);
     const [feedback, setFeedback] = useState('Position yourself in frame');
     const [feedbackLevel, setFeedbackLevel] = useState<'success' | 'warning' | 'error'>('success');
     const [aiFeedback, setAiFeedback] = useState('');
@@ -52,7 +53,8 @@ export default function FormCheckPushupScreen() {
                 if (data.type === 'analysis' && data.feedback && now - lastUpdateRef.current > 66) {
                     const analysis = data.feedback.analysis;
                     if (analysis) {
-                        setRepCount(analysis.rep_count || 0);
+                        setValidReps(analysis.valid_reps ?? 0);
+                        setInvalidReps(analysis.invalid_reps ?? 0);
                         setElbowAngle(analysis.elbow_angle ?? analysis.knee_angle);
                         setFeedback(analysis.feedback);
                         setFeedbackLevel(analysis.feedback_level || 'success');
@@ -111,7 +113,7 @@ export default function FormCheckPushupScreen() {
     const startStreaming = useCallback(async () => {
         if (isStreamingRef.current) return;
         isStreamingRef.current = true;
-        const intervalMs = 150;  // ~6.7 fps - more frames = better rep detection
+        const intervalMs = 100;  // ~10 fps for better pushup rep detection
         const captureLoop = async () => {
             if (!isStreamingRef.current) return;
             try {
@@ -187,7 +189,7 @@ export default function FormCheckPushupScreen() {
                         <View style={[styles.statusDot, { backgroundColor: isConnected ? colors.success : colors.error }]} />
                     </View>
 
-                    <RepCounter count={repCount} />
+                    <RepBreakdown validReps={validReps} invalidReps={invalidReps} />
                     <FeedbackToast message={feedback} level={feedbackLevel} />
 
                     <View style={styles.bottomControls}>

@@ -10,7 +10,8 @@ from collections import deque
 
 # Thresholds: works facing camera OR sideways
 KNEE_UP = 155       # Standing / top of rep
-KNEE_DOWN = 135     # Bottom - count if we saw knee below this (catches shallow squats)
+KNEE_DOWN = 135     # Minimum to count as any rep
+KNEE_GOOD_DEPTH = 95    # Knee <= 95° + hip below knee = valid; 95-135° = invalid (half squat)
 COOLDOWN_FRAMES = 2
 
 
@@ -18,6 +19,9 @@ class SquatAnalyzer:
     def __init__(self):
         self.stage = "up"
         self.counter = 0
+        self.valid_reps = 0
+        self.invalid_reps = 0
+        self.had_good_depth = False  # Track if we achieved depth during descent
         self.feedback = "Start Squatting"
         self.hip_history = deque(maxlen=30)
         self.min_knee_since_up = 180.0
@@ -31,6 +35,8 @@ class SquatAnalyzer:
             "hip_angle": 0,
             "stage": self.stage,
             "rep_count": self.counter,
+            "valid_reps": self.valid_reps,
+            "invalid_reps": self.invalid_reps,
             "feedback": self.NO_BODY_MSG,
             "feedback_level": "warning",
             "is_good_form": False,
@@ -76,14 +82,24 @@ class SquatAnalyzer:
         is_deep_enough = hip_y >= knee_y
         self.frames_since_rep += 1
 
+        # Track good depth during descent
+        if knee_angle < KNEE_GOOD_DEPTH and is_deep_enough:
+            self.had_good_depth = True
+
         # Trajectory-based rep detection (catches reps even at low FPS)
         if knee_angle > KNEE_UP and self.frames_since_rep > COOLDOWN_FRAMES:
             if self.min_knee_since_up < KNEE_DOWN:
                 self.counter += 1
-                self.feedback = "Good depth! Drive up!" if is_deep_enough else "Rep counted!"
+                if self.min_knee_since_up < KNEE_GOOD_DEPTH and self.had_good_depth:
+                    self.valid_reps += 1
+                    self.feedback = "Good depth! Drive up!"
+                else:
+                    self.invalid_reps += 1
+                    self.feedback = "Half rep — go lower next time"
                 self.frames_since_rep = 0
             self.stage = "up"
             self.min_knee_since_up = 180.0
+            self.had_good_depth = False
 
         if self.stage == "up" and knee_angle < KNEE_UP:
             self.min_knee_since_up = min(self.min_knee_since_up, knee_angle)
@@ -115,6 +131,8 @@ class SquatAnalyzer:
             "hip_angle": int(hip_angle),
             "stage": self.stage,
             "rep_count": self.counter,
+            "valid_reps": self.valid_reps,
+            "invalid_reps": self.invalid_reps,
             "feedback": final_feedback,
             "feedback_level": feedback_level,
             "is_good_form": is_good_form,

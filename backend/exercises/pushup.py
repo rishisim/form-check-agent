@@ -7,18 +7,22 @@ from geometry import calculate_angle, is_full_body_in_frame
 
 from collections import deque
 
-# Thresholds: works facing camera OR sideways
-ELBOW_UP = 150      # Arms extended
-ELBOW_DOWN = 130    # Bottom - count if we saw elbow below this (catches shallow pushups)
-COOLDOWN_FRAMES = 2
+# Thresholds: works facing camera OR sideways (relaxed for reliable counting)
+ELBOW_UP = 140      # Arms extended - trigger "back at top" when elbow > this
+ELBOW_DOWN = 145    # Count rep if we saw elbow below this (more bent)
+ELBOW_GOOD_DEPTH = 115   # Elbows <= 115° = valid; 115-145° = invalid (half rep)
+COOLDOWN_FRAMES = 1
 
 
 class PushupAnalyzer:
     def __init__(self):
         self.stage = "up"
         self.counter = 0
+        self.valid_reps = 0
+        self.invalid_reps = 0
         self.feedback = "Get in pushup position"
         self.elbow_history = deque(maxlen=30)
+        self.elbow_smoother = deque(maxlen=2)  # Light smoothing for noisy angles
         self.min_elbow_since_up = 180.0
         self.frames_since_rep = 999
 
@@ -31,6 +35,8 @@ class PushupAnalyzer:
             "body_angle": 0,
             "stage": self.stage,
             "rep_count": self.counter,
+            "valid_reps": self.valid_reps,
+            "invalid_reps": self.invalid_reps,
             "feedback": self.NO_BODY_MSG,
             "feedback_level": "warning",
             "is_good_form": False,
@@ -63,24 +69,35 @@ class PushupAnalyzer:
 
         l_elbow_angle = calculate_angle(l_shoulder, l_elbow, l_wrist)
         r_elbow_angle = calculate_angle(r_shoulder, r_elbow, r_wrist)
-        elbow_angle = min(l_elbow_angle, r_elbow_angle)  # More bent = at bottom, no smoothing
+        # Use more bent arm; ignore wild outliers from occlusion
+        valid = [a for a in (l_elbow_angle, r_elbow_angle) if 35 <= a <= 178]
+        raw_elbow = min(valid) if valid else min(l_elbow_angle, r_elbow_angle)
+        self.elbow_smoother.append(raw_elbow)
+        elbow_angle = sum(self.elbow_smoother) / len(self.elbow_smoother)
 
         body_angle = calculate_angle(r_shoulder, r_hip, r_ankle)
         in_plank = 100 <= body_angle <= 230  # Very loose - for feedback only
         self.frames_since_rep += 1
 
-        # Trajectory-based rep detection (no plank required for counting)
-        if elbow_angle > ELBOW_UP and self.frames_since_rep > COOLDOWN_FRAMES:
+        # Trajectory-based: track min elbow during descent, count when back at top
+        # Use raw_elbow for transitions - smoothing can lag and miss the moment
+        if raw_elbow > ELBOW_UP and self.frames_since_rep > COOLDOWN_FRAMES:
             if self.min_elbow_since_up < ELBOW_DOWN:
                 self.counter += 1
-                self.feedback = "Good! Push back up!"
+                if self.min_elbow_since_up < ELBOW_GOOD_DEPTH:
+                    self.valid_reps += 1
+                    self.feedback = "Good rep! Full depth."
+                else:
+                    self.invalid_reps += 1
+                    self.feedback = "Half rep — go lower next time"
                 self.frames_since_rep = 0
             self.stage = "up"
             self.min_elbow_since_up = 180.0
 
-        if self.stage == "up" and elbow_angle < ELBOW_UP:
-            self.min_elbow_since_up = min(self.min_elbow_since_up, elbow_angle)
-            if elbow_angle < ELBOW_DOWN:
+        if self.stage == "up" and raw_elbow < ELBOW_UP:
+            # Track raw (unsmoothed) min for accurate depth - smoothing can lag
+            self.min_elbow_since_up = min(self.min_elbow_since_up, raw_elbow)
+            if raw_elbow < ELBOW_DOWN:
                 self.stage = "down"
 
         # Feedback - always pushup/elbow specific, never mention squats or knees
@@ -107,6 +124,8 @@ class PushupAnalyzer:
             "body_angle": int(body_angle),
             "stage": self.stage,
             "rep_count": self.counter,
+            "valid_reps": self.valid_reps,
+            "invalid_reps": self.invalid_reps,
             "feedback": final_feedback,
             "feedback_level": feedback_level,
             "is_good_form": is_good_form,
