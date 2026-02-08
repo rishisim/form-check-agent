@@ -15,11 +15,12 @@ const SERVER_BASE = 'ws://10.194.82.50:8000/ws/video';
 
 export default function FormCheckScreen() {
     const router = useRouter();
-    const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string; exercise?: string }>();
+    const params = useLocalSearchParams<{ sets: string; reps: string; timerSeconds: string; restSeconds?: string; exercise?: string }>();
 
     const totalSets = parseInt(params.sets || '3', 10);
     const repsPerSet = parseInt(params.reps || '10', 10);
     const initialTimer = parseInt(params.timerSeconds || '10', 10);
+    const restDuration = parseInt(params.restSeconds || '180', 10);
     const exercise = (params.exercise || 'squat').toLowerCase();
     const isPushup = exercise === 'pushup';
 
@@ -56,6 +57,11 @@ export default function FormCheckScreen() {
     // ─── Countdown Timer ─────────────────────────
     const [countdown, setCountdown] = useState(initialTimer);
     const [isCountdownActive, setIsCountdownActive] = useState(initialTimer > 0);
+
+    // ─── Rest Break Timer ────────────────────────
+    const [restCountdown, setRestCountdown] = useState(0);
+    const [isRestActive, setIsRestActive] = useState(false);
+    const restCountdownRef = useRef(0);
 
     // ─── Analysis State ──────────────────────────
     const [validReps, setValidReps] = useState(0);
@@ -146,20 +152,33 @@ export default function FormCheckScreen() {
                     frameIntervalRef.current = null;
                 }
             } else {
-                // Set complete → transition
+                // Set complete → start rest break
                 isSetTransitionRef.current = true;
                 setIsSetTransition(true);
                 setFeedback(`✅ Set ${currentSetRef.current} Complete!`);
                 setFeedbackLevel('success');
                 speakTTS(`Set ${currentSetRef.current} complete! Rest up.`);
 
-                setTimeout(() => {
+                // Stop streaming during rest
+                isStreamingRef.current = false;
+                if (frameIntervalRef.current) {
+                    clearTimeout(frameIntervalRef.current);
+                    frameIntervalRef.current = null;
+                }
+
+                if (restDuration > 0) {
+                    // Start rest countdown
+                    restCountdownRef.current = restDuration;
+                    setRestCountdown(restDuration);
+                    setIsRestActive(true);
+                } else {
+                    // No rest — advance immediately
                     currentSetRef.current += 1;
                     setCurrentSet(currentSetRef.current);
                     resetReps();
                     isSetTransitionRef.current = false;
                     setIsSetTransition(false);
-                }, 3000);
+                }
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -381,6 +400,50 @@ export default function FormCheckScreen() {
         lastFrameSeqRef.current = Number.MAX_SAFE_INTEGER;
     }, []);
 
+    // ─── Rest Break Countdown ─────────────────────
+    useEffect(() => {
+        if (!isRestActive) return;
+        if (restCountdown <= 0) {
+            // Rest over — advance to next set
+            setIsRestActive(false);
+            currentSetRef.current += 1;
+            setCurrentSet(currentSetRef.current);
+            resetReps();
+            isSetTransitionRef.current = false;
+            setIsSetTransition(false);
+            const goMsg = `Set ${currentSetRef.current} — let's go!`;
+            setFeedback(goMsg);
+            setFeedbackLevel('success');
+            speakTTS(goMsg);
+            return;
+        }
+        // Announce at certain milestones
+        if (restCountdown === 30) speakTTS('30 seconds left');
+        if (restCountdown === 10) speakTTS('10 seconds, get ready!');
+
+        const timer = setTimeout(() => {
+            restCountdownRef.current -= 1;
+            setRestCountdown(restCountdownRef.current);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [restCountdown, isRestActive, resetReps, speakTTS]);
+
+    // ─── Skip Rest Handler ───────────────────────
+    const skipRest = useCallback(() => {
+        setIsRestActive(false);
+        restCountdownRef.current = 0;
+        setRestCountdown(0);
+        currentSetRef.current += 1;
+        setCurrentSet(currentSetRef.current);
+        resetReps();
+        isSetTransitionRef.current = false;
+        setIsSetTransition(false);
+        const goMsg = `Set ${currentSetRef.current} — let's go!`;
+        setFeedback(goMsg);
+        setFeedbackLevel('success');
+        speakTTS(goMsg);
+    }, [resetReps, speakTTS]);
+
     // ─── Camera Ready ────────────────────────────
     const onCameraReady = useCallback(async () => {
         cameraReadyRef.current = true;
@@ -453,13 +516,13 @@ export default function FormCheckScreen() {
         };
     }, [connectWebSocket, disconnectWebSocket, stopTTS]);
 
-    // Only start streaming after countdown finishes
+    // Only start streaming after countdown finishes and not during rest break
     useEffect(() => {
-        if (isConnected && permission?.granted && !isCountdownActive && !isWorkoutCompleteRef.current) {
+        if (isConnected && permission?.granted && !isCountdownActive && !isWorkoutCompleteRef.current && !isRestActive) {
             if (!workoutStartRef.current) workoutStartRef.current = Date.now();
             startStreaming();
         }
-    }, [isConnected, permission, startStreaming, isCountdownActive]);
+    }, [isConnected, permission, startStreaming, isCountdownActive, isRestActive]);
 
     // ─── Progress Calculation ────────────────────
     const totalRepsGoal = totalSets * repsPerSet;
@@ -654,16 +717,33 @@ export default function FormCheckScreen() {
                             </View>
                         )}
 
-                        {/* Set Transition Overlay */}
+                        {/* Rest Break Overlay */}
                         {isSetTransition && !isWorkoutComplete && (
-                            <View style={styles.centerCard}>
+                            <View style={styles.restOverlay}>
                                 <Text style={styles.transitionEmoji}>✅</Text>
                                 <Text style={styles.transitionTitle}>
                                     Set {currentSet} Complete!
                                 </Text>
-                                <Text style={styles.transitionHint}>
-                                    Next set starting soon…
-                                </Text>
+                                {isRestActive && restCountdown > 0 ? (
+                                    <>
+                                        <Text style={styles.restLabel}>Rest Break</Text>
+                                        <Text style={styles.restTimer}>
+                                            {Math.floor(restCountdown / 60)}:{String(restCountdown % 60).padStart(2, '0')}
+                                        </Text>
+                                        <Text style={styles.restNextSet}>Next: Set {currentSet + 1} of {totalSets}</Text>
+                                        <TouchableOpacity
+                                            style={styles.skipButton}
+                                            onPress={skipRest}
+                                            activeOpacity={0.8}
+                                        >
+                                            <Text style={styles.skipButtonText}>Skip Rest →</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                ) : (
+                                    <Text style={styles.transitionHint}>
+                                        Starting next set…
+                                    </Text>
+                                )}
                             </View>
                         )}
                     </View>
@@ -907,7 +987,14 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
     },
 
-    /* ── Set Transition ───────────────────── */
+    /* ── Set Transition / Rest Break ─────── */
+    restOverlay: {
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderRadius: 28,
+        paddingVertical: 28,
+        paddingHorizontal: 36,
+    },
     transitionEmoji: {
         fontSize: 72,
         marginBottom: 12,
@@ -928,6 +1015,43 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0,0,0,0.3)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 4,
+    },
+    restLabel: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.7)',
+        marginTop: 16,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+    },
+    restTimer: {
+        fontSize: 72,
+        fontWeight: '900',
+        color: '#fff',
+        marginVertical: 4,
+        textShadowColor: 'rgba(0,0,0,0.4)',
+        textShadowOffset: { width: 0, height: 4 },
+        textShadowRadius: 14,
+    },
+    restNextSet: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.6)',
+        marginBottom: 20,
+    },
+    skipButton: {
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.5)',
+        paddingVertical: 14,
+        paddingHorizontal: 36,
+        borderRadius: 22,
+    },
+    skipButtonText: {
+        fontSize: 17,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: 0.3,
     },
 
     /* ── Workout Complete Overlay ──────────── */

@@ -11,9 +11,10 @@ export default function WorkoutConfigScreen() {
     const [sets, setSets] = useState(3);
     const [reps, setReps] = useState(10);
     const [timerSeconds, setTimerSeconds] = useState(10);
+    const [restSeconds, setRestSeconds] = useState(180);
 
     const handleStartWorkout = () => {
-        router.push(`/form-check?sets=${sets}&reps=${reps}&timerSeconds=${timerSeconds}&exercise=${exercise}`);
+        router.push(`/form-check?sets=${sets}&reps=${reps}&timerSeconds=${timerSeconds}&restSeconds=${restSeconds}&exercise=${exercise}`);
     };
 
     const isPushup = exercise === 'pushup';
@@ -109,6 +110,33 @@ export default function WorkoutConfigScreen() {
                     </View>
                 </View>
 
+                {/* ── Rest Between Sets ────────────── */}
+                {sets > 1 && (
+                    <View style={styles.card}>
+                        <Text style={styles.cardLabel}>Rest Between Sets</Text>
+                        <Text style={styles.cardHint}>You can skip the rest timer during workout</Text>
+                        <View style={styles.stepper}>
+                            <TouchableOpacity
+                                style={[styles.stepBtn, restSeconds <= 0 && styles.stepBtnDisabled]}
+                                onPress={() => adjust(setRestSeconds, restSeconds, 0, 600, -15)}
+                                activeOpacity={0.6}
+                            >
+                                <Text style={[styles.stepBtnText, restSeconds <= 0 && styles.stepBtnTextDisabled]}>−</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.stepValue}>
+                                {Math.floor(restSeconds / 60)}:{String(restSeconds % 60).padStart(2, '0')}
+                            </Text>
+                            <TouchableOpacity
+                                style={[styles.stepBtn, restSeconds >= 600 && styles.stepBtnDisabled]}
+                                onPress={() => adjust(setRestSeconds, restSeconds, 0, 600, 15)}
+                                activeOpacity={0.6}
+                            >
+                                <Text style={[styles.stepBtnText, restSeconds >= 600 && styles.stepBtnTextDisabled]}>+</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+
                 {/* ── Summary ────────────────────── */}
                 <View style={styles.summaryCard}>
                     <Text style={styles.summaryText}>
@@ -116,6 +144,11 @@ export default function WorkoutConfigScreen() {
                     </Text>
                     {timerSeconds > 0 && (
                         <Text style={styles.summarySubtext}>{timerSeconds}s countdown before start</Text>
+                    )}
+                    {sets > 1 && restSeconds > 0 && (
+                        <Text style={styles.summarySubtext}>
+                            {Math.floor(restSeconds / 60)}:{String(restSeconds % 60).padStart(2, '0')} rest between sets
+                        </Text>
                     )}
                 </View>
             </ScrollView>
