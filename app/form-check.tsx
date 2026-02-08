@@ -99,6 +99,7 @@ export default function FormCheckScreen() {
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const reconnectDelayRef = useRef(1000);
     const lastFeedbackRef = useRef('');
+    const startStreamingRef = useRef<() => void>(() => {});
 
     // ─── Workout Stats Tracking ─────────
     const workoutStartRef = useRef<number>(0);
@@ -202,6 +203,8 @@ export default function FormCheckScreen() {
             setConnectionStatus('connected');
             setCurrentSessionId(null);
             currentSessionIdRef.current = null;
+            lastFrameSeqRef.current = 0;
+            isResetPendingRef.current = false;
             reconnectDelayRef.current = 1000; // reset backoff on success
             console.log('WebSocket connected');
         };
@@ -379,8 +382,9 @@ export default function FormCheckScreen() {
         resetTimeoutRef.current = setTimeout(() => {
             if (isResetPendingRef.current) {
                 isResetPendingRef.current = false;
-                currentSessionIdRef.current = `client_reset_${Date.now()}`;
+                currentSessionIdRef.current = null;
                 setCurrentSessionId(null);
+                lastFrameSeqRef.current = 0;
             }
         }, 3000);
 
@@ -392,6 +396,7 @@ export default function FormCheckScreen() {
                 clearTimeout(resetTimeoutRef.current);
                 resetTimeoutRef.current = null;
             }
+            lastFrameSeqRef.current = 0;
         }
 
         setValidReps(0);
@@ -417,6 +422,8 @@ export default function FormCheckScreen() {
             setFeedback(goMsg);
             setFeedbackLevel('success');
             speakTTS(goMsg);
+            // Explicitly restart streaming for the next set
+            startStreamingRef.current();
             return;
         }
         // Announce at certain milestones
@@ -444,6 +451,8 @@ export default function FormCheckScreen() {
         setFeedback(goMsg);
         setFeedbackLevel('success');
         speakTTS(goMsg);
+        // Explicitly restart streaming for the next set
+        startStreamingRef.current();
     }, [resetReps, speakTTS]);
 
     // ─── Camera Ready ────────────────────────────
@@ -508,6 +517,9 @@ export default function FormCheckScreen() {
 
         captureLoop();
     }, []);
+
+    // Keep the ref in sync so earlier-defined hooks can call startStreaming
+    startStreamingRef.current = startStreaming;
 
     // ─── Lifecycle ───────────────────────────────
     useEffect(() => {
