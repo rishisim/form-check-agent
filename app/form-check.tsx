@@ -332,7 +332,7 @@ export default function FormCheckScreen() {
         if (isStreamingRef.current) return;
         isStreamingRef.current = true;
 
-        const intervalMs = 150; // ~7 fps
+        const intervalMs = 100; // ~10 fps (server drops stale frames)
 
         const captureLoop = async () => {
             if (!isStreamingRef.current) return;

@@ -20,28 +20,40 @@ const CONNECTIONS: [number, number][] = [
 
 const KEY_JOINTS = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28];
 const VISIBILITY_THRESHOLD = 0.45;
-const LERP_SPEED = 0.3; // 0-1, higher = snappier catch-up
 
-interface SmoothedPoint {
+// ── Tuning knobs ────────────────────────────────────────────────────────
+const LERP_SPEED = 0.55;           // faster catch-up (was 0.3)
+const VELOCITY_DECAY = 0.88;       // how fast prediction fades (0 = instant, 1 = never)
+const PREDICTION_WEIGHT = 0.45;    // how much velocity-extrapolation contributes
+const SNAP_DISTANCE = 0.15;        // if target jumps > this, snap (no lerp)
+const STALE_MS = 400;              // after this many ms without update, dampen prediction
+
+interface TrackedPoint {
+    // Smoothed (rendered) position
     x: number;
     y: number;
+    // Estimated velocity (normalized units / sec)
+    vx: number;
+    vy: number;
+    visible: boolean;
 }
 
 interface TargetPoint {
     x: number;
     y: number;
     visible: boolean;
+    arrivedAt: number; // performance.now() when this target was set
 }
 
 export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true }: SkeletonOverlayProps) => {
     const [viewSize, setViewSize] = useState({ width: 1, height: 1 });
-    const smoothedRef = useRef<Map<number, SmoothedPoint>>(new Map());
+    const trackedRef = useRef<Map<number, TrackedPoint>>(new Map());
     const targetRef = useRef<Map<number, TargetPoint>>(new Map());
+    const prevTargetRef = useRef<Map<number, { x: number; y: number; time: number }>>(new Map());
     const animFrameRef = useRef<number | null>(null);
     const hasLandmarksRef = useRef(false);
-    const [, setTick] = useState(0); // force re-render
+    const [, setTick] = useState(0);
 
-    // Measure actual overlay size (matches camera view)
     const onLayout = useCallback((e: LayoutChangeEvent) => {
         const { width, height } = e.nativeEvent.layout;
         if (width > 0 && height > 0) {
@@ -49,45 +61,72 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
         }
     }, []);
 
-    // Update targets immediately when new landmarks arrive
+    // ── Update targets + compute velocity when new landmarks arrive ──────
     useEffect(() => {
         if (!landmarks || landmarks.length === 0) {
             hasLandmarksRef.current = false;
             return;
         }
         hasLandmarksRef.current = true;
+        const now = performance.now();
 
-        // Build a lookup by landmark id
         const lmMap = new Map<number, number[]>();
         for (const lm of landmarks) {
             lmMap.set(lm[0], lm);
         }
 
         for (const [id, lm] of lmMap) {
-            const rawX = lm[1]; // normalized 0-1
-            const rawY = lm[2]; // normalized 0-1
+            const rawX = lm[1];
+            const rawY = lm[2];
             const visibility = lm.length > 3 ? lm[3] : 1;
-
-            // Mirror x for front camera (preview is mirrored but coords are not)
             const x = mirrored ? 1 - rawX : rawX;
             const y = rawY;
             const visible = visibility >= VISIBILITY_THRESHOLD;
 
-            targetRef.current.set(id, { x, y, visible });
+            // Compute velocity from previous target
+            const prev = prevTargetRef.current.get(id);
+            let vx = 0;
+            let vy = 0;
+            if (prev) {
+                const dtSec = (now - prev.time) / 1000;
+                if (dtSec > 0 && dtSec < 1) {
+                    vx = (x - prev.x) / dtSec;
+                    vy = (y - prev.y) / dtSec;
+                }
+            }
 
-            // Snap to position on first appearance (no lerp from 0,0)
-            if (!smoothedRef.current.has(id)) {
-                smoothedRef.current.set(id, { x, y });
+            // Store as new previous
+            prevTargetRef.current.set(id, { x, y, time: now });
+            targetRef.current.set(id, { x, y, visible, arrivedAt: now });
+
+            const tracked = trackedRef.current.get(id);
+            if (!tracked) {
+                // First appearance → snap
+                trackedRef.current.set(id, { x, y, vx, vy, visible });
+            } else {
+                // Update velocity on tracked point (blended)
+                tracked.vx = vx * 0.6 + tracked.vx * 0.4;
+                tracked.vy = vy * 0.6 + tracked.vy * 0.4;
+                tracked.visible = visible;
+
+                // Snap if the target jumped far (e.g., person re-entered frame)
+                const dist = Math.hypot(x - tracked.x, y - tracked.y);
+                if (dist > SNAP_DISTANCE) {
+                    tracked.x = x;
+                    tracked.y = y;
+                    tracked.vx = 0;
+                    tracked.vy = 0;
+                }
             }
         }
     }, [landmarks, mirrored]);
 
-    // 60fps interpolation loop — smoothly moves rendered positions toward targets
+    // ── 60 fps animation loop with velocity prediction ───────────────────
     useEffect(() => {
         let lastTime = performance.now();
 
         const animate = (now: number) => {
-            const dt = Math.min((now - lastTime) / 1000, 0.1); // cap delta
+            const dt = Math.min((now - lastTime) / 1000, 0.1);
             lastTime = now;
 
             if (!hasLandmarksRef.current) {
@@ -95,26 +134,42 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
                 return;
             }
 
-            // Frame-rate independent lerp factor
-            const factor = 1 - Math.pow(1 - LERP_SPEED, dt * 60);
+            const lerpFactor = 1 - Math.pow(1 - LERP_SPEED, dt * 60);
             let needsUpdate = false;
 
             for (const [id, tgt] of targetRef.current) {
-                const curr = smoothedRef.current.get(id);
-                if (!curr) {
-                    smoothedRef.current.set(id, { x: tgt.x, y: tgt.y });
+                const pt = trackedRef.current.get(id);
+                if (!pt) {
+                    trackedRef.current.set(id, {
+                        x: tgt.x, y: tgt.y, vx: 0, vy: 0, visible: tgt.visible,
+                    });
                     needsUpdate = true;
                     continue;
                 }
 
-                const dx = tgt.x - curr.x;
-                const dy = tgt.y - curr.y;
+                // How stale is the data?
+                const staleness = now - tgt.arrivedAt;
+                // Dampen prediction when data is stale
+                const predictionScale = staleness < STALE_MS
+                    ? PREDICTION_WEIGHT
+                    : PREDICTION_WEIGHT * Math.max(0, 1 - (staleness - STALE_MS) / 600);
 
-                if (Math.abs(dx) > 0.0005 || Math.abs(dy) > 0.0005) {
-                    curr.x += dx * factor;
-                    curr.y += dy * factor;
+                // Predicted target = actual target + velocity extrapolation
+                const predX = tgt.x + pt.vx * dt * predictionScale;
+                const predY = tgt.y + pt.vy * dt * predictionScale;
+
+                const dx = predX - pt.x;
+                const dy = predY - pt.y;
+
+                if (Math.abs(dx) > 0.0003 || Math.abs(dy) > 0.0003) {
+                    pt.x += dx * lerpFactor;
+                    pt.y += dy * lerpFactor;
                     needsUpdate = true;
                 }
+
+                // Decay velocity over time
+                pt.vx *= Math.pow(VELOCITY_DECAY, dt * 60);
+                pt.vy *= Math.pow(VELOCITY_DECAY, dt * 60);
             }
 
             if (needsUpdate) {
@@ -137,16 +192,12 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
 
     const { width, height } = viewSize;
 
-    // Read smoothed position for a landmark, respecting visibility
     const getPoint = (idx: number) => {
-        const tgt = targetRef.current.get(idx);
-        if (!tgt || !tgt.visible) return null;
-        const s = smoothedRef.current.get(idx);
-        if (!s) return null;
-        return { x: s.x * width, y: s.y * height };
+        const pt = trackedRef.current.get(idx);
+        if (!pt || !pt.visible) return null;
+        return { x: pt.x * width, y: pt.y * height };
     };
 
-    // Hip trajectory with mirroring
     const trajectoryPoints = hipTrajectory
         .map(pt => {
             const x = mirrored ? 1 - pt[0] : pt[0];
