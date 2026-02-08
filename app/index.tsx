@@ -1,6 +1,7 @@
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
+    Animated,
     Dimensions,
     NativeScrollEvent,
     NativeSyntheticEvent,
@@ -13,6 +14,113 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Animated Exercise Card with ripple effect on press
+interface AnimatedExerciseCardProps {
+    emoji: string;
+    name: string;
+    desc: string;
+    href: string;
+}
+
+function AnimatedExerciseCard({ emoji, name, desc, href }: AnimatedExerciseCardProps) {
+    const router = useRouter();
+    const rippleScale = useRef(new Animated.Value(0)).current;
+    const rippleOpacity = useRef(new Animated.Value(0.4)).current;
+    const scaleAnimation = useRef(new Animated.Value(1)).current;
+    const [isPressed, setIsPressed] = useState(false);
+    const [pressLocation, setPressLocation] = useState({ x: 0, y: 0 });
+
+    const handlePressIn = (event: any) => {
+        const { locationX, locationY } = event.nativeEvent;
+        setPressLocation({ x: locationX, y: locationY });
+    };
+
+    const handlePress = (event: any) => {
+        if (isPressed) return;
+        setIsPressed(true);
+
+        // Reset ripple values
+        rippleScale.setValue(0);
+        rippleOpacity.setValue(0.35);
+
+        // Start animations
+        Animated.parallel([
+            // Ripple expands outward
+            Animated.timing(rippleScale, {
+                toValue: 1,
+                duration: 350,
+                useNativeDriver: true,
+            }),
+            // Ripple fades slightly as it expands
+            Animated.timing(rippleOpacity, {
+                toValue: 0.15,
+                duration: 350,
+                useNativeDriver: true,
+            }),
+            // Subtle scale feedback
+            Animated.sequence([
+                Animated.timing(scaleAnimation, {
+                    toValue: 0.97,
+                    duration: 80,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(scaleAnimation, {
+                    toValue: 1,
+                    duration: 270,
+                    useNativeDriver: true,
+                }),
+            ]),
+        ]).start(() => {
+            // Navigate after animation completes
+            router.push(href as any);
+
+            // Reset animation state after a delay
+            setTimeout(() => {
+                rippleScale.setValue(0);
+                rippleOpacity.setValue(0.4);
+                scaleAnimation.setValue(1);
+                setIsPressed(false);
+            }, 500);
+        });
+    };
+
+    // Calculate ripple size (should be large enough to cover card)
+    const rippleSize = 300;
+
+    return (
+        <Pressable
+            onPressIn={handlePressIn}
+            onPress={handlePress}
+            style={styles.gridItem}
+        >
+            <Animated.View style={[styles.exerciseCard, { transform: [{ scale: scaleAnimation }] }]}>
+                {/* Ripple effect */}
+                <Animated.View
+                    style={[
+                        styles.ripple,
+                        {
+                            width: rippleSize,
+                            height: rippleSize,
+                            borderRadius: rippleSize / 2,
+                            left: pressLocation.x - rippleSize / 2,
+                            top: pressLocation.y - rippleSize / 2,
+                            opacity: rippleOpacity,
+                            transform: [{ scale: rippleScale }],
+                        },
+                    ]}
+                />
+
+                {/* Content */}
+                <View style={styles.cardContent}>
+                    <Text style={styles.exerciseEmoji}>{emoji}</Text>
+                    <Text style={styles.exerciseName}>{name}</Text>
+                    <Text style={styles.exerciseDesc}>{desc}</Text>
+                </View>
+            </Animated.View>
+        </Pressable>
+    );
+}
 
 const comingSoonExercises = [
     { emoji: '🧘', name: 'Planks', desc: 'Core stability tracking' },
@@ -74,25 +182,19 @@ export default function HomeScreen() {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={styles.grid}>
-                        <Link href="/workout-config" asChild>
-                            <Pressable style={styles.gridItem}>
-                                <View style={styles.exerciseCard}>
-                                    <Text style={styles.exerciseEmoji}>🦵</Text>
-                                    <Text style={styles.exerciseName}>Squats</Text>
-                                    <Text style={styles.exerciseDesc}>Track depth & form</Text>
-                                </View>
-                            </Pressable>
-                        </Link>
+                        <AnimatedExerciseCard
+                            emoji="🦵"
+                            name="Squats"
+                            desc="Track depth & form"
+                            href="/workout-config"
+                        />
 
-                        <Link href="/workout-config?exercise=pushup" asChild>
-                            <Pressable style={styles.gridItem}>
-                                <View style={styles.exerciseCard}>
-                                    <Text style={styles.exerciseEmoji}>💪</Text>
-                                    <Text style={styles.exerciseName}>Push-ups</Text>
-                                    <Text style={styles.exerciseDesc}>Track form & reps</Text>
-                                </View>
-                            </Pressable>
-                        </Link>
+                        <AnimatedExerciseCard
+                            emoji="💪"
+                            name="Push-ups"
+                            desc="Track form & reps"
+                            href="/workout-config?exercise=pushup"
+                        />
                     </View>
 
                     <Text style={styles.sectionTitle}>Coming Soon</Text>
@@ -218,6 +320,16 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.06,
         shadowRadius: 12,
         elevation: 3,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    ripple: {
+        position: 'absolute',
+        backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    },
+    cardContent: {
+        alignItems: 'center',
+        zIndex: 1,
     },
     exerciseEmoji: {
         fontSize: 44,
