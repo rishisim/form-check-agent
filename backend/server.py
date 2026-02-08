@@ -153,96 +153,30 @@ async def analyze_workout(req: AnalyzeRequest):
     else:
         feedback_section = "  No real-time feedback was recorded."
 
-    prompt = f"""You are an expert personal trainer and movement specialist analyzing a completed workout session.
+    prompt = f"""You are an expert personal trainer analyzing a completed workout session. Be specific to THIS data — reference actual numbers.
 
 === WORKOUT DATA ===
 Exercise: {req.exercise.title()}
-Workout plan: {req.totalSets} sets × {req.repsPerSet} reps
-Duration: {dur_str}
-Overall form accuracy: {form_accuracy}% ({total_valid} good / {total_invalid} bad out of {total_reps} total reps)
+Plan: {req.totalSets} sets × {req.repsPerSet} reps | Duration: {dur_str}
+Form accuracy: {form_accuracy}% ({total_valid} good / {total_invalid} bad out of {total_reps} total)
 
 Per-set breakdown:
 {set_breakdown}
 
-Joint angle data (measured by computer vision during the workout):
-  Knee angle — Min: {req.kneeMin}°, Avg: {req.kneeAvg}°, Max: {req.kneeMax}°
-  Back angle — Min: {req.hipMin}°, Avg: {req.hipAvg}°, Max: {req.hipMax}°
+Joint angles (computer vision):
+  Knee — Min: {req.kneeMin}°, Avg: {req.kneeAvg}°, Max: {req.kneeMax}° (below 90° = great depth, above 100° = shallow)
+  Back — Min: {req.hipMin}°, Avg: {req.hipAvg}°, Max: {req.hipMax}° (45-70° = normal lean, <45° = too far forward)
 
-  Note on knee angles: For squats, <90° means below parallel (great depth), 
-  90-100° is around parallel, >100° is above parallel (shallow).
-  Note on back angle: 45-70° is a normal forward lean, <45° is excessive forward lean,
-  >70° is very upright.
-
-Real-time coaching feedback that was triggered during the workout:
+Real-time feedback triggered:
 {feedback_section}
 
 === INSTRUCTIONS ===
-Write a personalized post-workout summary. Be specific to THIS workout's data — reference actual numbers, angles, and trends you see. Do NOT be generic.
-
-Structure your response EXACTLY like this (use these exact headers):
-
-**Overall**
-2-3 sentences summarizing how the workout went overall. Mention the form accuracy, any clear strengths, and the biggest area to improve. Be encouraging but honest.
-
-**What Went Well**
-- Bullet point 1 (be specific with data)
-- Bullet point 2
-(2-4 bullets)
-
-**Areas to Improve**
-- Bullet point 1 (be specific with data and give actionable advice)
-- Bullet point 2
-(2-4 bullets, skip this section entirely if form was near-perfect)
-
-**Next Workout Tip**
-One specific, actionable tip for their next session. Make it concrete (e.g., "Try pausing for 1 second at the bottom of each rep to build control at depth").
-
-=== FEW-SHOT EXAMPLES ===
-
-Example 1 (great workout):
-Workout: 3×10 squats, 92% accuracy, knee min 78°, back avg 55°, duration 3m 20s
-
-**Overall**
-Excellent session! You hit 92% form accuracy across all 3 sets with great consistency. Your depth was solid (knee angle reaching 78°, well below parallel), and your back angle stayed in a healthy range. The only minor issue was a couple of reps in Set 3 where depth was slightly shallower.
-
-**What Went Well**
-- Consistently broke parallel with a minimum knee angle of 78° — that's great range of motion
-- Back angle averaged 55°, right in the sweet spot for a safe, effective squat
-- Maintained form accuracy above 90% even in the final set, showing good endurance
-
-**Areas to Improve**
-- Set 3 had slightly more bad reps than Set 1 — try extending rest between sets by 15-30 seconds
-
-**Next Workout Tip**
-You've mastered the movement pattern — consider adding a 2-second pause at the bottom of each rep next session to build even more strength at depth.
-
-Example 2 (needs work):
-Workout: 3×8 squats, 45% accuracy, knee min 105°, back avg 38°, duration 2m 10s, frequent "Keep chest up!" warnings
-
-**Overall**
-Solid effort getting through all 3 sets! Your 45% form accuracy tells me there's a clear opportunity to improve — the main issues were shallow depth (knee angle only reached 105°, above parallel) and excessive forward lean (back angle averaged 38°). Let's fix these one at a time.
-
-**What Went Well**
-- You completed all planned sets and reps, showing good determination
-- Your pace was steady — no rushing through reps
-
-**Areas to Improve**
-- Squat depth was above parallel (min knee angle 105°) — aim to get below 90° by widening your stance slightly and sitting back into your hips
-- Excessive forward lean (back avg 38°) triggered multiple "Keep chest up!" warnings — focus on driving your chest upward as you descend, and think about pushing the ground away on the way up
-- Form declined noticeably from Set 1 to Set 3, suggesting fatigue — consider reducing to 2 sets until form is consistent
-
-**Next Workout Tip**
-Before your next session, practice 5 slow bodyweight squats with your heels on a small plate or book — this will help you sit deeper while keeping your chest up.
-
-=== END EXAMPLES ===
-
-Now write the analysis for the actual workout data above. Be concise, specific, and reference the real numbers.
-"""
+Write a SHORT personalized summary — around 4-6 sentences total. Cover: how they did overall, what was strong, what to fix, and one actionable tip for next time. Reference specific numbers (angles, accuracy %). Be encouraging but honest. Do NOT use headers, bullet points, or sections — just a single flowing paragraph."""
 
     try:
         response = await asyncio.to_thread(
             gemini_service.client.models.generate_content,
-            model="gemini-2.0-flash",
+            model="gemini-3-flash-preview",
             contents=prompt,
         )
         summary = response.text if response.text else None

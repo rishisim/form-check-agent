@@ -1018,3 +1018,131 @@ O] WebSocket disconnect message received in loop
 2026-02-07 19:04:53,994 [INFO] TTS generated (24703 bytes) for: 'Workout Complete! Great job!'
 2026-02-07 19:04:59,485 [INFO] [3b1a2106] Client disconnected normally
 2026-02-07 19:04:59,488 [INFO] [3b1a2106] Connection cleaned up (0 active)
+2026-02-07 20:14:39,686 [INFO] [ee6e85fb] WebSocket connection established (1 active)
+2026-02-07 20:14:39,773 [INFO] [7bf79804] WebSocket connection established (2 active)
+2026-02-07 20:14:42,369 [INFO] [7bf79804] Client disconnected normally
+2026-02-07 20:14:42,369 [INFO] [7bf79804] Connection cleaned up (1 active)
+2026-02-07 20:14:42,369 [INFO] [ee6e85fb] Client disconnected normally
+2026-02-07 20:14:42,369 [INFO] [ee6e85fb] Connection cleaned up (0 active)
+2026-02-07 20:14:58,344 [INFO] [66e5d88f] WebSocket connection established (1 active)
+2026-02-07 20:15:07,758 [INFO] [5f8255ff] WebSocket connection established (2 active)
+2026-02-07 20:15:21,255 [INFO] [5f8255ff] Client disconnected normally
+2026-02-07 20:15:21,255 [INFO] [5f8255ff] Connection cleaned up (1 active)
+2026-02-07 20:15:51,313 [INFO] [7b8be8a2] WebSocket connection established (2 active)
+2026-02-07 20:16:02,070 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:16:02,090 [INFO] TTS generated (24285 bytes) for: 'Go! Start your squats!'
+2026-02-07 20:16:25,907 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:16:25,922 [INFO] TTS generated (22613 bytes) for: 'Good depth! Drive up!'
+2026-02-07 20:16:30,184 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:16:30,190 [INFO] TTS generated (15926 bytes) for: 'Good rep!'
+2026-02-07 20:16:30,979 [INFO] [9718f78e] WebSocket connection established (3 active)
+2026-02-07 20:16:34,258 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 20:16:38,360 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:16:42,217 [INFO] [9718f78e] Client disconnected normally
+2026-02-07 20:16:42,218 [INFO] [9718f78e] Connection cleaned up (2 active)
+2026-02-07 20:16:42,218 [INFO] [a114cf09] WebSocket connection established (3 active)
+2026-02-07 20:16:45,178 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 20:16:45,289 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash-preview:generateContent "HTTP/1.1 404 Not Found"
+2026-02-07 20:16:45,289 [ERROR] Gemini analysis error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-3.0-flash-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+2026-02-07 20:16:47,601 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:16:47,602 [INFO] TTS generated (18852 bytes) for: 'Keep chest up!'
+2026-02-07 20:16:47,629 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-07 20:17:04,794 [INFO] [a114cf09] Client disconnected normally
+2026-02-07 20:17:04,794 [INFO] [a114cf09] Connection cleaned up (2 active)
+2026-02-07 20:17:04,797 [INFO] [dfca4254] WebSocket connection established (3 active)
+2026-02-07 20:18:17,275 [INFO] [dfca4254] Client disconnected normally
+2026-02-07 20:18:17,277 [INFO] [dfca4254] Connection cleaned up (2 active)
+2026-02-07 20:18:24,357 [INFO] [9ef86ee0] WebSocket connection established (1 active)
+2026-02-07 20:18:24,629 [INFO] [b37abc23] WebSocket connection established (2 active)
+2026-02-07 20:18:27,138 [INFO] [b37abc23] Client disconnected normally
+2026-02-07 20:18:27,138 [INFO] [b37abc23] Connection cleaned up (1 active)
+2026-02-07 20:18:27,138 [INFO] [9ef86ee0] Client disconnected normally
+2026-02-07 20:18:27,138 [INFO] [9ef86ee0] Connection cleaned up (0 active)
+2026-02-07 20:18:47,163 [INFO] [8c475d63] WebSocket connection established (1 active)
+2026-02-07 20:18:52,532 [INFO] [9bf77f78] WebSocket connection established (2 active)
+2026-02-07 20:18:52,999 [INFO] [8273a161] WebSocket connection established (3 active)
+2026-02-07 20:18:53,013 [INFO] [8c475d63] Client disconnected normally
+2026-02-07 20:18:53,013 [INFO] [8c475d63] Connection cleaned up (2 active)
+2026-02-07 20:18:53,734 [INFO] [69e03c7c] WebSocket connection established (3 active)
+2026-02-07 20:18:55,535 [INFO] [69e03c7c] Client disconnected normally
+2026-02-07 20:18:55,535 [INFO] [69e03c7c] Connection cleaned up (2 active)
+2026-02-07 20:18:56,751 [INFO] [abe8531e] WebSocket connection established (3 active)
+2026-02-07 20:19:02,162 [INFO] [9bf77f78] Client disconnected normally
+2026-02-07 20:19:02,162 [INFO] [9bf77f78] Connection cleaned up (2 active)
+2026-02-07 20:19:09,323 [INFO] [72d72636] WebSocket connection established (3 active)
+2026-02-07 20:19:20,002 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:19:20,024 [INFO] TTS generated (24703 bytes) for: 'Go! Start your squats!'
+2026-02-07 20:19:27,601 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:19:27,618 [INFO] TTS generated (23449 bytes) for: 'Good depth! Drive up!'
+2026-02-07 20:19:34,066 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:19:34,069 [INFO] TTS generated (15926 bytes) for: 'Good rep!'
+2026-02-07 20:19:37,761 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 20:19:41,709 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:19:46,000 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:19:46,015 [INFO] TTS generated (27211 bytes) for: 'Workout Complete! Great job!'
+2026-02-07 20:19:49,156 [INFO] [7feb8fcb] WebSocket connection established (4 active)
+2026-02-07 20:19:54,556 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:19:54,572 [INFO] TTS generated (24285 bytes) for: 'Go! Start your pushups!'
+2026-02-07 20:19:54,614 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-07 20:19:58,835 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-07 20:19:59,502 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:19:59,560 [INFO] TTS generated (18852 bytes) for: 'Squat deeper'
+2026-02-07 20:19:59,603 [INFO] TTS cache hit for: 'Squat deeper'
+2026-02-07 20:20:02,665 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 20:20:02,680 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 20:20:06,699 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-07 20:20:06,706 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:20:06,706 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-07 20:20:09,255 [INFO] [abe8531e] Client disconnected normally
+2026-02-07 20:20:09,255 [INFO] [abe8531e] Connection cleaned up (3 active)
+2026-02-07 20:20:09,255 [INFO] [045adaee] WebSocket connection established (4 active)
+2026-02-07 20:20:14,996 [INFO] [7feb8fcb] Client disconnected normally
+2026-02-07 20:20:14,997 [INFO] [7feb8fcb] Connection cleaned up (3 active)
+2026-02-07 20:20:22,142 [INFO] [eede02cf] WebSocket connection established (4 active)
+2026-02-07 20:20:27,275 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-07 20:20:27,453 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-07 20:20:35,028 [INFO] [045adaee] Client disconnected normally
+2026-02-07 20:20:35,029 [INFO] [045adaee] Connection cleaned up (3 active)
+2026-02-07 20:20:35,029 [INFO] [b324e6d2] WebSocket connection established (4 active)
+2026-02-07 20:20:35,301 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:20:35,331 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:20:39,039 [INFO] [2f603fdd] WebSocket connection established (5 active)
+2026-02-07 20:20:39,048 [INFO] [b324e6d2] Client disconnected normally
+2026-02-07 20:20:39,048 [INFO] [b324e6d2] Connection cleaned up (4 active)
+2026-02-07 20:20:39,661 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-07 20:20:39,666 [INFO] TTS generated (18852 bytes) for: 'Sit back more'
+2026-02-07 20:20:39,679 [INFO] TTS cache hit for: 'Sit back more'
+2026-02-07 20:20:44,167 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:20:44,185 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:20:48,248 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 20:20:48,263 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-07 20:20:56,445 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:20:56,473 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-07 20:21:03,552 [INFO] TTS cache hit for: 'Squat deeper'
+2026-02-07 20:21:03,581 [INFO] TTS cache hit for: 'Squat deeper'
+2026-02-07 20:21:06,810 [INFO] TTS cache hit for: 'Sit back more'
+2026-02-07 20:21:06,826 [INFO] TTS cache hit for: 'Sit back more'
+2026-02-07 20:21:20,760 [INFO] [2f603fdd] Client disconnected normally
+2026-02-07 20:21:20,761 [INFO] [2f603fdd] Connection cleaned up (3 active)
+2026-02-07 20:21:36,490 [INFO] [eede02cf] Client disconnected normally
+2026-02-07 20:21:36,491 [INFO] [eede02cf] Connection cleaned up (2 active)
+2026-02-07 20:21:47,142 [INFO] [963397b4] WebSocket connection established (3 active)
+2026-02-07 20:24:16,973 [INFO] [963397b4] Client disconnected normally
+2026-02-07 20:24:16,976 [INFO] [963397b4] Connection cleaned up (2 active)
+2026-02-07 20:24:16,977 [INFO] [bd4299f0] WebSocket connection established (3 active)
+2026-02-07 20:24:17,197 [INFO] [bd4299f0] Client disconnected normally
+2026-02-07 20:24:17,197 [INFO] [bd4299f0] Connection cleaned up (2 active)
+2026-02-07 20:24:17,197 [INFO] [e1049a91] WebSocket connection established (3 active)
+2026-02-07 20:24:17,742 [INFO] [e1049a91] Client disconnected normally
+2026-02-07 20:24:17,742 [INFO] [e1049a91] Connection cleaned up (2 active)
+2026-02-07 20:24:17,745 [INFO] [8d9cbd9a] WebSocket connection established (3 active)
+2026-02-07 20:24:49,467 [INFO] [8273a161] Client disconnected normally
+2026-02-07 20:24:49,467 [INFO] [8273a161] Connection cleaned up (2 active)
+2026-02-07 20:24:57,342 [INFO] [4b55a747] WebSocket connection established (3 active)
+2026-02-07 20:24:59,769 [INFO] [4b55a747] Client disconnected normally
+2026-02-07 20:24:59,770 [INFO] [4b55a747] Connection cleaned up (2 active)
+2026-02-07 20:25:05,673 [INFO] [8d9cbd9a] Client disconnected normally
+2026-02-07 20:25:05,673 [INFO] [8d9cbd9a] Connection cleaned up (1 active)
+2026-02-07 20:25:07,335 [INFO] [ad51dcf1] WebSocket connection established (2 active)
+2026-02-07 20:25:09,685 [INFO] [ad51dcf1] Client disconnected normally
+2026-02-07 20:25:09,686 [INFO] [ad51dcf1] Connection cleaned up (1 active)
