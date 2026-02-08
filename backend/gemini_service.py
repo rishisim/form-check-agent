@@ -89,19 +89,24 @@ class GeminiService:
             # Use gemini-2.5-flash - has reliable video support (gemini-3-flash-preview has "no usable data" issues)
             model_name = "gemini-2.5-flash"
             
+            exercise_prompts = {
+                "squat": """
+            The user is performing SQUATS. Focus ONLY on: knee bend depth, hip position, back angle, chest.
+            NEVER mention pushups, elbows, or arms.
+            """,
+                "pushup": """
+            The user is performing PUSH-UPS. Focus ONLY on: elbow bend angle, arm position, chest lowering, body line.
+            NEVER mention squats, knees, or legs.
+            """,
+            }
+            exercise_guidance = exercise_prompts.get(exercise_name, f"Focus on {exercise_name} form.")
+            
             prompt = f"""
-            You are an elite gym coach with computer vision expertise. 
-            The user is performing a {exercise_name}.
+            You are an elite gym coach. {exercise_guidance}
             
-            Analyze the video clip carefully:
-            1. Observe the user's body positioning and movement
-            2. Identify any form issues (depth, alignment, stability)
-            3. Focus on safety and effectiveness
-            
-            Give a concise, actionable coaching cue (max 10 words) to fix their form instantly.
+            Analyze the video clip. Identify form issues. Give ONE concise coaching cue (max 12 words).
             If form is perfect, say "Perfect form! Great work!".
-            
-            Be specific and encouraging.
+            Be specific and encouraging. Reference elbows/arms for pushups; knees/hips for squats.
             """
             
             print(f"Requesting analysis from {model_name}...")

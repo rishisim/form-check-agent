@@ -215,7 +215,7 @@ export default function FormCheckPushupScreen() {
 
                     {isProMode && elbowAngle !== null && (
                         <View style={styles.proStats}>
-                            <Text style={styles.proStatsText}>{elbowAngle}°</Text>
+                            <Text style={styles.proStatsText}>Elbow: {elbowAngle}°</Text>
                         </View>
                     )}
                 </SafeAreaView>

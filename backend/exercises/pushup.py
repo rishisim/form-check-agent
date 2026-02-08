@@ -83,26 +83,22 @@ class PushupAnalyzer:
             if elbow_angle < ELBOW_DOWN:
                 self.stage = "down"
 
-        # Feedback
+        # Feedback - always pushup/elbow specific, never mention squats or knees
         if not full_body_visible:
             self.feedback = self.NO_BODY_MSG
         elif not in_plank:
-            self.feedback = "Get in pushup position"
+            self.feedback = "Get in pushup position — body straight, arms under shoulders"
         elif self.stage == "up" and ELBOW_DOWN < elbow_angle < ELBOW_UP:
-            self.feedback = "Go lower - chest toward floor"
+            self.feedback = f"Bend elbows more — {int(elbow_angle)}° now, aim for 90° at bottom"
+        elif self.stage == "up" and elbow_angle >= ELBOW_UP:
+            self.feedback = f"Arms extended ({int(elbow_angle)}°) — lower chest toward floor"
         elif self.stage == "down":
-            self.feedback = "Good! Push back up!"
+            self.feedback = "Good depth! Push up and extend elbows"
 
-        feedback_list = []
-        is_good_form = True
-        if in_plank and (body_angle < 100 or body_angle > 230):
-            is_good_form = False
-
+        is_good_form = in_plank and (100 <= body_angle <= 230)
         final_feedback = self.feedback
         feedback_level = "success"
         if not full_body_visible:
-            feedback_level = "warning"
-        elif feedback_list:
             feedback_level = "warning"
 
         return {
