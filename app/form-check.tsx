@@ -156,7 +156,7 @@ export default function FormCheckScreen() {
         }
         isStreamingRef.current = true;
 
-        const intervalMs = Platform.OS === 'android' ? 400 : 250;
+        const intervalMs = 150;  // ~6.7 fps - more frames = better rep detection
 
         const captureLoop = async () => {
             if (!isStreamingRef.current) {

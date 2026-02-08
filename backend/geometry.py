@@ -4,12 +4,11 @@ import numpy as np
 KEY_LANDMARKS = [0, 11, 12, 23, 24, 25, 26, 27, 28]
 
 
-def is_full_body_in_frame(lm_list, frame_width, frame_height, margin=0.08, exercise="squat"):
+def is_full_body_in_frame(lm_list, frame_width, frame_height, margin=0.03, exercise="squat"):
     """
     Returns True when full body (head, torso, legs, feet) is in frame.
-    Optimized for SIDE/PROFILE view: camera on Y-axis, body along X-axis.
-    - Squat (standing): body vertical in frame → large y_span, small x_span (narrow profile)
-    - Pushup (horizontal): body horizontal in frame → large x_span, small y_span
+    Works facing camera OR sideways. Very permissive - only rejects obvious cut-off.
+    Rep counting does NOT depend on this; it's for feedback only.
     """
     if len(lm_list) < 33:
         return False
@@ -22,7 +21,6 @@ def is_full_body_in_frame(lm_list, frame_width, frame_height, margin=0.08, exerc
     y_min = margin * h
     y_max = (1 - margin) * h
 
-    # 1. Key landmarks (head, shoulders, hips, knees, ankles) must be in bounds
     xs, ys = [], []
     for idx in KEY_LANDMARKS:
         if idx >= len(lm_list):
@@ -33,25 +31,18 @@ def is_full_body_in_frame(lm_list, frame_width, frame_height, margin=0.08, exerc
         if not (x_min <= cx <= x_max and y_min <= cy <= y_max):
             return False
 
-    # 2. Body must span enough (rejects head-only). Side view: squat=vertical (y_span), pushup=horizontal (x_span)
     x_span = max(xs) - min(xs)
     y_span = max(ys) - min(ys)
-    min_span = 0.28 * min(w, h)  # Slightly relaxed for profile (narrow body width)
+    min_span = 0.15 * min(w, h)  # Very permissive
     if x_span < min_span and y_span < min_span:
         return False
 
-    # 3. Squat (side view): body vertical - head top, feet bottom
+    # Squat: minimal vertical span (rejects head-only)
     if exercise == "squat":
         head_y = lm_list[0][2]
         ankle_y = max(lm_list[27][2], lm_list[28][2])
-        if head_y > 0.7 * h:  # Head shouldn't be in bottom 30% (would mean only feet visible)
+        if ankle_y - head_y < 0.15 * h:
             return False
-        if ankle_y < 0.3 * h:  # Ankles shouldn't be in top 30% (would mean only head visible)
-            return False
-        if ankle_y - head_y < 0.25 * h:  # Vertical span head-to-feet at least 25%
-            return False
-
-    # Pushup: body span check above is enough (horizontal or diagonal)
 
     return True
 

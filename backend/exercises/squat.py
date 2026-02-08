@@ -8,18 +8,24 @@ from geometry import calculate_angle, is_full_body_in_frame
 
 from collections import deque
 
+# Thresholds: works facing camera OR sideways
+KNEE_UP = 155       # Standing / top of rep
+KNEE_DOWN = 135     # Bottom - count if we saw knee below this (catches shallow squats)
+COOLDOWN_FRAMES = 2
+
+
 class SquatAnalyzer:
     def __init__(self):
-        self.stage = "up" # Start in "up" position
+        self.stage = "up"
         self.counter = 0
         self.feedback = "Start Squatting"
-        # Track last 30 frames of hip positions for trajectory
-        self.hip_history = deque(maxlen=30) 
+        self.hip_history = deque(maxlen=30)
+        self.min_knee_since_up = 180.0
+        self.frames_since_rep = 999
 
     NO_BODY_MSG = "Get fully in frame — head, torso, legs, feet must all be visible"
 
     def _no_body_response(self):
-        """Return analysis when no/incomplete body detected. Does NOT count reps."""
         return {
             "knee_angle": 0,
             "hip_angle": 0,
@@ -36,7 +42,8 @@ class SquatAnalyzer:
 
     def get_analysis(self, lm_list, frame_width=None, frame_height=None):
         """
-        Returns structured analysis data. Reps ONLY count when FULL body in frame.
+        Rep counting works facing camera OR sideways.
+        Uses trajectory: count when we see knee go down (below KNEE_DOWN) then back up.
         """
         if len(lm_list) < 33:
             return self._no_body_response()
@@ -45,7 +52,7 @@ class SquatAnalyzer:
         if frame_width and frame_height:
             full_body_visible = is_full_body_in_frame(lm_list, frame_width, frame_height, exercise="squat")
 
-        # Side view: use the leg with larger vertical extent (visible profile leg)
+        # Both legs - use MORE BENT knee (works facing and sideways)
         r_hip = lm_list[24][1:]
         r_knee = lm_list[26][1:]
         r_ankle = lm_list[28][1:]
@@ -56,56 +63,53 @@ class SquatAnalyzer:
 
         knee_r = calculate_angle(r_hip, r_knee, r_ankle)
         knee_l = calculate_angle(l_hip, l_knee, l_ankle)
-        # Side view: use leg with larger vertical span (more visible from profile)
+        knee_angle = min(knee_r, knee_l)  # More bent = at bottom
+
         r_leg_span = abs(r_ankle[1] - r_hip[1])
         l_leg_span = abs(l_ankle[1] - l_hip[1])
         use_right = r_leg_span >= l_leg_span
-        knee_angle = knee_r if use_right else knee_l
         hip_y = r_hip[1] if use_right else l_hip[1]
         knee_y = r_knee[1] if use_right else l_knee[1]
 
         self.hip_history.append(r_hip)
         hip_angle = calculate_angle(r_shoulder, r_hip, r_knee)
         is_deep_enough = hip_y >= knee_y
+        self.frames_since_rep += 1
 
-        if knee_angle > 155:
-            self.stage = "up"
-
-        if self.stage == "up" and knee_angle < 95 and full_body_visible:
-            if is_deep_enough:
-                self.stage = "down"
+        # Trajectory-based rep detection (catches reps even at low FPS)
+        if knee_angle > KNEE_UP and self.frames_since_rep > COOLDOWN_FRAMES:
+            if self.min_knee_since_up < KNEE_DOWN:
                 self.counter += 1
-                self.feedback = "Good depth! Drive up!"
-            else:
-                self.feedback = "Lower — hips below knees"
+                self.feedback = "Good depth! Drive up!" if is_deep_enough else "Rep counted!"
+                self.frames_since_rep = 0
+            self.stage = "up"
+            self.min_knee_since_up = 180.0
 
-        # Real-time form checks
+        if self.stage == "up" and knee_angle < KNEE_UP:
+            self.min_knee_since_up = min(self.min_knee_since_up, knee_angle)
+            if knee_angle < KNEE_DOWN:
+                self.stage = "down"
+
+        # Feedback
         feedback_list = []
         is_good_form = True
-        
-        # Check Back Angle (Leaning too far)
-        if hip_angle < 45: # Torso is too horizontal relative to thighs
+        if hip_angle < 45:
             feedback_list.append("Keep chest up!")
             is_good_form = False
-            
-        # Check Knee Depth relative to stage
-        if self.stage == "up" and knee_angle < 140 and knee_angle > 95:
-             feedback_list.append("Squat deeper")
+        if self.stage == "up" and KNEE_DOWN < knee_angle < 150:
+            feedback_list.append("Squat deeper")
 
-        # Combine feedback
         final_feedback = self.feedback
-        feedback_level = 'success' # default
-        
+        feedback_level = "success"
         if not full_body_visible:
             final_feedback = self.NO_BODY_MSG
             feedback_level = "warning"
         elif feedback_list:
             final_feedback = feedback_list[0]
             feedback_level = "warning"
-
         if not is_good_form and full_body_visible:
             feedback_level = "error"
-            
+
         return {
             "knee_angle": int(knee_angle),
             "hip_angle": int(hip_angle),
@@ -117,7 +121,7 @@ class SquatAnalyzer:
             "depth_status": "Good" if hip_y >= knee_y else "High",
             "target_depth_y": knee_y,
             "current_depth_y": hip_y,
-            "hip_trajectory": list(self.hip_history)
+            "hip_trajectory": list(self.hip_history),
         }
 
     def analyze(self, img, lm_list):
@@ -126,18 +130,13 @@ class SquatAnalyzer:
             r_hip = lm_list[24][1:]
             r_knee = lm_list[26][1:]
             r_ankle = lm_list[28][1:]
-            
             angle_knee = calculate_angle(r_hip, r_knee, r_ankle)
-            
-            cv2.putText(img, str(int(angle_knee)), (r_knee[0] + 10, r_knee[1]), 
+            cv2.putText(img, str(int(angle_knee)), (r_knee[0] + 10, r_knee[1]),
                         cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
-
             if angle_knee > 160:
                 self.stage = "up"
             if angle_knee < 90 and self.stage == "up":
                 self.stage = "down"
                 self.counter += 1
                 print("Squat count:", self.counter)
-            
             return img
-
