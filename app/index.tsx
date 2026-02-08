@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
     Animated,
     Dimensions,
     NativeScrollEvent,
     NativeSyntheticEvent,
+    Platform,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -12,6 +13,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WaveHeader } from '../components/WaveHeader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -134,11 +136,17 @@ const PAGE_TITLES = ['Body Weight Exercises', 'Physical Therapy'];
 export default function HomeScreen() {
     const [activePageIndex, setActivePageIndex] = useState(0);
     const horizontalRef = useRef<ScrollView>(null);
+    const scrollX = useRef(new Animated.Value(0)).current;
 
-    const onHorizontalScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const onScroll = Animated.event(
+        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+        { useNativeDriver: false },
+    );
+
+    const onMomentumEnd = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
         const page = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-        if (page !== activePageIndex) setActivePageIndex(page);
-    };
+        setActivePageIndex(page);
+    }, []);
 
     const goToPage = (index: number) => {
         horizontalRef.current?.scrollTo({ x: index * SCREEN_WIDTH, animated: true });
@@ -147,6 +155,7 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
+            <WaveHeader />
             <SafeAreaView style={styles.safeArea}>
                 {/* Header – always visible */}
                 <View style={styles.header}>
@@ -167,19 +176,29 @@ export default function HomeScreen() {
                 </View>
 
                 {/* Horizontal paging scroll */}
-                <ScrollView
-                    ref={horizontalRef}
+                <Animated.ScrollView
+                    ref={horizontalRef as any}
                     horizontal
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
-                    onMomentumScrollEnd={onHorizontalScroll}
+                    onScroll={onScroll}
+                    onMomentumScrollEnd={onMomentumEnd}
+                    scrollEventThrottle={16}
+                    decelerationRate="fast"
+                    overScrollMode="never"
+                    bounces={false}
                     style={styles.pager}
+                    snapToInterval={SCREEN_WIDTH}
+                    snapToAlignment="start"
+                    directionalLockEnabled={true}
+                    disableIntervalMomentum={true}
                 >
                     {/* ─── Page 1: Body Weight Exercises ─── */}
                     <ScrollView
                         style={{ width: SCREEN_WIDTH }}
                         contentContainerStyle={styles.pageContent}
                         showsVerticalScrollIndicator={false}
+                        nestedScrollEnabled={true}
                     >
                         <View style={styles.grid}>
                             <AnimatedExerciseCard
@@ -230,7 +249,7 @@ export default function HomeScreen() {
                             Guided physical therapy routines with real-time form tracking to support your recovery.
                         </Text>
                     </View>
-                </ScrollView>
+                </Animated.ScrollView>
             </SafeAreaView>
         </View>
     );
@@ -244,6 +263,7 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: 'transparent',
+        zIndex: 1,
     },
     header: {
         alignItems: 'center',
