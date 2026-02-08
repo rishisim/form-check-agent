@@ -21,34 +21,37 @@ const CONNECTIONS: [number, number][] = [
 const KEY_JOINTS = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28];
 const VISIBILITY_THRESHOLD = 0.45;
 
-// ── Tuning knobs ────────────────────────────────────────────────────────
-const LERP_SPEED = 0.85;           // near-instant snap to target
-const VELOCITY_DECAY = 0.78;       // prediction decays quickly to avoid overshoot
-const PREDICTION_WEIGHT = 0.75;    // aggressive forward prediction between updates
-const SNAP_DISTANCE = 0.12;        // snap sooner on big jumps
-const STALE_MS = 300;              // dampen prediction sooner when data is stale
+// ─────────────────────────────────────────────────────────────────────────
+// Dead-reckoning constants  (same technique as multiplayer game net-code)
+//
+// The skeleton data is ~300-500 ms old by the time we render it (camera
+// capture + encode + network + MediaPipe).  Instead of showing where the
+// body WAS, we extrapolate forward by the pipeline delay so the skeleton
+// appears where the body IS RIGHT NOW.
+// ─────────────────────────────────────────────────────────────────────────
+const LEAD_TIME_S = 0.18;        // extra seconds to predict AHEAD of current time
+const MAX_EXTRAPOLATE_S = 0.55;  // clamp total extrapolation to avoid runaway
+const VELOCITY_BLEND = 0.45;     // EMA blend for new velocity (lower = smoother)
+const SNAP_DISTANCE = 0.12;      // teleport on big jumps
+const JITTER_THRESHOLD = 0.001;  // ignore sub-pixel noise
 
-interface TrackedPoint {
-    // Smoothed (rendered) position
-    x: number;
-    y: number;
-    // Estimated velocity (normalized units / sec)
+interface JointState {
+    // Last known target from server (normalized 0-1)
+    tx: number;
+    ty: number;
+    // Smoothed velocity (normalized units / sec)
     vx: number;
     vy: number;
+    // Rendered position (updated every animation frame)
+    rx: number;
+    ry: number;
     visible: boolean;
-}
-
-interface TargetPoint {
-    x: number;
-    y: number;
-    visible: boolean;
-    arrivedAt: number; // performance.now() when this target was set
+    arrivedAt: number; // performance.now() when last target arrived
 }
 
 export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true }: SkeletonOverlayProps) => {
     const [viewSize, setViewSize] = useState({ width: 1, height: 1 });
-    const trackedRef = useRef<Map<number, TrackedPoint>>(new Map());
-    const targetRef = useRef<Map<number, TargetPoint>>(new Map());
+    const jointsRef = useRef<Map<number, JointState>>(new Map());
     const prevTargetRef = useRef<Map<number, { x: number; y: number; time: number }>>(new Map());
     const animFrameRef = useRef<number | null>(null);
     const hasLandmarksRef = useRef(false);
@@ -56,12 +59,10 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
 
     const onLayout = useCallback((e: LayoutChangeEvent) => {
         const { width, height } = e.nativeEvent.layout;
-        if (width > 0 && height > 0) {
-            setViewSize({ width, height });
-        }
+        if (width > 0 && height > 0) setViewSize({ width, height });
     }, []);
 
-    // ── Update targets + compute velocity when new landmarks arrive ──────
+    // ── New landmarks arrive → update targets + compute velocity ─────────
     useEffect(() => {
         if (!landmarks || landmarks.length === 0) {
             hasLandmarksRef.current = false;
@@ -71,9 +72,7 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
         const now = performance.now();
 
         const lmMap = new Map<number, number[]>();
-        for (const lm of landmarks) {
-            lmMap.set(lm[0], lm);
-        }
+        for (const lm of landmarks) lmMap.set(lm[0], lm);
 
         for (const [id, lm] of lmMap) {
             const rawX = lm[1];
@@ -83,108 +82,96 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
             const y = rawY;
             const visible = visibility >= VISIBILITY_THRESHOLD;
 
-            // Compute velocity from previous target
+            // Velocity from consecutive server updates
             const prev = prevTargetRef.current.get(id);
-            let vx = 0;
-            let vy = 0;
+            let newVx = 0;
+            let newVy = 0;
             if (prev) {
                 const dtSec = (now - prev.time) / 1000;
-                if (dtSec > 0 && dtSec < 1) {
-                    vx = (x - prev.x) / dtSec;
-                    vy = (y - prev.y) / dtSec;
+                if (dtSec > 0.01 && dtSec < 1.5) {
+                    newVx = (x - prev.x) / dtSec;
+                    newVy = (y - prev.y) / dtSec;
                 }
             }
-
-            // Store as new previous
             prevTargetRef.current.set(id, { x, y, time: now });
-            targetRef.current.set(id, { x, y, visible, arrivedAt: now });
 
-            const tracked = trackedRef.current.get(id);
-            if (!tracked) {
-                // First appearance → snap
-                trackedRef.current.set(id, { x, y, vx, vy, visible });
+            const joint = jointsRef.current.get(id);
+            if (!joint) {
+                // First sighting — snap everything
+                jointsRef.current.set(id, {
+                    tx: x, ty: y,
+                    vx: newVx, vy: newVy,
+                    rx: x, ry: y,
+                    visible,
+                    arrivedAt: now,
+                });
             } else {
-                // Update velocity on tracked point (blended)
-                tracked.vx = vx * 0.6 + tracked.vx * 0.4;
-                tracked.vy = vy * 0.6 + tracked.vy * 0.4;
-                tracked.visible = visible;
-
-                // Snap if the target jumped far (e.g., person re-entered frame)
-                const dist = Math.hypot(x - tracked.x, y - tracked.y);
+                const dist = Math.hypot(x - joint.tx, y - joint.ty);
                 if (dist > SNAP_DISTANCE) {
-                    tracked.x = x;
-                    tracked.y = y;
-                    tracked.vx = 0;
-                    tracked.vy = 0;
+                    // Big jump (person re-entered) — hard reset
+                    joint.tx = x; joint.ty = y;
+                    joint.rx = x; joint.ry = y;
+                    joint.vx = 0; joint.vy = 0;
+                } else {
+                    // Smooth velocity with EMA to avoid jittery prediction
+                    joint.vx = newVx * VELOCITY_BLEND + joint.vx * (1 - VELOCITY_BLEND);
+                    joint.vy = newVy * VELOCITY_BLEND + joint.vy * (1 - VELOCITY_BLEND);
+                    joint.tx = x;
+                    joint.ty = y;
+                    // SNAP rendered position to the dead-reckoned spot immediately
+                    // (the animation loop will continue extrapolating from here)
+                    const leadNow = Math.min(LEAD_TIME_S, MAX_EXTRAPOLATE_S);
+                    joint.rx = x + joint.vx * leadNow;
+                    joint.ry = y + joint.vy * leadNow;
                 }
+                joint.visible = visible;
+                joint.arrivedAt = now;
             }
         }
     }, [landmarks, mirrored]);
 
-    // ── 60 fps animation loop with velocity prediction ───────────────────
+    // ── 60 fps dead-reckoning loop ───────────────────────────────────────
+    // Every frame: rendered pos = target + velocity × (timeSinceTarget + LEAD)
+    // No lerp. No smoothing on position. Just pure extrapolation.
+    // This makes the skeleton track where the body IS, not where it WAS.
     useEffect(() => {
-        let lastTime = performance.now();
-
         const animate = (now: number) => {
-            const dt = Math.min((now - lastTime) / 1000, 0.1);
-            lastTime = now;
-
             if (!hasLandmarksRef.current) {
                 animFrameRef.current = requestAnimationFrame(animate);
                 return;
             }
 
-            const lerpFactor = 1 - Math.pow(1 - LERP_SPEED, dt * 60);
             let needsUpdate = false;
 
-            for (const [id, tgt] of targetRef.current) {
-                const pt = trackedRef.current.get(id);
-                if (!pt) {
-                    trackedRef.current.set(id, {
-                        x: tgt.x, y: tgt.y, vx: 0, vy: 0, visible: tgt.visible,
-                    });
-                    needsUpdate = true;
-                    continue;
-                }
+            for (const [, joint] of jointsRef.current) {
+                if (!joint.visible) continue;
 
-                // How stale is the data?
-                const staleness = now - tgt.arrivedAt;
-                // Dampen prediction when data is stale
-                const predictionScale = staleness < STALE_MS
-                    ? PREDICTION_WEIGHT
-                    : PREDICTION_WEIGHT * Math.max(0, 1 - (staleness - STALE_MS) / 600);
+                const timeSinceUpdate = (now - joint.arrivedAt) / 1000;
+                // Total time to extrapolate: time elapsed + lead-time, capped
+                const extrapT = Math.min(timeSinceUpdate + LEAD_TIME_S, MAX_EXTRAPOLATE_S);
 
-                // Predicted target = actual target + velocity extrapolation
-                const predX = tgt.x + pt.vx * dt * predictionScale;
-                const predY = tgt.y + pt.vy * dt * predictionScale;
+                // Dead-reckoned position
+                const drX = joint.tx + joint.vx * extrapT;
+                const drY = joint.ty + joint.vy * extrapT;
 
-                const dx = predX - pt.x;
-                const dy = predY - pt.y;
-
-                if (Math.abs(dx) > 0.0003 || Math.abs(dy) > 0.0003) {
-                    pt.x += dx * lerpFactor;
-                    pt.y += dy * lerpFactor;
+                // Only update if it moved enough (avoids unnecessary renders)
+                if (Math.abs(drX - joint.rx) > JITTER_THRESHOLD ||
+                    Math.abs(drY - joint.ry) > JITTER_THRESHOLD) {
+                    joint.rx = drX;
+                    joint.ry = drY;
                     needsUpdate = true;
                 }
-
-                // Decay velocity over time
-                pt.vx *= Math.pow(VELOCITY_DECAY, dt * 60);
-                pt.vy *= Math.pow(VELOCITY_DECAY, dt * 60);
             }
 
             if (needsUpdate) {
                 setTick(t => t + 1);
             }
-
             animFrameRef.current = requestAnimationFrame(animate);
         };
 
         animFrameRef.current = requestAnimationFrame(animate);
-
         return () => {
-            if (animFrameRef.current !== null) {
-                cancelAnimationFrame(animFrameRef.current);
-            }
+            if (animFrameRef.current !== null) cancelAnimationFrame(animFrameRef.current);
         };
     }, []);
 
@@ -193,9 +180,9 @@ export const SkeletonOverlay = memo(({ landmarks, hipTrajectory, mirrored = true
     const { width, height } = viewSize;
 
     const getPoint = (idx: number) => {
-        const pt = trackedRef.current.get(idx);
-        if (!pt || !pt.visible) return null;
-        return { x: pt.x * width, y: pt.y * height };
+        const j = jointsRef.current.get(idx);
+        if (!j || !j.visible) return null;
+        return { x: j.rx * width, y: j.ry * height };
     };
 
     const trajectoryPoints = hipTrajectory
