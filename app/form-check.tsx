@@ -71,6 +71,12 @@ export default function FormCheckScreen() {
     const reconnectDelayRef = useRef(1000);
     const lastFeedbackRef = useRef('');
 
+    // ─── Workout Stats Tracking ─────────
+    const workoutStartRef = useRef<number>(0);
+    const setDataRef = useRef<Array<{ validReps: number; invalidReps: number }>>([]);
+    const kneeAngleStatsRef = useRef({ min: Infinity, max: -Infinity, sum: 0, count: 0 });
+    const hipAngleStatsRef = useRef({ min: Infinity, max: -Infinity, sum: 0, count: 0 });
+
     // Workout refs (avoid stale closures)
     const currentSetRef = useRef(1);
     const isSetTransitionRef = useRef(false);
@@ -100,6 +106,9 @@ export default function FormCheckScreen() {
     useEffect(() => {
         if (isSetTransitionRef.current || isWorkoutCompleteRef.current) return;
         if (validReps > 0 && validReps >= repsPerSet) {
+            // Record set data for post-workout analysis
+            setDataRef.current.push({ validReps, invalidReps });
+
             if (currentSetRef.current >= totalSets) {
                 // All sets done → Workout complete
                 isWorkoutCompleteRef.current = true;
@@ -223,6 +232,22 @@ export default function FormCheckScreen() {
                             setKneeAngle(analysis.knee_angle);
                             setHipAngle(analysis.hip_angle);
                             setSideDetected(analysis.side_detected);
+
+                            // Track angle stats for post-workout analysis
+                            if (analysis.knee_angle != null) {
+                                const ks = kneeAngleStatsRef.current;
+                                ks.min = Math.min(ks.min, analysis.knee_angle);
+                                ks.max = Math.max(ks.max, analysis.knee_angle);
+                                ks.sum += analysis.knee_angle;
+                                ks.count++;
+                            }
+                            if (analysis.hip_angle != null) {
+                                const hs = hipAngleStatsRef.current;
+                                hs.min = Math.min(hs.min, analysis.hip_angle);
+                                hs.max = Math.max(hs.max, analysis.hip_angle);
+                                hs.sum += analysis.hip_angle;
+                                hs.count++;
+                            }
 
                             setTargetDepthY(analysis.target_depth_y || 0);
                             setCurrentDepthY(analysis.current_depth_y || 0);
@@ -397,6 +422,7 @@ export default function FormCheckScreen() {
     // Only start streaming after countdown finishes
     useEffect(() => {
         if (isConnected && permission?.granted && !isCountdownActive && !isWorkoutCompleteRef.current) {
+            if (!workoutStartRef.current) workoutStartRef.current = Date.now();
             startStreaming();
         }
     }, [isConnected, permission, startStreaming, isCountdownActive]);
@@ -405,6 +431,29 @@ export default function FormCheckScreen() {
     const totalRepsGoal = totalSets * repsPerSet;
     const completedReps = (currentSet - 1) * repsPerSet + Math.min(validReps, repsPerSet);
     const progressPercent = Math.min((completedReps / totalRepsGoal) * 100, 100);
+
+    // ─── Navigate to Analysis ────────────────────
+    const handleShowAnalysis = useCallback(() => {
+        const workoutDuration = Math.round((Date.now() - workoutStartRef.current) / 1000);
+        const ks = kneeAngleStatsRef.current;
+        const hs = hipAngleStatsRef.current;
+
+        router.push({
+            pathname: '/analysis',
+            params: {
+                totalSets: totalSets.toString(),
+                repsPerSet: repsPerSet.toString(),
+                setData: JSON.stringify(setDataRef.current),
+                workoutDuration: workoutDuration.toString(),
+                kneeMin: ks.count ? Math.round(ks.min).toString() : '0',
+                kneeMax: ks.count ? Math.round(ks.max).toString() : '0',
+                kneeAvg: ks.count ? Math.round(ks.sum / ks.count).toString() : '0',
+                hipMin: hs.count ? Math.round(hs.min).toString() : '0',
+                hipMax: hs.count ? Math.round(hs.max).toString() : '0',
+                hipAvg: hs.count ? Math.round(hs.sum / hs.count).toString() : '0',
+            },
+        });
+    }, [router, totalSets, repsPerSet]);
 
     // ─── Permission Screens ──────────────────────
     if (!permission) {
@@ -598,10 +647,17 @@ export default function FormCheckScreen() {
                         <View style={styles.completeDivider} />
                         <TouchableOpacity
                             style={styles.completeButton}
+                            onPress={handleShowAnalysis}
+                            activeOpacity={0.85}
+                        >
+                            <Text style={styles.completeButtonText}>📊  Show Analysis</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.completeButtonSecondary}
                             onPress={() => router.replace('/')}
                             activeOpacity={0.85}
                         >
-                            <Text style={styles.completeButtonText}>Back to Home</Text>
+                            <Text style={styles.completeButtonSecondaryText}>Back to Home</Text>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -866,6 +922,20 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '800',
         color: '#fff',
+        letterSpacing: 0.3,
+    },
+    completeButtonSecondary: {
+        marginTop: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 44,
+        borderRadius: 22,
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.3)',
+    },
+    completeButtonSecondaryText: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.85)',
         letterSpacing: 0.3,
     },
 
