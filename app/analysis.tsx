@@ -36,16 +36,8 @@ function renderAISummary(text: string) {
         // Bold header: **text**
         if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
             const headerText = trimmed.replace(/\*\*/g, '');
-            // Pick icon based on header
-            let icon = '📋';
-            if (/overall/i.test(headerText)) icon = '📋';
-            else if (/went well|strength/i.test(headerText)) icon = '✅';
-            else if (/improve|work on/i.test(headerText)) icon = '🔧';
-            else if (/next|tip/i.test(headerText)) icon = '🎯';
-
             elements.push(
                 <View key={key++} style={aiStyles.sectionHeader}>
-                    <Text style={aiStyles.sectionIcon}>{icon}</Text>
                     <Text style={aiStyles.sectionTitle}>{headerText}</Text>
                 </View>,
             );
@@ -81,21 +73,21 @@ const aiStyles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 14,
         marginBottom: 6,
-    },
-    sectionIcon: {
-        fontSize: 16,
-        marginRight: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: '#88B04B',
+        paddingLeft: 10,
     },
     sectionTitle: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: '#444',
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#333',
+        letterSpacing: 0.2,
     },
     bulletRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginBottom: 5,
-        paddingLeft: 8,
+        marginBottom: 6,
+        paddingLeft: 12,
     },
     bulletDot: {
         fontSize: 14,
@@ -117,6 +109,7 @@ const aiStyles = StyleSheet.create({
         color: '#555',
         lineHeight: 21,
         marginBottom: 4,
+        paddingLeft: 12,
     },
 });
 

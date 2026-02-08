@@ -304,8 +304,15 @@ class SquatAnalyzer:
                     self.counter += 1
                     self._last_rep_time = now
 
+                    # "Squat deeper" is guidance during descent, not a form error.
+                    # If they followed through and achieved good depth, exclude it.
+                    actual_form_issues = [
+                        issue for issue in self._rep_form_issues
+                        if issue != "Squat deeper" or not self._rep_had_good_depth
+                    ]
+
                     rep_is_valid = (
-                        len(self._rep_form_issues) == 0
+                        len(actual_form_issues) == 0
                         and self._rep_had_good_depth
                     )
 
@@ -316,8 +323,8 @@ class SquatAnalyzer:
                         self.invalid_reps += 1
                         if not self._rep_had_good_depth:
                             self.feedback = "Deeper! Hips below knees."
-                        elif self._rep_form_issues:
-                            self.feedback = self._rep_form_issues[0]
+                        elif actual_form_issues:
+                            self.feedback = actual_form_issues[0]
                         else:
                             self.feedback = "Check form"
 

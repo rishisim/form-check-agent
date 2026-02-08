@@ -173,7 +173,21 @@ Real-time feedback triggered:
 {feedback_section}
 
 === INSTRUCTIONS ===
-Write a SHORT personalized summary — around 4-6 sentences total. Cover: how they did overall, what was strong, what to fix, and one actionable tip for next time. Reference specific numbers (angles, accuracy %). Be encouraging but honest. Do NOT use headers, bullet points, or sections — just a single flowing paragraph."""
+Write a structured workout summary using this EXACT format. Be specific with numbers (angles, percentages). Be encouraging but honest. Keep each bullet point to 1-2 sentences max. Do NOT use emojis.
+
+**Overall Performance**
+One sentence summary of how they did overall, referencing their form accuracy percentage.
+
+**What Went Well**
+- First strength (specific to their data)
+- Second strength if applicable
+
+**Areas to Improve**
+- First area needing work (reference specific angles or feedback)
+- Second area if applicable
+
+**Tip for Next Time**
+- One specific, actionable tip they can apply immediately"""
 
     try:
         response = await asyncio.to_thread(

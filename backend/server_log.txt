@@ -1414,3 +1414,62 @@ O] WebSocket disconnect message received in loop
 2026-02-07 22:44:57,670 [INFO] TTS cache hit for: 'Go! Start your pushups!'
 2026-02-07 22:45:06,537 [INFO] [998c6296] Client disconnected normally
 2026-02-07 22:45:06,537 [INFO] [998c6296] Connection cleaned up (0 active)
+2026-02-08 01:18:47,329 [INFO] [96883afa] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 01:18:50,102 [INFO] [96883afa] Client disconnected normally
+2026-02-08 01:18:50,102 [INFO] [96883afa] Connection cleaned up (0 active)
+2026-02-08 01:19:16,527 [INFO] [4a38fce6] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 01:19:17,504 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:19:17,517 [INFO] TTS generated (21777 bytes) for: 'Good depth! Push up!'
+2026-02-08 01:19:17,539 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:22,181 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:19:22,185 [INFO] TTS generated (20524 bytes) for: 'Keep body straight!'
+2026-02-08 01:19:22,198 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:19:26,390 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:26,407 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:33,486 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:19:33,515 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:19:37,487 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:37,505 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:44,685 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:19:44,714 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:19:51,031 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:51,058 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:19:58,788 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:19:58,814 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:08,955 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:08,981 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:13,061 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:13,078 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:16,745 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:16,763 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:22,251 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:22,278 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:32,406 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:32,429 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:35,878 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:35,896 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:40,873 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:40,888 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:20:49,244 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:49,269 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:20:57,630 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:20:57,643 [INFO] TTS generated (20524 bytes) for: "Don't pike hips up!"
+2026-02-08 01:20:57,669 [INFO] TTS cache hit for: "Don't pike hips up!"
+2026-02-08 01:21:01,185 [INFO] [5f8aac70] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 01:21:01,674 [INFO] [5f8aac70] Client disconnected normally
+2026-02-08 01:21:01,674 [INFO] [5f8aac70] Connection cleaned up (0 active)
+2026-02-08 01:21:01,899 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:21:01,912 [INFO] TTS generated (20942 bytes) for: 'Good depth! Push up!'
+2026-02-08 01:21:09,256 [INFO] [dfac2f76] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 01:21:10,446 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:21:10,458 [INFO] TTS generated (20942 bytes) for: 'Keep body straight!'
+2026-02-08 01:21:10,485 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:21:16,322 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:21:16,337 [INFO] TTS generated (22613 bytes) for: 'Good depth! Push up!'
+2026-02-08 01:21:16,360 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:21:19,937 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:21:19,954 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 01:21:27,107 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:21:27,224 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 01:21:27,238 [INFO] [dfac2f76] Client disconnected normally
+2026-02-08 01:21:27,238 [INFO] [dfac2f76] Connection cleaned up (0 active)
