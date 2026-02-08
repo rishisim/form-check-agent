@@ -113,7 +113,7 @@ export default function FormCheckPushupScreen() {
     const startStreaming = useCallback(async () => {
         if (isStreamingRef.current) return;
         isStreamingRef.current = true;
-        const intervalMs = 100;  // ~10 fps for better pushup rep detection
+        const intervalMs = Platform.OS === 'android' ? 400 : 250;
         const captureLoop = async () => {
             if (!isStreamingRef.current) return;
             try {

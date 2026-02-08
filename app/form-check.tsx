@@ -11,7 +11,7 @@ import { colors, spacing, radius } from '../constants/theme';
 
 // Configuration - Your computer's local IP for physical device testing
 // Make sure your phone is on the same WiFi network as your computer
-const SERVER_URL = 'ws://10.194.82.50:8000/ws/video';
+const SERVER_URL = 'ws://10.194.82.50:8000/ws/video?exercise=squat';
 
 // For emulator testing, you can use:
 // Android emulator: 'ws://10.0.2.2:8000/ws/video'
@@ -158,7 +158,7 @@ export default function FormCheckScreen() {
         }
         isStreamingRef.current = true;
 
-        const intervalMs = 150;  // ~6.7 fps - more frames = better rep detection
+        const intervalMs = Platform.OS === 'android' ? 400 : 250;
 
         const captureLoop = async () => {
             if (!isStreamingRef.current) {

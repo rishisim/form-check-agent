@@ -50,10 +50,14 @@ async def websocket_video_endpoint(websocket: WebSocket):
     Query param: exercise=squat|pushup (default: squat)
     Returns pose analysis and AI feedback.
     """
-    query_string = websocket.scope.get("query_string", b"").decode()
+    query_string = websocket.scope.get("query_string") or b""
+    if isinstance(query_string, bytes):
+        query_string = query_string.decode("utf-8", errors="ignore")
     params = parse_qs(query_string)
-    exercise = params.get("exercise", ["squat"])[0].lower()
-    analyzer = ANALYZERS.get(exercise, squat_analyzer)
+    exercise = (params.get("exercise") or ["squat"])[0].strip().lower()
+    if exercise not in ANALYZERS:
+        exercise = "squat"
+    analyzer = ANALYZERS[exercise]
 
     await websocket.accept()
     print(f"WebSocket connection established (exercise={exercise})")
