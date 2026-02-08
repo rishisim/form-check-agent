@@ -8,20 +8,32 @@
 </div>
 <br />
 
-Form Check Agent is a real-time AI coaching application that helps users improve their exercise form using their phone's camera. By leveraging computer vision and generative AI, it provides instant biomechanical feedback — including a live skeleton overlay, depth tracking, rep counting, and per-rep form validation — to ensure safe and effective workouts.
+Form Check Agent is a real-time AI coaching application that helps users improve their exercise form using their phone's camera. By leveraging computer vision and generative AI, it provides instant biomechanical feedback — including a live skeleton overlay, depth tracking, rep counting, per-rep form validation, and **voice coaching** — to ensure safe and effective workouts.
 
 ## 🚀 Features
 
+### Exercise Analysis
 - **Real-Time Pose Detection**: Uses MediaPipe to track 33 body landmarks at ~7 fps with automatic side detection (left/right).
+- **Multi-Exercise Support**: Full analysis for **Squats** and **Push-ups** with exercise-specific form validation.
 - **Smooth Skeleton Overlay**: 60 fps interpolated skeleton drawn on the camera feed with hip trajectory visualization.
-- **Depth Guide Line**: Visual target-depth indicator showing where your hips need to reach relative to your knees.
-- **Rep Counting with Form Validation**: 4-stage state machine (up → descending → bottom → ascending) counts reps and classifies each as **valid** or **invalid** based on depth and posture.
+- **Depth Guide Line**: Visual target-depth indicator showing where your hips/chest need to reach.
+- **Rep Counting with Form Validation**: 4-stage state machine counts reps and classifies each as **valid** or **invalid** based on depth and posture.
+
+### Workout Management
 - **Workout Configuration**: Configurable sets, reps-per-set, and countdown timer from a dedicated setup screen.
-- **Set & Workout Tracking**: Automatic set transitions with rest periods and a full-screen workout-complete summary.
-- **Live HUD Metrics**: Real-time display of knee angle, back (hip) angle, detected side, and connection status.
-- **Color-Coded Feedback Toast**: Contextual coaching cues (success / warning / error) displayed as a floating pill at the bottom of the screen.
+- **Set & Workout Tracking**: Automatic set transitions with rest periods (skippable) and a full-screen workout-complete summary.
+- **Workout Streak Tracking**: Tracks consecutive workout days with streak preservation.
+
+### Coaching & Feedback
+- **Live HUD Metrics**: Real-time display of joint angles, detected side, and connection status.
+- **Color-Coded Feedback Toast**: Contextual coaching cues (success / warning / error) displayed as a floating pill.
+- **Voice Coaching (TTS)**: Real-time spoken feedback via **ElevenLabs** text-to-speech integration with rate-limiting and caching.
+- **AI-Powered Post-Workout Analysis**: Detailed workout summaries and coaching insights via **Google Gemini Flash** with an interactive chat feature.
+
+### User Experience
+- **Dark/Light Theme**: Fully themed UI with animated circle-reveal transition and persistent preference storage.
+- **Particle Background Animation**: Beautiful floating particle effect on the home screen.
 - **Robust WebSocket Connection**: Exponential-backoff reconnection, session IDs, frame sequencing, and server keepalive pings.
-- **AI-Powered Coaching (Gemini)**: Buffers frames for periodic high-level analysis via Google Gemini Flash.
 - **Privacy Focused**: Frames are processed in memory; nothing is stored permanently.
 
 ## 🛠 Tech Stack
@@ -32,28 +44,41 @@ Form Check Agent is a real-time AI coaching application that helps users improve
 | **Backend** | Python · FastAPI · WebSockets · Uvicorn |
 | **Computer Vision** | OpenCV · MediaPipe Pose (lite model) |
 | **AI / LLM** | Google Gemini 1.5 Flash |
+| **Voice** | ElevenLabs Text-to-Speech (Turbo v2.5) |
 | **Communication** | WebSocket (JSON payloads with Base64-encoded JPEG frames) |
 
 ## 📁 Project Structure
 
 ```
 ├── app/
-│   ├── _layout.tsx          # Expo Router stack (headerless)
-│   ├── index.tsx             # Home screen – exercise selector
+│   ├── _layout.tsx          # Expo Router stack with ThemeProvider
+│   ├── index.tsx             # Home screen – exercise selector with streak tracking
 │   ├── workout-config.tsx    # Sets / reps / timer configuration
-│   └── form-check.tsx        # Live camera + analysis screen
+│   ├── form-check.tsx        # Live camera + analysis screen
+│   └── analysis.tsx          # Post-workout analysis + AI chat
 ├── components/
-│   ├── SkeletonOverlay.tsx   # Smooth SVG skeleton + hip trajectory
-│   ├── DepthLine.tsx         # Target depth line + hip indicator
+│   ├── SkeletonOverlay.tsx   # Smooth SVG skeleton + trajectory
+│   ├── DepthLine.tsx         # Target depth line + indicator
 │   ├── RepCounter.tsx        # Valid / invalid rep counter card
-│   └── FeedbackToast.tsx     # Color-coded coaching toast
+│   ├── FeedbackToast.tsx     # Color-coded coaching toast
+│   ├── ThemeToggle.tsx       # Animated sun/moon theme toggle
+│   ├── ParticleBackground.tsx # Floating particle animation
+│   └── WaveHeader.tsx        # Decorative wave header
+├── hooks/
+│   ├── useTheme.tsx          # Theme context with dark/light modes
+│   ├── useTTS.ts             # Text-to-speech hook for voice coaching
+│   └── useOrientation.ts     # Device orientation handling
 ├── backend/
-│   ├── server.py             # FastAPI WebSocket server
+│   ├── server.py             # FastAPI WebSocket server + TTS endpoint
 │   ├── pose_tracker.py       # MediaPipe pose estimation wrapper
 │   ├── geometry.py           # Angle calculation utility
-│   ├── gemini_service.py     # Gemini video analysis service
-│   └── exercises/
-│       └── squat.py          # Squat analyzer (state machine + form checks)
+│   ├── exercises/
+│   │   ├── base.py           # Shared utilities (angle smoothing, feedback stabilization)
+│   │   ├── squat.py          # Squat analyzer (state machine + form checks)
+│   │   └── pushup.py         # Push-up analyzer with body alignment checks
+│   └── services/
+│       ├── gemini_service.py # Gemini video analysis service
+│       └── tts_service.py    # ElevenLabs TTS service with caching
 ```
 
 ## 📦 Installation
@@ -64,6 +89,7 @@ Form Check Agent is a real-time AI coaching application that helps users improve
 - Python 3.9+
 - Expo Go app installed on your mobile device (iOS / Android)
 - A Google Cloud API Key for Gemini
+- (Optional) An ElevenLabs API Key for voice coaching
 
 ### 1. Backend Setup
 
@@ -77,7 +103,8 @@ pip install -r requirements.txt
 Create a `.env` file in the `backend/` directory:
 
 ```
-GEMINI_API_KEY=your_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here  # Optional
 ```
 
 Start the server:
@@ -104,12 +131,19 @@ Scan the QR code with Expo Go, or press `i` (iOS simulator) / `a` (Android emula
 
 1.  Ensure your phone and computer are on the **same Wi-Fi network**.
 2.  Start the backend server.
-3.  Open the app → select **Squats**.
+3.  Open the app → select an exercise (**Squats** or **Push-ups**).
 4.  Configure your workout (sets, reps, countdown timer) and tap **Start Workout**.
 5.  Position yourself so the camera can see your full body from the side.
-6.  Perform your reps — the app provides real-time skeleton overlay, depth guidance, and coaching feedback.
-7.  After each set, a brief transition screen appears before the next set.
-8.  When all sets are complete, a summary screen is shown.
+6.  Perform your reps — the app provides real-time skeleton overlay, depth guidance, voice coaching, and visual feedback.
+7.  After each set, a brief rest screen appears (tap "Skip Rest" to continue immediately).
+8.  When all sets are complete, view your detailed **Analysis** screen with AI-powered insights.
+
+## 🎨 Theme Support
+
+The app supports both light and dark themes:
+- Toggle via the sun/moon button in the top-right corner
+- Theme preference is persisted across app sessions
+- Features a smooth animated circle-reveal transition effect
 
 ## 🤝 Contributing
 
