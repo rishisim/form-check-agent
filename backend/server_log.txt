@@ -1550,3 +1550,40 @@ O] WebSocket disconnect message received in loop
 2026-02-08 01:40:35,800 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
 2026-02-08 01:40:43,289 [INFO] [f569812b] Client disconnected normally
 2026-02-08 01:40:43,289 [INFO] [f569812b] Connection cleaned up (1 active)
+2026-02-08 01:41:04,322 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 01:41:04,326 [INFO] TTS generated (18016 bytes) for: 'Keep chest up!'
+2026-02-08 01:41:04,350 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 01:41:08,991 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 01:41:09,006 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 01:41:12,062 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 01:41:12,075 [INFO] TTS cache hit for: 'Keep chest up!'
+2026-02-08 01:41:15,120 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 01:41:15,132 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 01:41:16,309 [INFO] [155d28ca] Client disconnected normally
+2026-02-08 01:41:16,309 [INFO] [155d28ca] Connection cleaned up (0 active)
+2026-02-08 01:42:04,630 [INFO] [14260329] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 01:42:15,137 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 01:42:34,732 [INFO] [14260329] Client disconnected normally
+2026-02-08 01:42:34,733 [INFO] [14260329] Connection cleaned up (0 active)
+2026-02-08 01:42:50,098 [INFO] [49d91621] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 01:43:00,417 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 01:43:01,611 [INFO] [49d91621] Client disconnected normally
+2026-02-08 01:43:01,612 [INFO] [49d91621] Connection cleaned up (0 active)
+2026-02-08 01:50:46,092 [INFO] TTS cache hit for: 'Good depth! Drive up!'
+2026-02-08 01:50:47,118 [INFO] [fc23a196] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 01:50:51,336 [INFO] [fc23a196] Client disconnected normally
+2026-02-08 01:50:51,336 [INFO] [fc23a196] Connection cleaned up (0 active)
+2026-02-08 02:05:18,100 [INFO] [540d2a1d] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 02:05:28,501 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 02:05:28,538 [INFO] TTS cache hit for: 'Go! Start your pushups!'
+2026-02-08 02:05:35,906 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 02:05:35,928 [INFO] TTS cache hit for: 'Keep body straight!'
+2026-02-08 02:05:42,369 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 02:05:42,395 [INFO] TTS cache hit for: 'Good depth! Push up!'
+2026-02-08 02:05:44,619 [INFO] [540d2a1d] Client disconnected normally
+2026-02-08 02:05:44,619 [INFO] [540d2a1d] Connection cleaned up (0 active)
+2026-02-08 02:05:47,852 [INFO] [1dd7ff79] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 02:05:58,092 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 02:05:58,124 [INFO] TTS cache hit for: 'Go! Start your squats!'
+2026-02-08 02:06:12,265 [INFO] [1dd7ff79] Client disconnected normally
+2026-02-08 02:06:12,265 [INFO] [1dd7ff79] Connection cleaned up (0 active)
