@@ -2293,3 +2293,579 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2026-02-08 11:39:53,254 [INFO] TTS cache hit for: 'Great depth, drive it up!'
 2026-02-08 11:39:59,905 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
 2026-02-08 11:39:59,940 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 11:41:03,103 [INFO] [acbc0c69] Client disconnected normally
+2026-02-08 11:41:03,103 [INFO] [acbc0c69] Connection cleaned up (0 active)
+2026-02-08 12:10:58,968 [INFO] [586c53d9] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:11:02,655 [INFO] [586c53d9] Client disconnected normally
+2026-02-08 12:11:02,656 [INFO] [586c53d9] Connection cleaned up (0 active)
+2026-02-08 12:11:07,769 [INFO] [d8b3a89a] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:11:18,165 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:11:26,519 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:11:49,884 [INFO] [d8b3a89a] Client disconnected normally
+2026-02-08 12:11:49,884 [INFO] [d8b3a89a] Connection cleaned up (0 active)
+2026-02-08 12:11:52,508 [INFO] [334854fd] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:11:54,029 [INFO] [334854fd] Client disconnected normally
+2026-02-08 12:11:54,029 [INFO] [334854fd] Connection cleaned up (0 active)
+2026-02-08 12:11:58,809 [INFO] [c36b4a00] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:12:04,020 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:12:07,034 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:12:14,495 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:12:19,385 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:12:26,239 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:12:29,612 [INFO] [c36b4a00] Client disconnected normally
+2026-02-08 12:12:29,612 [INFO] [c36b4a00] Connection cleaned up (0 active)
+2026-02-08 12:21:09,176 [INFO] [dce25d78] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:21:14,379 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:21:14,412 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:21:21,084 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:21:21,123 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:22:15,465 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:22:15,476 [INFO] TTS generated (15926 bytes) for: 'Good rep!'
+2026-02-08 12:22:15,508 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:22:28,307 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 12:22:28,338 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 12:22:46,218 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:22:46,251 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:22:49,629 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:22:49,654 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:22:56,302 [INFO] [dce25d78] Client disconnected normally
+2026-02-08 12:22:56,302 [INFO] [dce25d78] Connection cleaned up (0 active)
+2026-02-08 12:24:05,131 [INFO] [4972ab07] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:24:10,167 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:24:10,202 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:24:13,371 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:24:13,397 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:24:19,462 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:24:19,496 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:24:23,012 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:24:23,038 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:24:26,558 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:24:26,581 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:24:38,007 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:24:44,030 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:24:44,038 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:24:44,038 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:27:16,509 [INFO] [5b896729] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 12:27:21,637 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:27:21,669 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:27:25,682 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:27:25,696 [INFO] TTS generated (24703 bytes) for: 'Try to lower just a bit more'
+2026-02-08 12:27:25,729 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:27:29,272 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:27:29,299 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:27:33,857 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:27:33,870 [INFO] TTS generated (23449 bytes) for: 'Great depth, push it up!'
+2026-02-08 12:27:33,892 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:27:37,244 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:27:37,287 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:27:40,460 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:27:40,485 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:27:44,028 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:27:44,059 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:27:49,031 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:27:49,054 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:27:55,633 [INFO] [5b896729] Resetting rep counter
+2026-02-08 12:27:55,942 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:27:55,944 [INFO] TTS generated (18852 bytes) for: "Set 2  let's go!"
+2026-02-08 12:27:55,975 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 12:28:20,438 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:28:20,454 [INFO] TTS generated (33062 bytes) for: "Let's keep the body nice and straight"
+2026-02-08 12:28:20,495 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:28:24,212 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:28:24,236 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:28:29,249 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:28:29,288 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:28:34,135 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:28:34,162 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:28:40,719 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:28:40,754 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:28:44,854 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:28:44,881 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:28:48,255 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:28:48,280 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:28:58,696 [INFO] [5b896729] Resetting rep counter
+2026-02-08 12:28:58,996 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:28:59,011 [INFO] TTS generated (21777 bytes) for: "Set 3  let's go!"
+2026-02-08 12:28:59,052 [INFO] TTS cache hit for: "Set 3  let's go!"
+2026-02-08 12:29:52,235 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:29:52,277 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:29:55,662 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:29:55,687 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:29:58,982 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:29:59,011 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:30:03,472 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:03,494 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:08,480 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:08,518 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:12,281 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:12,304 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:18,614 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:30:18,627 [INFO] TTS generated (25539 bytes) for: 'Try dropping the hips a bit'
+2026-02-08 12:30:18,659 [INFO] TTS cache hit for: 'Try dropping the hips a bit'
+2026-02-08 12:30:23,367 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:23,391 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:26,536 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:26,561 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:33,309 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:33,349 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:37,176 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:37,206 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:41,479 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:41,511 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:30:45,812 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:45,840 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:30:57,142 [INFO] TTS cache hit for: 'Try dropping the hips a bit'
+2026-02-08 12:30:57,179 [INFO] TTS cache hit for: 'Try dropping the hips a bit'
+2026-02-08 12:31:01,436 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:31:01,463 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:31:04,500 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:31:04,530 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:31:07,820 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:31:07,846 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:31:19,523 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:31:25,909 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:31:25,910 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:31:25,910 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:32:01,656 [INFO] [5a2dc413] WebSocket connection established (3 active, exercise=pushup)
+2026-02-08 12:32:06,762 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:32:06,805 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:32:09,835 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:32:09,864 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:32:14,151 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:32:14,181 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:32:17,644 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:32:17,676 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:32:20,818 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:32:20,852 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:32:24,523 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:32:24,550 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:32:29,654 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:32:29,701 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:32:33,672 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 12:32:33,689 [INFO] TTS generated (27211 bytes) for: 'Amazing work today, well done!'
+2026-02-08 12:32:33,717 [INFO] TTS cache hit for: 'Amazing work today, well done!'
+2026-02-08 12:32:41,619 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:32:49,206 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:32:49,207 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:32:49,207 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:33:12,913 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:33:16,655 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:33:16,656 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:33:16,656 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:35:16,264 [INFO] [a9127230] WebSocket connection established (4 active, exercise=pushup)
+2026-02-08 12:35:21,281 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:35:21,326 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:35:24,512 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:35:24,539 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:35:29,309 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:35:29,337 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:35:34,749 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:35:34,794 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:35:38,575 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:35:38,607 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:35:46,281 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:35:52,605 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:35:52,606 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:35:52,606 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:36:26,616 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:36:32,133 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:36:32,134 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:36:32,134 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:36:50,697 [INFO] [fcaed53c] WebSocket connection established (5 active, exercise=squat)
+2026-02-08 12:36:55,807 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:36:55,844 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:37:00,122 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:37:00,158 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:37:04,154 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 12:37:04,192 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 12:37:07,428 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:37:07,463 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:37:16,730 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:37:16,770 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:37:21,708 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:37:21,736 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:37:25,425 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:37:31,361 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:37:31,362 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:37:31,362 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:39:51,785 [INFO] [4972ab07] Client disconnected normally
+2026-02-08 12:39:51,788 [INFO] [4972ab07] Connection cleaned up (4 active)
+2026-02-08 12:39:51,794 [INFO] [5b896729] Client disconnected normally
+2026-02-08 12:39:51,794 [INFO] [5b896729] Connection cleaned up (3 active)
+2026-02-08 12:39:51,794 [INFO] [5a2dc413] Client disconnected normally
+2026-02-08 12:39:51,794 [INFO] [5a2dc413] Connection cleaned up (2 active)
+2026-02-08 12:39:51,794 [INFO] [a9127230] Client disconnected normally
+2026-02-08 12:39:51,794 [INFO] [a9127230] Connection cleaned up (1 active)
+2026-02-08 12:39:51,794 [INFO] [fcaed53c] Client disconnected normally
+2026-02-08 12:39:51,794 [INFO] [fcaed53c] Connection cleaned up (0 active)
+2026-02-08 12:40:36,067 [INFO] [2cc9ef89] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 12:40:36,130 [INFO] [10e32b49] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 12:40:36,178 [INFO] [a8f60c12] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 12:40:36,224 [INFO] [44a4e3ed] WebSocket connection established (4 active, exercise=squat)
+2026-02-08 12:40:36,268 [INFO] [7bed0830] WebSocket connection established (5 active, exercise=pushup)
+2026-02-08 12:41:21,826 [INFO] [2cc9ef89] Client disconnected normally
+2026-02-08 12:41:21,826 [INFO] [2cc9ef89] Connection cleaned up (4 active)
+2026-02-08 12:41:21,826 [INFO] [10e32b49] Client disconnected normally
+2026-02-08 12:41:21,826 [INFO] [10e32b49] Connection cleaned up (3 active)
+2026-02-08 12:41:21,829 [INFO] [a8f60c12] Client disconnected normally
+2026-02-08 12:41:21,829 [INFO] [a8f60c12] Connection cleaned up (2 active)
+2026-02-08 12:41:21,829 [INFO] [44a4e3ed] Client disconnected normally
+2026-02-08 12:41:21,829 [INFO] [44a4e3ed] Connection cleaned up (1 active)
+2026-02-08 12:41:21,829 [INFO] [7bed0830] Client disconnected normally
+2026-02-08 12:41:21,829 [INFO] [7bed0830] Connection cleaned up (0 active)
+2026-02-08 12:41:24,962 [INFO] [13facc67] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 12:41:25,009 [INFO] [c41e4753] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 12:41:25,052 [INFO] [6497ce8e] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 12:41:25,096 [INFO] [3c4c25f0] WebSocket connection established (4 active, exercise=squat)
+2026-02-08 12:41:25,139 [INFO] [b3915103] WebSocket connection established (5 active, exercise=pushup)
+2026-02-08 12:41:30,530 [INFO] [13facc67] Client disconnected normally
+2026-02-08 12:41:30,530 [INFO] [13facc67] Connection cleaned up (4 active)
+2026-02-08 12:41:30,531 [INFO] [c41e4753] Client disconnected normally
+2026-02-08 12:41:30,532 [INFO] [c41e4753] Connection cleaned up (3 active)
+2026-02-08 12:41:30,532 [INFO] [6497ce8e] Client disconnected normally
+2026-02-08 12:41:30,532 [INFO] [6497ce8e] Connection cleaned up (2 active)
+2026-02-08 12:41:30,532 [INFO] [3c4c25f0] Client disconnected normally
+2026-02-08 12:41:30,532 [INFO] [3c4c25f0] Connection cleaned up (1 active)
+2026-02-08 12:41:30,532 [INFO] [b3915103] Client disconnected normally
+2026-02-08 12:41:30,532 [INFO] [b3915103] Connection cleaned up (0 active)
+2026-02-08 12:48:07,240 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 12:48:07,244 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:48:07,244 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:48:07,244 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:48:07,245 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:48:07,245 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:48:07,291 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:48:07,292 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:48:07,292 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:48:07,292 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,297 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 12:48:07,304 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:48:07,305 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:48:07,306 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,312 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,314 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,314 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,316 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,322 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,328 [INFO] TTS cache hit for: "Set 2  let's go!"
+2026-02-08 12:48:07,329 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:48:07,337 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,342 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,359 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,359 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,359 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,369 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,370 [INFO] TTS cache hit for: "Set 3  let's go!"
+2026-02-08 12:48:07,382 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:48:07,413 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,455 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,456 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:48:07,456 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,474 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,474 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,474 [INFO] TTS cache hit for: 'Try dropping the hips a bit'
+2026-02-08 12:48:07,486 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,487 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,551 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,552 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,552 [INFO] TTS cache hit for: 'Try dropping the hips a bit'
+2026-02-08 12:48:07,567 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,569 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,590 [INFO] TTS cache hit for: "Let's keep the body nice and straight"
+2026-02-08 12:48:07,591 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,591 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:48:07,600 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,603 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:48:07,650 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,651 [INFO] TTS cache hit for: 'Try to lower just a bit more'
+2026-02-08 12:48:07,653 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,667 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:48:07,667 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,667 [INFO] TTS cache hit for: 'Amazing work today, well done!'
+2026-02-08 12:48:07,722 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,723 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,723 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,734 [INFO] TTS cache hit for: 'Great depth, push it up!'
+2026-02-08 12:48:07,738 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:48:07,768 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 12:48:07,768 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:48:07,768 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:48:07,779 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 12:48:07,807 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:48:07,900 [INFO] [aed26a68] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 12:48:07,973 [INFO] [e5952c7e] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 12:48:08,019 [INFO] [958318b4] WebSocket connection established (3 active, exercise=pushup)
+2026-02-08 12:48:08,982 [INFO] [ebeba9f9] WebSocket connection established (4 active, exercise=pushup)
+2026-02-08 12:48:09,033 [INFO] [ac766161] WebSocket connection established (5 active, exercise=squat)
+2026-02-08 12:51:25,694 [INFO] [590cadc6] WebSocket connection established (6 active, exercise=squat)
+2026-02-08 12:51:30,896 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 12:51:34,586 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 12:51:40,376 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 12:52:03,932 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:52:10,220 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:52:10,223 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:52:10,223 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:53:19,372 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 12:53:23,204 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 12:53:23,207 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 12:53:23,207 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:04:49,890 [INFO] [5ad97af4] WebSocket connection established (7 active, exercise=squat)
+2026-02-08 13:04:55,272 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:05:21,395 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:05:27,096 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:05:27,096 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:05:27,097 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:06:52,625 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:06:56,047 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:06:56,048 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:06:56,049 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:11:56,604 [INFO] [aed26a68] Client disconnected normally
+2026-02-08 13:11:56,606 [INFO] [aed26a68] Connection cleaned up (6 active)
+2026-02-08 13:11:56,607 [INFO] [e5952c7e] Client disconnected normally
+2026-02-08 13:11:56,607 [INFO] [e5952c7e] Connection cleaned up (5 active)
+2026-02-08 13:11:56,615 [INFO] [958318b4] Client disconnected normally
+2026-02-08 13:11:56,615 [INFO] [958318b4] Connection cleaned up (4 active)
+2026-02-08 13:11:56,615 [INFO] [ac766161] Client disconnected normally
+2026-02-08 13:11:56,616 [INFO] [ac766161] Connection cleaned up (3 active)
+2026-02-08 13:11:56,616 [INFO] [ebeba9f9] Client disconnected normally
+2026-02-08 13:11:56,616 [INFO] [ebeba9f9] Connection cleaned up (2 active)
+2026-02-08 13:12:16,070 [INFO] [590cadc6] Client disconnected normally
+2026-02-08 13:12:16,073 [INFO] [590cadc6] Connection cleaned up (1 active)
+2026-02-08 13:12:16,073 [INFO] [5ad97af4] Client disconnected normally
+2026-02-08 13:12:16,073 [INFO] [5ad97af4] Connection cleaned up (0 active)
+2026-02-08 13:12:16,939 [INFO] [d8765f7e] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 13:12:16,989 [INFO] [e2e720e4] WebSocket connection established (2 active, exercise=pushup)
+2026-02-08 13:12:17,032 [INFO] [2276cf1e] WebSocket connection established (3 active, exercise=pushup)
+2026-02-08 13:12:17,079 [INFO] [e9906b9a] WebSocket connection established (4 active, exercise=pushup)
+2026-02-08 13:12:17,127 [INFO] [31023faa] WebSocket connection established (5 active, exercise=squat)
+2026-02-08 13:12:19,956 [INFO] [31023faa] Client disconnected normally
+2026-02-08 13:12:19,956 [INFO] [31023faa] Connection cleaned up (4 active)
+2026-02-08 13:12:19,959 [INFO] [e9906b9a] Client disconnected normally
+2026-02-08 13:12:19,959 [INFO] [e9906b9a] Connection cleaned up (3 active)
+2026-02-08 13:12:19,959 [INFO] [2276cf1e] Client disconnected normally
+2026-02-08 13:12:19,959 [INFO] [2276cf1e] Connection cleaned up (2 active)
+2026-02-08 13:12:19,959 [INFO] [e2e720e4] Client disconnected normally
+2026-02-08 13:12:19,959 [INFO] [e2e720e4] Connection cleaned up (1 active)
+2026-02-08 13:12:19,959 [INFO] [d8765f7e] Client disconnected normally
+2026-02-08 13:12:19,959 [INFO] [d8765f7e] Connection cleaned up (0 active)
+2026-02-08 13:13:36,898 [INFO] [c1f9f784] WebSocket connection established (1 active, exercise=pushup)
+2026-02-08 13:13:47,102 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:13:47,152 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:13:51,787 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 13:13:51,843 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 13:13:53,617 [INFO] [c1f9f784] Client disconnected normally
+2026-02-08 13:13:53,617 [INFO] [c1f9f784] Connection cleaned up (0 active)
+2026-02-08 13:14:10,963 [INFO] [160ec4ff] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 13:14:16,059 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:14:16,097 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:14:20,542 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:14:20,594 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:14:34,991 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 13:14:35,045 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 13:14:51,186 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:14:51,238 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:15:06,778 [INFO] [160ec4ff] Client disconnected normally
+2026-02-08 13:15:06,778 [INFO] [160ec4ff] Connection cleaned up (0 active)
+2026-02-08 13:15:49,510 [INFO] [cbc11f31] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 13:15:54,526 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:15:54,588 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:15:57,870 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 13:15:57,911 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 13:16:01,118 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:16:01,159 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:16:04,411 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 13:16:04,454 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 13:16:08,521 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 13:16:08,562 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 13:16:11,662 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:16:11,706 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:16:27,394 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 13:16:27,448 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 13:16:30,583 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:16:37,523 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:16:37,525 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:16:37,525 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:17:13,788 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:17:17,156 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:17:17,157 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:17:17,157 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:17:29,490 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:17:33,638 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:17:33,639 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:17:33,639 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:29:42,160 [INFO] [7ba39354] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 13:29:47,339 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:29:47,391 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:29:50,425 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:29:50,453 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:29:54,361 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 13:29:54,392 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 13:29:59,059 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:29:59,090 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:30:34,979 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:30:41,695 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:30:41,696 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:30:41,696 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:33:12,302 [INFO] [cbc11f31] Client disconnected normally
+2026-02-08 13:33:12,303 [INFO] [cbc11f31] Connection cleaned up (1 active)
+2026-02-08 13:36:19,538 [INFO] [8199aa1d] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 13:46:00,474 [INFO] [e0154d41] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 13:46:05,489 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:46:05,531 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:46:08,637 [INFO] [e0154d41] Client disconnected normally
+2026-02-08 13:46:08,638 [INFO] [e0154d41] Connection cleaned up (2 active)
+2026-02-08 13:46:16,549 [INFO] [ffac1c53] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 13:46:21,548 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:46:21,590 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:46:25,987 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 13:46:26,005 [INFO] TTS generated (20942 bytes) for: 'Try sitting back a bit'
+2026-02-08 13:46:26,040 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 13:46:30,224 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:46:30,286 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:46:34,182 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 13:46:34,232 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 13:46:37,923 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:46:37,978 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 13:46:42,425 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 13:46:42,475 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 13:46:46,162 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 13:46:46,223 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 13:46:49,405 [INFO] TTS cache hit for: 'Amazing work today, well done!'
+2026-02-08 13:46:49,434 [INFO] TTS cache hit for: 'Amazing work today, well done!'
+2026-02-08 13:46:57,161 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 13:47:03,909 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 13:47:03,912 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:47:03,912 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 13:50:57,147 [INFO] [ffac1c53] Client disconnected normally
+2026-02-08 13:50:57,150 [INFO] [ffac1c53] Connection cleaned up (2 active)
+2026-02-08 13:50:57,155 [INFO] [8199aa1d] Client disconnected normally
+2026-02-08 13:50:57,155 [INFO] [8199aa1d] Connection cleaned up (1 active)
+2026-02-08 13:51:01,194 [INFO] [a10d6fdb] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 13:51:01,265 [INFO] [39bd7dcc] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 13:52:04,863 [INFO] [27d9e3f8] WebSocket connection established (4 active, exercise=pushup)
+2026-02-08 13:52:14,074 [INFO] [27d9e3f8] Client disconnected normally
+2026-02-08 13:52:14,075 [INFO] [27d9e3f8] Connection cleaned up (3 active)
+2026-02-08 13:53:11,978 [INFO] [a10d6fdb] Client disconnected normally
+2026-02-08 13:53:11,979 [INFO] [a10d6fdb] Connection cleaned up (2 active)
+2026-02-08 13:53:11,979 [INFO] [39bd7dcc] Client disconnected normally
+2026-02-08 13:53:11,979 [INFO] [39bd7dcc] Connection cleaned up (1 active)
+2026-02-08 13:54:54,568 [INFO] [d58a413e] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 13:54:54,635 [INFO] [050000f8] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 13:55:01,658 [INFO] [d58a413e] Client disconnected normally
+2026-02-08 13:55:01,658 [INFO] [d58a413e] Connection cleaned up (2 active)
+2026-02-08 13:55:01,658 [INFO] [050000f8] Client disconnected normally
+2026-02-08 13:55:01,658 [INFO] [050000f8] Connection cleaned up (1 active)
+2026-02-08 13:55:10,653 [INFO] [c99fda06] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 13:55:20,815 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:55:20,978 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 13:55:23,476 [INFO] [c99fda06] Client disconnected normally
+2026-02-08 13:55:23,476 [INFO] [c99fda06] Connection cleaned up (1 active)
+2026-02-08 14:03:25,394 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,398 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:03:25,398 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:03:25,399 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 14:03:25,428 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,429 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,429 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 14:03:25,430 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 14:03:25,445 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,446 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 14:03:25,447 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 14:03:25,447 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,460 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 14:03:25,470 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:03:25,471 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 14:03:25,472 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,472 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:03:25,473 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 14:03:25,482 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:03:25,483 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 14:03:25,484 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 14:03:25,497 [INFO] TTS cache hit for: 'Amazing work today, well done!'
+2026-02-08 14:03:26,296 [INFO] [09e14ea5] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 14:03:26,340 [INFO] [e47ae42e] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 14:03:56,634 [INFO] [09e14ea5] Client disconnected normally
+2026-02-08 14:03:56,634 [INFO] [09e14ea5] Connection cleaned up (2 active)
+2026-02-08 14:03:56,638 [INFO] [e47ae42e] Client disconnected normally
+2026-02-08 14:03:56,638 [INFO] [e47ae42e] Connection cleaned up (1 active)
+2026-02-08 14:07:24,138 [INFO] [0e139c76] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 14:07:29,221 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:07:29,308 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:07:33,210 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:07:33,251 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:07:37,049 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 14:07:37,089 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 14:07:43,151 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:07:43,202 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:08:37,150 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 14:08:43,617 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 14:08:43,620 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 14:08:43,620 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 14:08:59,918 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:08:59,919 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 14:08:59,920 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,031 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 14:09:00,035 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,036 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 14:09:00,046 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:09:00,046 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,056 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,057 [INFO] TTS cache hit for: 'Close! Focus on form for the next rep.'
+2026-02-08 14:09:00,057 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 14:09:00,065 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,065 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 14:09:00,075 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:09:00,076 [INFO] TTS cache hit for: "Let's go, you got this!"
+2026-02-08 14:09:00,077 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 14:09:00,089 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 14:09:00,090 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 14:09:00,093 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,094 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 14:09:00,094 [INFO] TTS cache hit for: 'Amazing work today, well done!'
+2026-02-08 14:09:00,101 [INFO] TTS cache hit for: "Let's go a bit deeper"
+2026-02-08 14:09:00,898 [INFO] [5659f934] WebSocket connection established (3 active, exercise=squat)
+2026-02-08 14:09:00,968 [INFO] [636456e8] WebSocket connection established (4 active, exercise=squat)
+2026-02-08 14:10:45,784 [INFO] [5659f934] Client disconnected normally
+2026-02-08 14:10:45,784 [INFO] [5659f934] Connection cleaned up (3 active)
+2026-02-08 14:10:45,785 [INFO] [636456e8] Client disconnected normally
+2026-02-08 14:10:45,785 [INFO] [636456e8] Connection cleaned up (2 active)
+2026-02-08 14:11:56,851 [INFO] [7ba39354] Client disconnected normally
+2026-02-08 14:11:56,853 [INFO] [7ba39354] Connection cleaned up (1 active)
+2026-02-08 14:11:56,856 [INFO] [0e139c76] Client disconnected normally
+2026-02-08 14:11:56,856 [INFO] [0e139c76] Connection cleaned up (0 active)
+2026-02-08 14:11:58,489 [INFO] [41c451dc] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 14:11:58,560 [INFO] [0800bd68] WebSocket connection established (2 active, exercise=squat)
+2026-02-08 14:12:01,263 [INFO] [41c451dc] Client disconnected normally
+2026-02-08 14:12:01,263 [INFO] [41c451dc] Connection cleaned up (1 active)
+2026-02-08 14:12:01,263 [INFO] [0800bd68] Client disconnected normally
+2026-02-08 14:12:01,264 [INFO] [0800bd68] Connection cleaned up (0 active)
+2026-02-08 21:39:01,224 [INFO] [85dda5d6] WebSocket connection established (1 active, exercise=squat)
+2026-02-08 21:39:07,136 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:39:07,141 [INFO] TTS generated (24285 bytes) for: "Let's go, you got this!"
+2026-02-08 21:39:10,820 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:39:10,823 [INFO] TTS generated (22613 bytes) for: 'Great depth, drive it up!'
+2026-02-08 21:39:15,092 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:39:15,098 [INFO] TTS generated (21777 bytes) for: 'Nice rep, keep it up!'
+2026-02-08 21:39:18,415 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 21:39:24,246 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:39:24,279 [INFO] TTS generated (23449 bytes) for: 'Try sitting back a bit'
+2026-02-08 21:39:27,942 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 21:39:35,199 [INFO] TTS cache hit for: 'Try sitting back a bit'
+2026-02-08 21:39:39,327 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 21:39:44,040 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:39:44,049 [INFO] TTS generated (34316 bytes) for: 'Close! Focus on form for the next rep.'
+2026-02-08 21:39:50,283 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 21:40:25,701 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 21:40:29,420 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:40:29,429 [INFO] TTS generated (20524 bytes) for: "Let's go a bit deeper"
+2026-02-08 21:40:32,221 [INFO] TTS cache hit for: 'Great depth, drive it up!'
+2026-02-08 21:40:38,353 [INFO] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128 "HTTP/1.1 200 OK"
+2026-02-08 21:40:38,355 [INFO] TTS generated (14254 bytes) for: 'Good rep!'
+2026-02-08 21:40:41,749 [INFO] TTS cache hit for: 'Nice rep, keep it up!'
+2026-02-08 21:40:45,344 [INFO] TTS cache hit for: 'Good rep!'
+2026-02-08 21:41:01,203 [INFO] AFC is enabled with max remote calls: 10.
+2026-02-08 21:41:08,099 [INFO] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-02-08 21:41:08,101 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 21:41:08,101 [WARNING] Warning: there are non-text parts in the response: ['thought_signature'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+2026-02-08 21:48:16,128 [INFO] [85dda5d6] Client disconnected normally
+2026-02-08 21:48:16,131 [INFO] [85dda5d6] Connection cleaned up (0 active)

@@ -12,7 +12,7 @@ import { useOrientation } from '../hooks/useOrientation';
 import { useTheme } from '../hooks/useTheme';
 
 // ─── Configuration ───────────────────────────────────────
-const SERVER_BASE = 'ws://10.194.82.50:8000/ws/video';
+const SERVER_BASE = 'ws://11.35.7.230:8000/ws/video';
 
 export default function FormCheckScreen() {
     const router = useRouter();
